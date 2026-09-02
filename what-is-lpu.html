@@ -256,15 +256,15 @@
 
   <div class="statgrid">
     <div class="stat"><div class="v">19 × 2</div><div class="k">左右成對的 neuropil，各算一個</div></div>
-    <div class="stat"><div class="v">＋ 3</div><div class="k">中央不成對：PCB、FB、EB</div></div>
+    <div class="stat"><div class="v">＋ 3</div><div class="k">中央不成對：PCB、FB、EB<br><span style="color:var(--red)">（EB 這一個有問題，見下方坑三）</span></div></div>
     <div class="stat"><div class="v">＝ 41</div><div class="k">個 LPU</div></div>
   </div>
 
-  <p>另外約 26% 的已建圖神經元屬於 LPU 的在地神經元。剩下的區域則歸為 hub。論文說，LPU 加 hub 合起來填滿了大部分的腦（圖 5D）。</p>
+  <p>另外約 26% 的已建圖神經元屬於 LPU 的在地神經元。另有幾個缺乏分離 LN 族群、但有長程神經束的區域，被歸為 hub。論文說，LPU 加 hub 合起來填滿了大部分的腦（圖 5D）。</p>
 
   <div class="danger">
-    <b>但「LPU 的數量 ＋ hub 的數量」並不等於 neuropil 的數量。</b>
-    <p style="margin-top:8px">論文建連線矩陣時用的是 <b>58 個 neuropil</b>，判定出來的是 <b>41 個 LPU</b>，hub 的數量則有三個互相矛盾的說法（見下）。論文只說「多數 LPU 與看得見的 neuropil 重合」，<b>沒有提供一份把 58 個 neuropil 逐一歸到 LPU 或 hub 的對照，也沒有說明差額。</b>加上前一節那兩個「多個 neuropil 併成一個 LPU」的例子，這兩套數字本來就不是一對一的關係。</p>
+    <b>這 41 個 LPU 與那 58 個 neuropil 不是同一套東西。</b>
+    <p style="margin-top:8px">論文建連線矩陣時用的是 <b>58 個 neuropil</b>，判定出來的是 <b>41 個 LPU</b>；而前一節那兩個「多個 neuropil 併成一個 LPU」的例子已經說明，兩者不可能一對一。論文只說「多數 LPU 與看得見的 neuropil 重合」，<b>沒有提供一份把 58 個 neuropil 逐一歸到 LPU 或 hub 的對照表</b>——所以你沒辦法從一套換算到另一套。想重現這套分區時，這件事會直接卡住。</p>
   </div>
 
   <h3>這裡本來應該放一張全腦 41 個 LPU 的圖</h3>
@@ -288,9 +288,9 @@
 
   <h3>還有三個數字上的坑</h3>
 
-  <p><b>坑一：41 還是 43，沒有人裁決過。</b>後續由部分同一批作者發表的資訊流分析論文，引用時寫的是 43 個 LPU，Chiang 2011 自己寫 41。兩篇作者群高度重疊，卻沒有交代這個改動是怎麼來的。引用時要標清楚你用的是哪一篇的數字。</p>
+  <p><b>坑一：41 還是 43，沒有人裁決過。</b>2015 年由部分同一批作者發表的資訊流分析論文寫道：「我們先前提出了一個不同於傳統解剖學的判準來把腦分成數個功能單元，<b>包括 43 個在地處理單元（LPU）與六個中介單元</b>」——而它引用的正是 Chiang 2011，該文自己寫的是 <b>41</b>。那篇的補充圖 S1 標題也寫「標準腦包含 43 個 LPU 與六個 hub」，網路分析用的是 43 ＋ 6 ＝ 49 個節點。<b>兩篇作者群高度重疊，卻沒有任何一處交代這個改動是怎麼來的。</b>引用時要標清楚你用的是哪一篇的數字。</p>
 
-  <p><b>坑二：hub 有幾個，論文自己給了三個答案。</b>摘要寫「六個 hub」；正文寫「只有四對 neuropil 缺乏分離的 LN 族群：OPTU、Nod、OG、IDLP」；而圖 5A 那張正負號表上，標記為「−」的共有<b>九個</b>——Cal、EB、FSPP、IDLP、Lat Tri、MB、Nod、OG、OPTU（本頁直接判讀原圖數過）。三處三個數。<b>比較安全的寫法是「41 個 LPU，加上數個缺乏在地神經元的 hub」，避開這個數字。</b></p>
+  <p><b>坑二：hub 有幾個，論文自己給了三個答案。</b>摘要寫「六個 hub」；正文寫「只有四對 neuropil 缺乏分離的 LN 族群：OPTU、Nod、OG、IDLP」；而圖 5A 那張正負號表上，標記為「−」的共有<b>九個</b>——Cal、EB、FSPP、IDLP、Lat Tri、MB、Nod、OG、OPTU（本頁直接判讀原圖數過）。三處三個數。（坑一那篇 2015 年的論文採用的是摘要的「六個」。）<b>比較安全的寫法是「41 個 LPU，加上數個缺乏在地神經元的 hub」，避開這個數字。</b></p>
 
   <p><b>坑三：橢球體（EB）在正文與圖 5A 裡的身分不一樣。</b>正文把 EB 列為三個中央不成對 LPU 之一（另兩個是 PCB、FB），但圖 5A 給 EB 的標記是「<b>−</b>」，也就是「沒有自己的 LN 族群」；表上得到「＋」的是合併後的 <b>Lat Tri＋EB</b>。換句話說，同一篇論文的正文與圖，對 EB 到底算不算一個獨立的 LPU 給了不同的答案。<b>論文沒有說明這個差異。</b></p>
 
