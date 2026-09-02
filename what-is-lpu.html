@@ -16,103 +16,232 @@
 
 <div class="wrap">
 
-  <div class="draft"><b>本頁為大綱骨架。</b>下列章節的標題與順序是提案，內文待討論後填入。每個 <span class="todo" style="display:inline;padding:1px 6px">虛線框</span> 代表一段還沒寫的內容，框內列的是打算涵蓋的重點。</div>
-
   <nav class="toc">
     <h2>本頁章節</h2>
     <ol>
-      <li><a href="#s1">1. 先問一個笨問題：腦要怎麼切？</a></li>
-      <li><a href="#s2">2. 靈感來源：嗅覺觸角葉的 LN</a></li>
-      <li><a href="#s3">3. LPU 的正式定義：兩個條件</a></li>
-      <li><a href="#s4">4. LPU、neuropil、hub 三者的差別</a></li>
-      <li><a href="#s5">5. 全腦盤點：41 個 LPU 與 4 對例外</a></li>
-      <li><a href="#s6">6. 有了 LPU 之後：功能模組與連線圖</a></li>
-      <li><a href="#s7">7. 這個定義的限制與後續爭議</a></li>
+      <li><a href="#s1">一顆蕈狀體，是四塊還是一塊？</a></li>
+      <li><a href="#s2">這不是名詞問題，是你的分析結果會不會變</a></li>
+      <li><a href="#s3">先認四個字</a></li>
+      <li><a href="#s4">LPU 的定義：兩個條件</a></li>
+      <li><a href="#s5">LPU、neuropil、hub 差在哪</a></li>
+      <li><a href="#s6">全腦盤點：41 是怎麼算出來的</a></li>
+      <li><a href="#s7">所以它為什麼重要</a></li>
+      <li><a href="#s8">這個定義的限制</a></li>
     </ol>
   </nav>
 
-  <h2 id="s1"><span class="pt">1</span>先問一個笨問題：腦要怎麼切？</h2>
-  <div class="todo">
-    <b>要寫的重點</b>
-    <ul>
-      <li>傳統 neuropil（神經髓質區）的邊界來自染色後看得見的形態界線——是「解剖學家的眼睛」畫出來的。</li>
-      <li>形態上是一塊，功能上不見得是一個處理單元；反過來也成立。</li>
-      <li>做網路分析時，節點怎麼定義會直接改變結論（節點錯了，連線矩陣、模組、hub 全部跟著錯）。</li>
-      <li>所以需要一個<b>不依賴肉眼、可以計算</b>的劃分準則。</li>
-    </ul>
+  <h2 id="s1"><span class="pt">1</span>一顆蕈狀體，是四塊還是一塊？</h2>
+
+  <figure class="fig">
+    <img src="assets/fig1-mb-four-vs-one.png" alt="果蠅腦正視圖兩張並排。左圖的蕈狀體以四種顏色標示不同部分，右圖同一個蕈狀體只用單一顏色。">
+    <div class="panlab">
+      <div><b>左：解剖學看到的。</b>蕈狀體被切成四個有名字的區域。</div>
+      <div><b>右：用 LPU 的判準看到的。</b>同一個結構，一整塊。</div>
+    </div>
+    <figcaption>
+      <ul class="key">
+        <li><i style="background:#2563eb"></i>萼 MB_CA</li>
+        <li><i style="background:#9333ea"></i>柄 MB_PED</li>
+        <li><i style="background:#d97706"></i>垂直葉 MB_VL</li>
+        <li><i style="background:#16a34a"></i>水平葉 MB_ML</li>
+        <li><i style="background:#dfe4ea"></i>其餘腦區（淡灰剪影）</li>
+      </ul>
+      <span class="figsrc">本圖由 <code>scripts/make_figures.py</code> 從標準腦分區檔算出。模板 FCWB（Ostrovsky &amp; Jefferis 2014，CC0）；分區 FCWBNP（natverse，GPL-3；分區出自 Ito et al. 2014, <i>Neuron</i> 81:755–765）。</span>
+    </figcaption>
+  </figure>
+
+  <p>兩張圖是同一顆腦、同一個結構。差別只在於<b>你拿什麼問題去問它</b>。</p>
+
+  <p>左邊那張是解剖學家的答案。他們把腦切片、染色，看得見的界線畫下來，於是蕈狀體有了四個部分：萼、柄、垂直葉、水平葉。這是可靠的觀察，四個部分確實長得不一樣。</p>
+
+  <p>右邊那張是 Chiang 等人在 2011 年提出的答案。他們問的不是「這裡看起來像幾塊」，而是<b>「這裡有沒有一群只在這裡工作的神經元？」</b>——結果是：萼沒有自己的，葉也沒有自己的。整顆蕈狀體才有。所以按這個判準，它是<b>一個</b>單位，不是四個。</p>
+
+  <p>正視圖裡萼（藍）和柄（紫）被前面的葉擋掉大半。換個角度看，四個部分的關係會清楚很多：</p>
+
+  <figure class="fig narrow">
+    <img src="assets/fig1b-mb-sagittal.png" alt="右半腦矢狀視圖，蕈狀體的四個部分以不同顏色標示，可看出萼在後、柄向前延伸、垂直葉向上、水平葉在前。">
+    <figcaption><b>同一顆蕈狀體，從側面看（右半腦）。</b>畫面左方為前側、右方為後側、上方為背側。萼（藍）在最後方，柄（紫）由萼向前延伸，到前端分成向上的垂直葉（橘）與向內的水平葉（綠）。
+    <span class="figsrc">資料來源同上圖。</span></figcaption>
+  </figure>
+
+  <p>看清楚這個形狀之後，下一節的問題才有意義：如果你把這四個部分當成四個獨立的腦區來做分析，會發生什麼事？</p>
+
+  <h2 id="s2"><span class="pt">2</span>這不是名詞問題，是你的分析結果會不會變</h2>
+
+  <p>假設你手上有一批神經元的影像，你想問一個很自然的問題：<b>哪些腦區之間有連結？</b></p>
+
+  <p>做法很直觀——一顆神經元如果同時伸進 A 區和 B 區，就記 A 和 B 之間一筆連結。把所有神經元都這樣數過一遍，就得到一張全腦的連線表。</p>
+
+  <p>問題來了。這張表長什麼樣子，<b>完全取決於你事先怎麼劃 A 區和 B 區</b>，而劃分方式是你在數之前就決定的。</p>
+
+  <div class="callout">
+    <b>拿蕈狀體當例子。</b>蕈狀體裡有一種叫 Kenyon cell 的神經元，一顆大約有兩千五百個，它們的形狀都差不多：細胞本體在後上方，樹突長在萼裡，軸突穿過柄往前走，到前端分岔進入兩個葉。<b>一顆 Kenyon cell 同時經過萼、柄、垂直葉、水平葉。</b>
+    <p style="margin-top:8px">如果你把這四個部分當成四個腦區，那麼每一顆 Kenyon cell 都會替「萼—柄」「柄—葉」記上一筆連結。兩千五百顆下來，這幾條線會粗得嚇人，看起來像是全腦最強的連結之一。</p>
+    <p style="margin-top:8px"><b>但那不是兩個腦區在溝通，那是同一顆神經元的頭和尾。</b>你憑空製造出一條不存在的通路，而且它粗到會蓋掉真正的訊號。</p>
   </div>
 
-  <h2 id="s2"><span class="pt">2</span>靈感來源：嗅覺觸角葉的 LN</h2>
-  <div class="todo">
-    <b>要寫的重點</b>
-    <ul>
-      <li>觸角葉（AL）的 local neuron（AL-LN）是研究得最清楚的例子：一群神經元的纖維完全待在 AL 內部，彼此糾纏，負責區內的訊息整編。</li>
-      <li>論文的推廣：把 AL 的這個特徵當成「處理單元」的一般判準，去掃全腦其他區域——即使那些區域的功能還不清楚。</li>
-      <li>要解釋清楚 LN（local neuron，在地神經元）與 PN（projection neuron，投射神經元）的分工：LN 管區內、PN 管區間。</li>
-    </ul>
+  <p>反過來，如果劃得太粗也一樣有問題：把兩個其實各做各的區域合成一塊，它們之間真正的往來就被藏進「區內」，從連線表上消失了。</p>
+
+  <p>所以「腦區怎麼劃」不是一個命名習慣的問題，也不是可以之後再說的細節。<b>它是分析的第一步，而且錯了之後每一步都跟著錯。</b>這就是為什麼需要一個不靠肉眼、講得出理由、而且別人可以重跑一次的劃分方式。</p>
+
+  <p>LPU 就是這樣一個劃分方式。</p>
+
+  <h2 id="s3"><span class="pt">3</span>先認四個字</h2>
+
+  <p>接下來只會用到四個專有名詞，先花兩分鐘認一下。</p>
+
+  <div class="terms">
+    <div class="term"><div class="w">神經髓質區 <span class="en">neuropil</span></div>
+      <p>腦裡神經纖維密集交織、幾乎沒有細胞本體的區域。染色之後肉眼看得出界線，傳統的「腦區」指的就是它。<b>這是形態上的分區。</b></p></div>
+    <div class="term"><div class="w">在地神經元 <span class="en">LN，local neuron</span></div>
+      <p>纖維完全不離開某一個區域的神經元。它不負責把訊息送出去，只在區內把訊息整編一遍。<b>LPU 的判準完全建立在它身上。</b></p></div>
+    <div class="term"><div class="w">投射神經元 <span class="en">PN，projection neuron</span></div>
+      <p>纖維跨出所在區域、伸向別區的神經元。區與區之間的訊息往來靠它。<b>LN 管區內，PN 管區間。</b></p></div>
+    <div class="term"><div class="w">神經束 <span class="en">tract</span></div>
+      <p>一群走同一條路徑的神經纖維綁在一起形成的束。可以想成腦裡的幹道。論文規定一條神經束至少由三條神經纖維組成。</p></div>
   </div>
 
-  <h2 id="s3"><span class="pt">3</span>LPU 的正式定義：兩個條件</h2>
-  <blockquote>
-    LPU 是一個腦區，它擁有<b>自己的一群 LN</b>，這群 LN 的神經纖維<b>完全侷限在該區域內</b>；且該區域<b>至少被一條長程神經束連上</b>。
-  </blockquote>
-  <div class="todo">
-    <b>要寫的重點</b>
-    <ul>
-      <li>條件一（自有 LN 族群）＝ 這裡有在地的運算；條件二（至少一條 tract）＝ 這裡跟外界有明確的輸出入。兩者缺一不可，要說清楚為什麼。</li>
-      <li>預設前提：LPU 的範圍<b>等於或小於</b>一個解剖學 neuropil 的邊界——所以流程是「在 neuropil 內部找有沒有需要再細分」，不是重新畫整顆腦。</li>
-      <li>VLP（腹外側前腦）的實例：三條證據支持它該切成背側／腹側兩個 LPU——(1) 各有自己的 LN 且細胞本體位置分開，(2) 兩群 LN 的纖維在空間上分離，(3) 各有自己特徵性的長程神經束、連的對象不同。</li>
-      <li>提醒讀者：這是<b>操作型定義</b>（operational definition），不是生理學上「處理單元」的證明。</li>
-    </ul>
-  </div>
+  <h3>還有一件會讓人卡住的事：腦區的名字換過一輪</h3>
 
-  <h2 id="s4"><span class="pt">4</span>LPU、neuropil、hub 三者的差別</h2>
+  <p>Chiang 等人在 2011 年用的腦區名字，和今天大多數工具、資料庫用的名字<b>不是同一套</b>。2014 年一個由十七位研究者組成的工作小組發表了一套系統性命名法（Ito et al., <i>Neuron</i> 81:755–765），把整個昆蟲腦的名字重新整理過。本頁的圖用的是新名字，論文的文字用的是舊名字。</p>
+
+  <p>把 Chiang 論文列出的 29 個舊名字拿去對新的那一套，分成三類：</p>
+
   <div class="tblwrap"><table>
-    <tr><th>類別</th><th>自有 LN 族群</th><th>長程神經束</th><th>邊界怎麼來的</th></tr>
-    <tr><td><b>Neuropil</b>（神經髓質區）</td><td>不一定</td><td>不一定</td><td>染色後的形態界線，肉眼判定</td></tr>
-    <tr><td><b>LPU</b></td><td><b>有</b></td><td><b>有</b>（至少一條）</td><td>由 LN 纖維密度的等值面算出來</td></tr>
-    <tr><td><b>Hub</b></td><td><b>無</b></td><td><b>有</b></td><td>沿用 neuropil 邊界</td></tr>
+    <tr><th style="width:16%">類別</th><th style="width:14%">數量</th><th>例子</th></tr>
+    <tr><td><b>名字沒變</b></td><td>5 個</td><td>AL（觸角葉）、AMMC、EB（橢球體）、FB（扇形體）、LH（側角）</td></tr>
+    <tr><td><b>同一個東西，換了縮寫</b></td><td>10 個</td><td>Lat Tri（側三角）→ <b>BU</b>（bulb，論文明訂的新詞）；SOG（食道下神經節）→ <b>GNG／SEZ</b>；PCB → PB；Nod → NO；Lob → LO；Med → ME；Cal → MB_CA</td></tr>
+    <tr><td><b>找不到對應</b></td><td>14 個</td><td>VLP、IDLP、IDFP、SDFP、FSPP、CVLP、DLP、DMP、CCP、CMP、PAN、SPP、VMP、OG</td></tr>
   </table></div>
-  <div class="todo">
-    <b>要寫的重點</b>
-    <ul>
-      <li>hub 的物理意義：只轉接、不在地改寫——「輸入與輸出之間沒有進一步的編輯」。</li>
-      <li>把這張表講成一個判定流程圖（有 LN 嗎？→ 有 tract 嗎？），可能做成一張圖。</li>
-    </ul>
+
+  <div class="danger">
+    <b>第三類才是重點：那 14 個不是「改名」，是「重劃」。</b>舊名字裡一大片被統稱為「前腦」（protocerebrum）的區域，在新系統裡被拆開重組成 AVLP、PVLP、PLP、SLP、SIP、SMP、ICL、SCL、IB、ATL 等等。<b>邊界本身移動了，所以沒有一對一的對照表可以查。</b>看到兩篇論文講同一個地方卻用完全不同的字，多半就是卡在這裡。
   </div>
 
-  <h2 id="s5"><span class="pt">5</span>全腦盤點：41 個 LPU 與 4 對例外</h2>
-  <div class="todo">
-    <b>要寫的重點</b>
-    <ul>
-      <li>41 ＝ 19 對成對 neuropil ×2 ＋ 3 個中央不成對（PCB 前腦橋、FB 扇形體、EB 橢球體）。要把這個算式攤開講。</li>
-      <li>四對沒有分離 LN 族群的例外，被歸類為 hub：OPTU（視結節）、Nod（結節）、OG（視小球）、IDLP（內背外側前腦）。各自的理由不同——OPTU 是兩半腦之間的轉接站；Nod 與 OG 可能小到容不下額外的 LN；IDLP 形狀不規則、任何神經元的支配率都低於 30%，可能只是通道。</li>
-      <li>只有一個 neuropil（VLP）被切成兩個 LPU；蕈狀體（MB）反而是整顆算<b>一個</b> LPU——calyx 與 lobe 都沒有自己的 LN 族群。這兩個「反直覺」的案例最能說明定義的效果。</li>
-      <li>LPU ＋ hub 合起來幾乎填滿整顆腦（Figure 5D）。</li>
-      <li>論文自己承認的開放性：有些 LPU 可能還能再細分，就像 VLP 一樣。</li>
-    </ul>
+  <h2 id="s4"><span class="pt">4</span>LPU 的定義：兩個條件</h2>
+
+  <div class="defcard">
+    <h4>LOCAL PROCESSING UNIT（在地處理單元）</h4>
+    <p style="font-size:17px; line-height:1.8">一個腦區如果</p>
+    <p style="font-size:17px; line-height:1.8"><b>（一）</b>擁有<b>自己的一群在地神經元（LN）</b>，這群 LN 的纖維<b>完全侷限在該區域之內</b>；而且</p>
+    <p style="font-size:17px; line-height:1.8"><b>（二）</b>該區域<b>至少被一條神經束連上</b>，</p>
+    <p style="font-size:17px; line-height:1.8">它就是一個 LPU。</p>
   </div>
 
-  <h2 id="s6"><span class="pt">6</span>有了 LPU 之後：功能模組與連線圖</h2>
-  <div class="todo">
-    <b>要寫的重點</b>
-    <ul>
-      <li>把 LPU 當節點、神經元當邊，就能做圖論分析：先建 pairwise 連線矩陣（排除 LPU-LN），再做階層分群。</li>
-      <li>分出四個功能模組，每個模組的特徵：組內連線數高、直接連線頻繁、位置相鄰、跨模組連線稀疏。</li>
-      <li>58 條 tract 的三分類：commissural（連兩半腦的同名區）、decussate（連兩半腦的不同區）、association（連同半腦的兩區）。</li>
-      <li>往後接的線：資訊流分析、社群結構分析（本庫已收錄的 Shih 2015／2019）——它們全都以這 41 個 LPU 為節點。</li>
-    </ul>
+  <p>兩個條件各有各的道理，缺一不可。</p>
+
+  <p><b>條件一是「這裡有在地的運算」。</b>一群神經元的纖維完全不出這個區域，代表它們的工作就是把這一區收到的訊息整編一次。有這種居民，這裡才算一個處理的地方，而不只是訊息路過的走廊。</p>
+
+  <p><b>條件二是「這裡跟外界有明確的往來」。</b>一個完全封閉、不與外界交換訊息的區域，在全腦網路裡沒有位置。至少有一條神經束連上它，它才是網路裡的一個節點。</p>
+
+  <p>要注意這是一個<b>操作型定義</b>——它規定的是「怎麼判定」，不是證明了「這一區在生理上真的是一個運算單元」。判準給得很明確，因此可以重跑、可以被檢驗、也可以被推翻。這是它最有價值的地方，不是它一定對。</p>
+
+  <h3>三個反直覺的案例</h3>
+
+  <p>定義本身不難記，難的是它會給出跟直覺不一樣的答案。這三個案例最能說明它到底在做什麼：</p>
+
+  <div class="cases">
+    <div class="case">
+      <span class="badge one">四塊 → 一個</span>
+      <div class="bd"><b>蕈狀體（MB）：那麼大一塊，整顆算一個 LPU</b>
+      萼和葉都沒有自己的在地神經元族群，所以不能各自成為 LPU。加上組成蕈狀體的 Kenyon cell 在對外連結上的樣式高度相似，論文把整顆蕈狀體視為一個大的 LPU。</div>
+    </div>
+    <div class="case">
+      <span class="badge two">一塊 → 兩個</span>
+      <div class="bd"><b>腹外側前腦（VLP）：一個腦區切成兩個 LPU</b>
+      這是全篇唯一的例子。三條證據支持：背側與腹側各有自己的 LN 族群，而且細胞本體的位置是分開的；兩群 LN 的纖維在空間上彼此分離；兩者各有自己特徵性的神經束，連出去的對象不一樣。</div>
+    </div>
+    <div class="case">
+      <span class="badge hub">不是 LPU</span>
+      <div class="bd"><b>視結節（OPTU）等四對區域：有神經束，但沒有在地神經元</b>
+      它們通過不了條件一。論文另外給了一個名字叫 <b>hub</b>：只做轉接，不在地改寫。視結節上滿是連接左右腦的橫向纖維，像一座橋；另外兩個小到可能容不下額外的在地神經元。</div>
+    </div>
   </div>
 
-  <h2 id="s7"><span class="pt">7</span>這個定義的限制與後續爭議</h2>
-  <div class="todo">
-    <b>要寫的重點</b>
-    <ul>
-      <li>解析度限制：這是光學顯微鏡的中尺度圖譜，不是突觸級連結體。「有共同支配」不等於「有突觸」。</li>
-      <li>LPU 的邊界依賴 FlyCircuit 的取樣——沒有被標到 LN 的區域，就不會被判成 LPU。</li>
-      <li>個體差異：邊界是把多隻腦對位到標準腦之後的統計產物。</li>
-      <li>與後續 FlyWire／hemibrain 的突觸級分區如何對照，是可以帶到最後的開放問題。</li>
-    </ul>
+  <div class="note">
+    <b>順帶一提，「一群 LN」不是形態上的一類。</b>論文自己的補充圖顯示，光是觸角葉的 LN 就形態各異——有的支配幾乎全部的嗅小球，有的只管一個，有的纖維稀稀落落。把它們歸為同一群的理由不是長得像，而是<b>纖維都待在同一個區域裡不出去</b>。
+  </div>
+
+  <h2 id="s5"><span class="pt">5</span>LPU、neuropil、hub 差在哪</h2>
+
+  <div class="tblwrap"><table>
+    <tr><th>　</th><th>有自己的 LN 族群</th><th>有神經束連上</th><th>邊界怎麼來的</th></tr>
+    <tr><td><b>neuropil</b><br><span style="color:var(--faint);font-size:13px">神經髓質區</span></td><td>不一定</td><td>不一定</td><td>染色後的形態界線，肉眼判定</td></tr>
+    <tr><td><b>LPU</b><br><span style="color:var(--faint);font-size:13px">在地處理單元</span></td><td><b>有</b></td><td><b>有</b></td><td>由在地神經元的分布算出來</td></tr>
+    <tr><td><b>hub</b><br><span style="color:var(--faint);font-size:13px">轉接區</span></td><td><b>沒有</b></td><td><b>有</b></td><td>沿用 neuropil 的邊界</td></tr>
+  </table></div>
+
+  <p>三者的關係可以這樣讀：<b>neuropil 是問題，LPU 和 hub 是答案。</b>拿一個 neuropil 來，用兩個條件去問它——兩個都過，它是 LPU；只過第二個，它是 hub。</p>
+
+  <div class="callout">
+    <b>「hub」這個字有兩個意思，而且很容易混。</b>這裡的 hub 指的是「缺乏在地神經元的轉接區」，是一個解剖上的判定。但在網路分析的文獻裡，hub 通常指「連線數特別多的節點」，是一個拓撲上的判定。<b>兩者不是同一件事。</b>Chiang 論文自己也指出這是一個持續存在的混用風險。
+  </div>
+
+  <h2 id="s6"><span class="pt">6</span>全腦盤點：41 是怎麼算出來的</h2>
+
+  <p>把兩個條件套到全腦每一個 neuropil 上，論文得到 <b>41 個 LPU</b>。這個數字是這樣湊出來的：</p>
+
+  <div class="statgrid">
+    <div class="stat"><div class="v">19 × 2</div><div class="k">左右成對的 neuropil，各算一個</div></div>
+    <div class="stat"><div class="v">＋ 3</div><div class="k">中央不成對：PCB、FB、EB</div></div>
+    <div class="stat"><div class="v">＝ 41</div><div class="k">個 LPU</div></div>
+  </div>
+
+  <p>另外約 26% 的已建圖神經元屬於 LPU 的在地神經元。剩下的區域則歸為 hub。論文說，LPU 加 hub 合起來幾乎填滿整顆腦——沒有大片空白，代表這套劃分不是挑好做的地方做。</p>
+
+  <h3>這裡本來應該放一張全腦 41 個 LPU 的圖</h3>
+
+  <p>但那張圖只存在於論文裡，版權屬於出版社，不能放在這個公開網頁上。更根本的問題是：<b>LPU 的分區檔從來沒有公開發布過。</b>要有一張自己的 LPU 圖，就得把論文的劃分流程重跑一次——那正是 <a href="python-lpu.html">PART 3</a> 要做的事。</p>
+
+  <p>所以這裡先放一張<b>替身圖</b>。它不是 LPU，是今天通行的解剖學分區：</p>
+
+  <figure class="fig">
+    <img src="assets/fig2-neuropils-75.png" alt="果蠅腦正視圖，全腦依解剖學分區以多種顏色標示，左右對應的區域使用相同顏色。">
+    <figcaption><b>這張圖是 neuropil，不是 LPU。</b>Ito et al. 2014 的分區：41 個基本名字，其中 34 個有左右兩份、7 個位於中線，合計 75 個標籤。左右對應的區域用同一個顏色，所以看起來是左右鏡像的。
+    <span class="figsrc">本圖由 <code>scripts/make_figures.py</code> 從標準腦分區檔算出。資料來源同前圖。</span></figcaption>
+  </figure>
+
+  <div class="danger">
+    <b>兩個 41 是巧合，而且完全無關。</b>
+    <p style="margin-top:8px">上面那張圖的分區有 <b>41 個基本名字</b>（34 個成對 ＋ 7 個中線 ＝ 75 個標籤），出自 Ito et al. 2014。<br>
+    Chiang 等人數出來的是 <b>41 個 LPU</b>（19 對 ×2 ＋ 3 個中央不成對），出自 2011 年、用的是舊命名。</p>
+    <p style="margin-top:8px">兩個數字一樣純屬碰巧，兩套分區的邊界、名字、劃分依據沒有一項相同。<b>看到「41」不要以為講的是同一件事。</b></p>
+  </div>
+
+  <h3>還有兩個數字上的坑</h3>
+
+  <p><b>坑一：41 還是 43，沒有人裁決過。</b>後續由部分同一批作者發表的資訊流分析論文，引用時寫的是 43 個 LPU，Chiang 2011 自己寫 41。兩篇作者群高度重疊，卻沒有交代這個改動是怎麼來的。引用時要標清楚你用的是哪一篇的數字。</p>
+
+  <p><b>坑二：hub 有幾個，論文自己給了三個答案。</b>摘要寫「六個 hub」；正文寫「只有四對 neuropil 缺乏分離的 LN 族群」；而列出正負號的那張表上，標記為「無」的有九個。三處三個數。<b>比較安全的寫法是「41 個 LPU，加上數個缺乏在地神經元的 hub」，避開這個數字。</b></p>
+
+  <h2 id="s7"><span class="pt">7</span>所以它為什麼重要</h2>
+
+  <p>回到第 2 節那個問題：腦區怎麼劃，決定了連線表長什麼樣。</p>
+
+  <p>有了 41 個 LPU，就有了 41 個講得出理由的節點。把 LPU 當節點、神經元的投射當連線，全腦的連線表就成立了——而且這張表<b>不再是「某個解剖學家這樣切」的產物</b>，它背後有一條可以重跑的判準。</p>
+
+  <p>論文在建這張表的時候還做了一件細膩的事：<b>把所有屬於 LPU 的在地神經元排除掉。</b>理由正是第 2 節那個 Kenyon cell 的問題——在地神經元不跨區，算進去只會替「自己連自己」堆出重量，跟區與區之間的往來無關。這個處理本身就是「先把單位定義好」帶來的好處。</p>
+
+  <p>在這張表上做分群，跑出四個功能模組——聽覺、視覺、運動、嗅覺。每個模組的特徵是：組內連線多、彼此位置相鄰、跨模組的連線稀疏。論文另外辨識出 58 條神經束，依連法分成三類：連接左右腦同名區域的、斜向連接左右腦不同區域的、以及連接同側兩個區域的。</p>
+
+  <p>這才是「LPU 重要」的具體意思：<b>在它之後，這條研究線上的每一篇論文——資訊流分析、社群結構分析、自動分割工具——都以這 41 個節點、這顆標準腦為共同的座標框。</b>一個定義能被十幾年的後續研究直接拿去用，是因為它把「怎麼判定」講清楚了，而不是因為它一定正確。</p>
+
+  <h2 id="s8"><span class="pt">8</span>這個定義的限制</h2>
+
+  <p>這一節不是挑毛病，是使用這套分區時該知道的邊界。</p>
+
+  <p><b>一、看得到纖維，看不到突觸。</b>這是光學顯微鏡解析度的圖譜。它說的是「哪一區的神經元把纖維伸進了哪一區」，不是「哪一顆神經元接到哪一顆神經元」。兩顆神經元的纖維在同一個區域裡出現，不代表它們之間有突觸。論文自己講得很清楚：在缺少突觸細節的情況下，要理解一個 LPU 內部如何處理資訊，還太早。</p>
+
+  <p><b>二、41 不是一個穩定的數字。</b>VLP 已經被拆成兩個，論文明白承認其他 LPU 也可能有同樣情況，只是目前的解析度與取樣量還看不出來。這是一個當下的暫定值。</p>
+
+  <p><b>三、判準依賴取樣。</b>一個區域要被判定成 LPU，前提是它的在地神經元有被標記到、被取像、被放進資料庫。沒被標到的區域，不會因為判準而自動浮現。<b>「找不到 LN」和「沒有 LN」是兩件事</b>，而這套流程分不出來。</p>
+
+  <p><b>四、邊界是統計出來的，不是量出來的。</b>所有神經元都得先對齊到同一顆標準腦才能疊加，而對齊本身有誤差。論文自己量過：只做全腦整體對位時，同一個結構在不同樣本之間平均差 3.9 微米；針對局部再對一次可以降到 1.1 微米，但代價是選定區域之外反而歪掉。這個誤差是所有後續分析在空間精度上的天花板。</p>
+
+  <p><b>五、「有多少在地居民才算數」沒有下限。</b>論文提出過這個問題——是不是要有最少幾顆 LN，才構成一個有意義的處理單元？它把問題寫出來了，但沒有回答。</p>
+
+  <div class="note">
+    看懂了定義，下一步是看它<b>怎麼被算出來</b>。論文把上面那兩個條件寫成了七個可以執行的步驟——那是 <a href="how-to-draw-lpu.html">PART 2</a> 的內容。
   </div>
 
   <div class="pager">
@@ -120,6 +249,6 @@
     <a href="how-to-draw-lpu.html">PART 2　如何畫出 LPU →</a>
   </div>
 </div>
-<div class="foot">BSC 腦空間體研究中心 · 專題課程 LPU · PART 1</div>
+<div class="foot">BSC 腦空間體研究中心 · 專題課程 LPU · PART 1　｜　圖以 FCWB 標準腦（CC0）與 FCWBNP 分區（Ito et al. 2014）自製，產生器見 <code>scripts/make_figures.py</code></div>
 </body>
 </html>

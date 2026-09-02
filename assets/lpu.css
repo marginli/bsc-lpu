@@ -85,3 +85,38 @@ nav.toc h2{border:none; margin:0 0 8px; padding:0; font-size:18px}
 nav.toc ol{margin:6px 0 0}
 nav.toc a{color:var(--ink)}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto} a.btn:hover{transform:none}}
+
+/* ── 圖 ── */
+.fig{margin:26px 0}
+.fig img{display:block; width:100%; height:auto; border:1px solid var(--border); border-radius:10px; background:#fff}
+.fig.narrow img{max-width:330px; margin:0 auto}
+.fig figcaption{font-size:14px; color:var(--soft); line-height:1.7; margin-top:11px}
+.fig figcaption b{color:var(--ink)}
+.figsrc{display:block; margin-top:7px; color:var(--faint); font-size:12.5px}
+.panlab{display:flex; gap:12px; margin-top:9px; font-size:13.5px; color:var(--soft)}
+.panlab div{flex:1}
+.panlab b{color:var(--ink)}
+/* 色塊圖例 */
+.key{display:flex; flex-wrap:wrap; gap:8px 18px; margin:12px 0 0; padding:0; list-style:none; font-size:14px}
+.key li{display:flex; align-items:center; gap:7px; margin:0}
+.key i{width:13px; height:13px; border-radius:3px; flex:none}
+/* 定義卡 */
+.defcard{border:1px solid #c7dbff; background:var(--accent-soft); border-radius:12px; padding:6px 24px 18px; margin:24px 0}
+.defcard h4{color:var(--accent); font-size:14px; letter-spacing:.04em; margin:16px 0 4px}
+.defcard p{margin:4px 0}
+/* 名詞卡 */
+.terms{display:grid; gap:12px; margin:20px 0}
+@media(min-width:700px){.terms{grid-template-columns:1fr 1fr}}
+.term{border:1px solid var(--border); border-radius:10px; padding:13px 17px; background:var(--panel)}
+.term .w{font-weight:700; font-size:15.5px}
+.term .en{color:var(--faint); font-weight:400; font-size:13.5px; margin-left:5px}
+.term p{margin:5px 0 0; font-size:14.5px; color:var(--soft); line-height:1.7}
+/* 案例列 */
+.cases{display:grid; gap:12px; margin:20px 0}
+.case{display:flex; gap:14px; border:1px solid var(--border); border-radius:10px; padding:13px 16px; background:#fff}
+.case .badge{flex:none; font-size:12px; font-weight:700; border-radius:999px; padding:3px 11px; height:fit-content; white-space:nowrap}
+.case .badge.one{background:rgba(37,99,235,.12); color:#1d4ed8}
+.case .badge.two{background:rgba(147,51,234,.12); color:#7e22ce}
+.case .badge.hub{background:rgba(217,119,6,.16); color:#b45309}
+.case .bd{font-size:14.5px; line-height:1.75}
+.case .bd b{display:block; margin-bottom:2px; font-size:15.5px}
