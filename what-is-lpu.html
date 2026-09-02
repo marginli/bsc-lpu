@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PART 1 什麼是 LPU｜LPU 專題課程</title>
+<link rel="stylesheet" href="assets/lpu.css">
+</head>
+<body>
+<div class="crumb"><a href="index.html">LPU 專題課程</a> ／ PART 1</div>
+<header class="hero">
+  <p class="eyebrow">PART 1</p>
+  <h1>什麼是 LPU</h1>
+  <p class="subtitle">一個腦區的定義，如何從「看起來像一塊」變成「有沒有自己的在地神經元」</p>
+</header>
+
+<div class="wrap">
+
+  <div class="draft"><b>本頁為大綱骨架。</b>下列章節的標題與順序是提案，內文待討論後填入。每個 <span class="todo" style="display:inline;padding:1px 6px">虛線框</span> 代表一段還沒寫的內容，框內列的是打算涵蓋的重點。</div>
+
+  <nav class="toc">
+    <h2>本頁章節</h2>
+    <ol>
+      <li><a href="#s1">1. 先問一個笨問題：腦要怎麼切？</a></li>
+      <li><a href="#s2">2. 靈感來源：嗅覺觸角葉的 LN</a></li>
+      <li><a href="#s3">3. LPU 的正式定義：兩個條件</a></li>
+      <li><a href="#s4">4. LPU、neuropil、hub 三者的差別</a></li>
+      <li><a href="#s5">5. 全腦盤點：41 個 LPU 與 4 對例外</a></li>
+      <li><a href="#s6">6. 有了 LPU 之後：功能模組與連線圖</a></li>
+      <li><a href="#s7">7. 這個定義的限制與後續爭議</a></li>
+    </ol>
+  </nav>
+
+  <h2 id="s1"><span class="pt">1</span>先問一個笨問題：腦要怎麼切？</h2>
+  <div class="todo">
+    <b>要寫的重點</b>
+    <ul>
+      <li>傳統 neuropil（神經髓質區）的邊界來自染色後看得見的形態界線——是「解剖學家的眼睛」畫出來的。</li>
+      <li>形態上是一塊，功能上不見得是一個處理單元；反過來也成立。</li>
+      <li>做網路分析時，節點怎麼定義會直接改變結論（節點錯了，連線矩陣、模組、hub 全部跟著錯）。</li>
+      <li>所以需要一個<b>不依賴肉眼、可以計算</b>的劃分準則。</li>
+    </ul>
+  </div>
+
+  <h2 id="s2"><span class="pt">2</span>靈感來源：嗅覺觸角葉的 LN</h2>
+  <div class="todo">
+    <b>要寫的重點</b>
+    <ul>
+      <li>觸角葉（AL）的 local neuron（AL-LN）是研究得最清楚的例子：一群神經元的纖維完全待在 AL 內部，彼此糾纏，負責區內的訊息整編。</li>
+      <li>論文的推廣：把 AL 的這個特徵當成「處理單元」的一般判準，去掃全腦其他區域——即使那些區域的功能還不清楚。</li>
+      <li>要解釋清楚 LN（local neuron，在地神經元）與 PN（projection neuron，投射神經元）的分工：LN 管區內、PN 管區間。</li>
+    </ul>
+  </div>
+
+  <h2 id="s3"><span class="pt">3</span>LPU 的正式定義：兩個條件</h2>
+  <blockquote>
+    LPU 是一個腦區，它擁有<b>自己的一群 LN</b>，這群 LN 的神經纖維<b>完全侷限在該區域內</b>；且該區域<b>至少被一條長程神經束連上</b>。
+  </blockquote>
+  <div class="todo">
+    <b>要寫的重點</b>
+    <ul>
+      <li>條件一（自有 LN 族群）＝ 這裡有在地的運算；條件二（至少一條 tract）＝ 這裡跟外界有明確的輸出入。兩者缺一不可，要說清楚為什麼。</li>
+      <li>預設前提：LPU 的範圍<b>等於或小於</b>一個解剖學 neuropil 的邊界——所以流程是「在 neuropil 內部找有沒有需要再細分」，不是重新畫整顆腦。</li>
+      <li>VLP（腹外側前腦）的實例：三條證據支持它該切成背側／腹側兩個 LPU——(1) 各有自己的 LN 且細胞本體位置分開，(2) 兩群 LN 的纖維在空間上分離，(3) 各有自己特徵性的長程神經束、連的對象不同。</li>
+      <li>提醒讀者：這是<b>操作型定義</b>（operational definition），不是生理學上「處理單元」的證明。</li>
+    </ul>
+  </div>
+
+  <h2 id="s4"><span class="pt">4</span>LPU、neuropil、hub 三者的差別</h2>
+  <div class="tblwrap"><table>
+    <tr><th>類別</th><th>自有 LN 族群</th><th>長程神經束</th><th>邊界怎麼來的</th></tr>
+    <tr><td><b>Neuropil</b>（神經髓質區）</td><td>不一定</td><td>不一定</td><td>染色後的形態界線，肉眼判定</td></tr>
+    <tr><td><b>LPU</b></td><td><b>有</b></td><td><b>有</b>（至少一條）</td><td>由 LN 纖維密度的等值面算出來</td></tr>
+    <tr><td><b>Hub</b></td><td><b>無</b></td><td><b>有</b></td><td>沿用 neuropil 邊界</td></tr>
+  </table></div>
+  <div class="todo">
+    <b>要寫的重點</b>
+    <ul>
+      <li>hub 的物理意義：只轉接、不在地改寫——「輸入與輸出之間沒有進一步的編輯」。</li>
+      <li>把這張表講成一個判定流程圖（有 LN 嗎？→ 有 tract 嗎？），可能做成一張圖。</li>
+    </ul>
+  </div>
+
+  <h2 id="s5"><span class="pt">5</span>全腦盤點：41 個 LPU 與 4 對例外</h2>
+  <div class="todo">
+    <b>要寫的重點</b>
+    <ul>
+      <li>41 ＝ 19 對成對 neuropil ×2 ＋ 3 個中央不成對（PCB 前腦橋、FB 扇形體、EB 橢球體）。要把這個算式攤開講。</li>
+      <li>四對沒有分離 LN 族群的例外，被歸類為 hub：OPTU（視結節）、Nod（結節）、OG（視小球）、IDLP（內背外側前腦）。各自的理由不同——OPTU 是兩半腦之間的轉接站；Nod 與 OG 可能小到容不下額外的 LN；IDLP 形狀不規則、任何神經元的支配率都低於 30%，可能只是通道。</li>
+      <li>只有一個 neuropil（VLP）被切成兩個 LPU；蕈狀體（MB）反而是整顆算<b>一個</b> LPU——calyx 與 lobe 都沒有自己的 LN 族群。這兩個「反直覺」的案例最能說明定義的效果。</li>
+      <li>LPU ＋ hub 合起來幾乎填滿整顆腦（Figure 5D）。</li>
+      <li>論文自己承認的開放性：有些 LPU 可能還能再細分，就像 VLP 一樣。</li>
+    </ul>
+  </div>
+
+  <h2 id="s6"><span class="pt">6</span>有了 LPU 之後：功能模組與連線圖</h2>
+  <div class="todo">
+    <b>要寫的重點</b>
+    <ul>
+      <li>把 LPU 當節點、神經元當邊，就能做圖論分析：先建 pairwise 連線矩陣（排除 LPU-LN），再做階層分群。</li>
+      <li>分出四個功能模組，每個模組的特徵：組內連線數高、直接連線頻繁、位置相鄰、跨模組連線稀疏。</li>
+      <li>58 條 tract 的三分類：commissural（連兩半腦的同名區）、decussate（連兩半腦的不同區）、association（連同半腦的兩區）。</li>
+      <li>往後接的線：資訊流分析、社群結構分析（本庫已收錄的 Shih 2015／2019）——它們全都以這 41 個 LPU 為節點。</li>
+    </ul>
+  </div>
+
+  <h2 id="s7"><span class="pt">7</span>這個定義的限制與後續爭議</h2>
+  <div class="todo">
+    <b>要寫的重點</b>
+    <ul>
+      <li>解析度限制：這是光學顯微鏡的中尺度圖譜，不是突觸級連結體。「有共同支配」不等於「有突觸」。</li>
+      <li>LPU 的邊界依賴 FlyCircuit 的取樣——沒有被標到 LN 的區域，就不會被判成 LPU。</li>
+      <li>個體差異：邊界是把多隻腦對位到標準腦之後的統計產物。</li>
+      <li>與後續 FlyWire／hemibrain 的突觸級分區如何對照，是可以帶到最後的開放問題。</li>
+    </ul>
+  </div>
+
+  <div class="pager">
+    <a href="index.html">← 回首頁</a>
+    <a href="how-to-draw-lpu.html">PART 2　如何畫出 LPU →</a>
+  </div>
+</div>
+<div class="foot">BSC 腦空間體研究中心 · 專題課程 LPU · PART 1</div>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PART 2 如何畫出 LPU｜LPU 專題課程</title>
+<link rel="stylesheet" href="assets/lpu.css">
+</head>
+<body>
+<div class="crumb"><a href="index.html">LPU 專題課程</a> ／ PART 2</div>
+<header class="hero">
+  <p class="eyebrow">PART 2</p>
+  <h1>如何畫出 LPU</h1>
+  <p class="subtitle">論文把「一個腦區的定義」寫成了七個可執行的步驟</p>
+</header>
+
+<div class="wrap">
+
+  <div class="draft"><b>本頁為大綱骨架。</b>七個步驟的骨幹與數學條件已經照論文補充材料（Supplemental Experimental Procedures ／ Defining an LPU）填好，但每一步的白話解釋、示意圖與實例還沒寫。</div>
+
+  <div class="note">論文正文只列了七個步驟的標題，真正的數學定義在補充材料。這一頁把兩者合起來重建成一條可以照著做的流程。</div>
+
+  <nav class="toc">
+    <h2>七個步驟</h2>
+    <ol>
+      <li><a href="#s1">數 LN 纖維：把腦切成體素，每格記一個數字</a></li>
+      <li><a href="#s2">找熱點：用五數綜合的上四分位切</a></li>
+      <li><a href="#s3">分群：UPGMA 把熱點體素分成幾坨</a></li>
+      <li><a href="#s4">招募：從一顆最小的 LN 滾雪球</a></li>
+      <li><a href="#s5">定邊界：從招募到的 LN 抽等值面</a></li>
+      <li><a href="#s6">算 c 值：中心密、周邊空，比值要大於 2</a></li>
+      <li><a href="#s7">驗證：這區有沒有自己的長程神經束</a></li>
+    </ol>
+  </nav>
+
+  <h2 id="s1"><span class="pt">STEP 1</span>數 LN 纖維：把腦切成體素，每格記一個數字</h2>
+  <p>令 <code>r(i,j,k)</code> 為果蠅腦中的一個體素。每個體素關聯一個整數 <code>v(r)</code>，代表<b>穿過該體素的 LN 纖維條數</b>。為了壓掉密度的抖動，<code>v(r)</code> 實際上取的是以 <code>r</code> 為中心的 <b>3×3×3 ＝ 27 個體素</b>的平均。</p>
+  <div class="todo">
+    <b>要補的</b>
+    <ul>
+      <li>白話：這一步就是把「很多顆神經元疊在一起」變成一個三維的密度場。</li>
+      <li>資料前提：所有神經元都已經對位（registration）到同一顆標準腦，否則相加沒有意義——要回頭連到標準腦那一段。</li>
+      <li>只算 LN，不算 PN；LN 怎麼判定？（纖維是否完全侷限在該 neuropil 內）這裡有雞生蛋的味道，值得點出來。</li>
+      <li>一張示意圖：一格體素 ＋ 穿過它的幾條纖維。</li>
+    </ul>
+  </div>
+
+  <h2 id="s2"><span class="pt">STEP 2</span>找熱點：用五數綜合的上四分位切</h2>
+  <p>對某個 neuropil 內所有的 <code>v(r)</code> 做<b>五數綜合</b>（five-number summary）。取上四分位數 <code>Q_U</code>，定義熱點集合</p>
+  <pre><code>Z = { r : v(r) ≥ Q_U }</code></pre>
+  <div class="todo">
+    <b>要補的</b>
+    <ul>
+      <li>白話：只留下纖維最密的那 25% 體素，其餘丟掉。</li>
+      <li>為什麼用四分位而不是固定閾值：不同 neuropil 的絕對密度差很多，四分位是相對標準。</li>
+      <li>可以順帶教「五數綜合」是什麼（最小值、Q1、中位數、Q3、最大值）。</li>
+      <li>這是整條流程裡第一個可調參數，換成 Q3 以外的分位數會怎樣？留作討論。</li>
+    </ul>
+  </div>
+
+  <h2 id="s3"><span class="pt">STEP 3</span>分群：UPGMA 把熱點體素分成幾坨</h2>
+  <p>對 <code>Z</code> 中所有體素兩兩計算歐氏距離，構成距離矩陣</p>
+  <pre><code>D(r, r') = √[ (i−i')² + (j−j')² + (k−k')² ]</code></pre>
+  <p>用 <b>UPGMA</b>（unweighted pair group method with arithmetic mean，平均連結階層分群）把體素分群。<b>體素數超過該 neuropil 總體素數 1%</b> 的群，才算候選 LPU。</p>
+  <div class="callout"><b>關鍵分岔：</b>如果所有 <code>v(r)</code> 只形成<b>一群</b>，那麼這個 neuropil 本身就是一個完整的 LPU，不需再細分；否則，<b>每一群各自成為一個候選 LPU</b>。</div>
+  <div class="todo">
+    <b>要補的</b>
+    <ul>
+      <li>UPGMA 是什麼、為什麼用平均連結（對雜訊較穩、不會像單一連結那樣拉出鏈狀）。</li>
+      <li>樹要在哪裡剪？論文沒有明說切割高度，這是重建時會卡住的地方——要誠實寫出來。</li>
+      <li>1% 門檻的作用：擋掉零星的小熱點。</li>
+      <li>示意圖：VLP 的熱點分成背側／腹側兩群。</li>
+    </ul>
+  </div>
+
+  <h2 id="s4"><span class="pt">STEP 4</span>招募：從一顆最小的 LN 滾雪球</h2>
+  <p>在<b>最小</b>的候選群裡，用目視挑一顆纖維侷限在該群內、體積最小的 LN 當作起始 source。接著把所有體素單位<b>放大 4 倍</b>，若某顆目標神經元有<b>超過 50% 的體積</b>與 source 重疊，就把它招募進來；被招募的神經元與原 source 合併成新的 source，再去招募下一顆。反覆迭代直到找不到新目標為止。這群被招募的神經元，就是該候選 LPU 的組成單位。然後換下一個最小的群，重複一次。</p>
+  <div class="todo">
+    <b>要補的</b>
+    <ul>
+      <li>白話：這是一個「像我的就算我這一群」的滾雪球演算法。</li>
+      <li>「放大 4 倍」是為了容忍對位誤差與纖維之間的空隙——要解釋清楚，這是最容易被誤解的一步。</li>
+      <li>「目視挑起始神經元」是整條流程唯一的人工介入點——這件事要講明白，也是實作時要想辦法自動化的地方。</li>
+      <li>為什麼從最小的群、最小的 LN 開始？</li>
+    </ul>
+  </div>
+
+  <h2 id="s5"><span class="pt">STEP 5</span>定邊界：從招募到的 LN 抽等值面</h2>
+  <p>把所有被招募的 LN 疊在一起，<b>去掉它們的 primary neurite 與細胞本體（soma）</b>，再對剩下的纖維密度場取<b>等值面</b>（isointensity surface）——這個曲面就是候選 LPU 的估計邊界。</p>
+  <div class="todo">
+    <b>要補的</b>
+    <ul>
+      <li>為什麼要去掉 primary neurite 與 soma：它們只是「接線」與「本體」，會把邊界拉到區外。</li>
+      <li>等值面的門檻怎麼定？論文沒給——又一個重建時的空白。</li>
+      <li>示意圖：疊起來的 LN 雲 → 抽出來的封閉曲面。</li>
+    </ul>
+  </div>
+
+  <h2 id="s6"><span class="pt">STEP 6</span>算 c 值：中心密、周邊空，比值要大於 2</h2>
+  <p>一個真正的 LPU，其 LN 纖維應該<b>中間密、周邊相對空</b>（膠質細胞鞘可能也有貢獻）。把候選 LPU 的表面均勻內縮，使內部恰好包含 <b>80% 的體素</b>，記為中心區 <b>A</b>，其餘為周邊區 <b>B</b>。定義</p>
+  <pre><code>c = ( N_B · Σ_{r∈A} v(r) ) / ( N_A · Σ_{r∈B} v(r) )</code></pre>
+  <p>其中 <code>N_A</code>、<code>N_B</code> 分別是 A、B 的體素數——換句話說，<b>c 就是中心區與周邊區的平均纖維密度之比</b>。判準：<b>c &gt; 2</b>。</p>
+  <div class="todo">
+    <b>要補的</b>
+    <ul>
+      <li>白話一句：中心的纖維密度要比周邊高出一倍以上。</li>
+      <li>公式裡 N_A、N_B 交叉相乘的原因（就是在做兩個平均的比），要拆給沒學過的人看。</li>
+      <li>為什麼是 80%？為什麼是 2？這兩個數字論文沒有推導，是可調參數。</li>
+    </ul>
+  </div>
+
+  <h2 id="s7"><span class="pt">STEP 7</span>驗證：這區有沒有自己的長程神經束</h2>
+  <div class="tblwrap"><table>
+    <tr><th>c &gt; 2（有自己的 LN 團）</th><th>有自己的長程 tract</th><th>判定</th></tr>
+    <tr><td>是</td><td>是</td><td><b>LPU</b></td></tr>
+    <tr><td>否</td><td>是</td><td><b>Hub</b></td></tr>
+    <tr><td>是</td><td>否</td><td>不成立（LPU 必須連得出去）</td></tr>
+  </table></div>
+  <div class="todo">
+    <b>要補的</b>
+    <ul>
+      <li>tract 怎麼認定？（至少三條神經元共走的纖維束）</li>
+      <li>VLP 的完整走一遍：從熱點分兩群，到兩個 LPU 各有不同的 tract 對象（論文 Figure S5D）。這個實例最適合當本頁的收尾。</li>
+      <li>整條流程的一張總流程圖，把七步串起來，並標出三個人工／未定參數的位置。</li>
+    </ul>
+  </div>
+
+  <h2><span class="pt">總結</span>論文沒說清楚的三個地方</h2>
+  <div class="todo">
+    <b>要寫成一張表</b>——這三點會直接決定 PART 3 的實作能不能重現：
+    <ul>
+      <li>UPGMA 樹的<b>切割高度</b>沒有給。</li>
+      <li>STEP 5 <b>等值面的門檻</b>沒有給。</li>
+      <li>STEP 4 的<b>起始 LN 靠目視挑</b>，不是自動的。</li>
+    </ul>
+  </div>
+
+  <div class="pager">
+    <a href="what-is-lpu.html">← PART 1　什麼是 LPU</a>
+    <a href="python-lpu.html">PART 3　用 Python 實作 →</a>
+  </div>
+</div>
+<div class="foot">BSC 腦空間體研究中心 · 專題課程 LPU · PART 2</div>
+</body>
+</html>

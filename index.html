@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LPU：果蠅腦的在地處理單元｜BSC 專題課程</title>
+<link rel="stylesheet" href="assets/lpu.css">
+</head>
+<body>
+<header class="hero">
+  <p class="eyebrow">BSC 專題課程</p>
+  <h1>LPU：果蠅腦的「在地處理單元」</h1>
+  <p class="subtitle">腦區的邊界，從「解剖學家看得見的形狀」換成「有沒有自己的在地神經元」</p>
+</header>
+
+<div class="wrap">
+
+  <div class="intro"><dl>
+    <dt>這是什麼</dt>
+    <dd>一堂圍繞單一概念的專題課：<b>LPU（local processing unit，在地處理單元）</b>。它出自 Chiang 等人 2011 年發表在 <i>Current Biology</i> 的果蠅全腦單細胞解析度重建論文，是後續十幾年果蠅連結體研究共用的「節點」定義。</dd>
+    <dt>為什麼值得單獨開一堂</dt>
+    <dd>把腦切成幾塊、每塊的邊界畫在哪裡，決定了後面所有網路分析的結論。LPU 提供的不是一張圖，而是一個<b>可計算、可重跑、可被推翻</b>的劃分準則。看懂它，等於看懂「一個腦區的定義如何被寫成演算法」。</dd>
+    <dt>怎麼讀</dt>
+    <dd>按下面三個按鈕的順序：先弄懂概念，再看論文怎麼劃，最後自己用 Python 跑一次。</dd>
+    <dt>需要什麼基礎</dt>
+    <dd>前兩部分不需要程式基礎。第三部分需要能跑 Python 與 NumPy。</dd>
+  </dl></div>
+
+  <div class="btns">
+    <a class="btn c1" href="what-is-lpu.html">
+      <span class="no">PART 1</span>
+      <span class="t">什麼是 LPU</span>
+      <p class="s">從「腦區要怎麼切」這個問題出發，看 LPU 的兩條定義、它跟 neuropil 與 hub 的差別，以及全腦盤點出來的 41 個 LPU。</p>
+      <p class="m">概念為主 · 不需程式基礎</p>
+    </a>
+    <a class="btn c2" href="how-to-draw-lpu.html">
+      <span class="no">PART 2</span>
+      <span class="t">如何畫出 LPU</span>
+      <p class="s">論文用七個步驟把「一個腦區」變成一段可執行的流程：體素計數 → 上四分位取熱點 → 分群 → 招募 LN → 定邊界 → 算 c 值 → 驗證 tract。</p>
+      <p class="m">方法為主 · 有數學但不寫程式</p>
+    </a>
+    <a class="btn c3" href="python-lpu.html">
+      <span class="no">PART 3</span>
+      <span class="t">如何用 Python 實作畫出 LPU</span>
+      <p class="s">把 PART 2 的七個步驟一一對應到可以跑的程式碼：NumPy 體素場、SciPy 的 UPGMA、marching cubes 抽等值面，最後畫出來。</p>
+      <p class="m">實作為主 · 需要 Python 與 NumPy</p>
+    </a>
+  </div>
+
+  <h2><span class="pt">先看數字</span>論文交付了什麼</h2>
+  <div class="statgrid">
+    <div class="stat"><div class="v">41</div><div class="k">個 LPU（19 對成對 ＋ 3 個中央不成對）</div></div>
+    <div class="stat"><div class="v">6</div><div class="k">個 hub（有長程神經束、但沒有自己的 LN）</div></div>
+    <div class="stat"><div class="v">58</div><div class="k">條神經束（tract）</div></div>
+    <div class="stat"><div class="v">~26%</div><div class="k">的已建圖單神經元屬於 LPU-LN</div></div>
+  </div>
+
+  <div class="note">
+    <b>一句話定義（論文原文的中譯）：</b>LPU 是一個腦區，它擁有<b>自己的一群在地神經元（LN）</b>、這群 LN 的神經纖維<b>完全侷限在該區域之內</b>；並且該區域<b>至少被一條神經束（tract）連上</b>。相對地，一個用形態邊界定義出來的腦區，不一定具備這兩者。
+  </div>
+
+  <h2><span class="pt">出處</span>這堂課讀的是哪一篇</h2>
+  <p>Chiang, A.-S. <i>et al.</i> (2011). <b>Three-Dimensional Reconstruction of Brain-wide Wiring Networks in <i>Drosophila</i> at Single-Cell Resolution.</b> <i>Current Biology</i> 21(1), 1–11. doi:10.1016/j.cub.2010.11.056</p>
+  <p>LPU 的完整操作型定義不在正文，而在<b>補充材料的 Supplemental Experimental Procedures ／「Defining an LPU」</b>一節；正文只給了七個步驟的條列摘要與 VLP 的實例（Figure S5D）。PART 2 主要重建的就是那一節。</p>
+
+  <div class="draft">
+    <b>草稿狀態。</b>三個按鈕背後的頁面目前是<b>大綱骨架</b>——章節切法、要放哪些圖、深到什麼程度都還沒定案，等討論後再逐段填。首頁的三個按鈕之後也可能增減。
+  </div>
+
+</div>
+<div class="foot">BSC 腦空間體研究中心 · 專題課程 LPU · 教材由 Claude Code 產生</div>
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PART 3 用 Python 實作畫出 LPU｜LPU 專題課程</title>
+<link rel="stylesheet" href="assets/lpu.css">
+</head>
+<body>
+<div class="crumb"><a href="index.html">LPU 專題課程</a> ／ PART 3</div>
+<header class="hero">
+  <p class="eyebrow">PART 3</p>
+  <h1>如何用 Python 實作畫出 LPU</h1>
+  <p class="subtitle">把 PART 2 的七個步驟，一一換成可以跑的程式碼</p>
+</header>
+
+<div class="wrap">
+
+  <div class="draft"><b>本頁為大綱骨架。</b>模組切法與函式簽名是提案，程式碼區塊目前是<b>骨架（stub）</b>，還沒有實際跑過任何資料。等討論定案後才會真的實作與驗證。</div>
+
+  <div class="danger"><b>還沒驗證的事：</b>本頁所有程式碼都<b>尚未在真實資料上跑過</b>，執行時間、記憶體用量、以及能不能重現論文的 41 個 LPU，全都是未知數。討論後要先做一次端到端的實跑，再把真實輸出貼回這一頁。</div>
+
+  <nav class="toc">
+    <h2>本頁章節</h2>
+    <ol>
+      <li><a href="#s0">0. 資料從哪來、環境需要什麼</a></li>
+      <li><a href="#s1">1. 讀神經元、堆成體素密度場</a></li>
+      <li><a href="#s2">2. 27 鄰域平滑與上四分位取熱點</a></li>
+      <li><a href="#s3">3. UPGMA 分群與 1% 篩選</a></li>
+      <li><a href="#s4">4. 招募迴圈</a></li>
+      <li><a href="#s5">5. 等值面抽邊界</a></li>
+      <li><a href="#s6">6. c 值計算</a></li>
+      <li><a href="#s7">7. 畫出來</a></li>
+      <li><a href="#s8">8. 驗證：跟論文的 41 個 LPU 對得上嗎</a></li>
+    </ol>
+  </nav>
+
+  <h2 id="s0"><span class="pt">0</span>資料從哪來、環境需要什麼</h2>
+  <div class="todo">
+    <b>要確認的（討論時要一起決定）</b>
+    <ul>
+      <li><b>神經元影像</b>：本機的 FlyCircuit 全套在 <code>/mnt/sda1/work1/fly_circuit/</code>。要用整套？還是先拿 EP1-1 那 20 顆 <code>.am</code> 當小樣本把管線跑通？</li>
+      <li><b>標準腦與分區</b>：BSC_plan 的 <code>D03</code> 有自製的標準腦模板與分區檔，可以直接當 neuropil 遮罩用。</li>
+      <li><b>LN／PN 的標記</b>：流程的輸入是「已知是 LN 的神經元」。這個標記從哪來？如果沒有現成的，要不要在管線裡先做「纖維是否完全落在某個 neuropil 內」的判定？<b>這是最大的未決問題。</b></li>
+      <li>套件：<code>numpy</code>、<code>scipy</code>（<code>cluster.hierarchy</code>、<code>ndimage</code>）、<code>scikit-image</code>（<code>marching_cubes</code>）、<code>trimesh</code>、<code>matplotlib</code> 或 <code>plotly</code>。</li>
+      <li>規模估算：全腦體素數 × 熱點 25% 的兩兩距離矩陣，記憶體會不會爆？要先算一次再決定用不用抽樣。</li>
+    </ul>
+  </div>
+  <pre><code>lpu/
+├── io_am.py        # 讀 AmiraMesh，沿用 EP1-1 已驗證的判讀
+├── voxelize.py     # STEP 1：神經元 → 密度場 v(r)
+├── hotspot.py      # STEP 2：五數綜合、上四分位
+├── cluster.py      # STEP 3：UPGMA、1% 篩選
+├── recruit.py      # STEP 4：滾雪球招募
+├── surface.py      # STEP 5：等值面 → 邊界網格
+├── cvalue.py       # STEP 6：內縮 80%、算 c
+├── validate.py     # STEP 7：tract 檢查
+└── render.py       # 出圖</code></pre>
+
+  <h2 id="s1"><span class="pt">STEP 1</span>讀神經元、堆成體素密度場</h2>
+  <pre><code>import numpy as np
+
+def build_density(neuron_masks, shape, kernel=3):
+    """把一批已對位的 LN 二值遮罩疊成纖維密度場 v(r)。
+
+    neuron_masks : Iterable[np.ndarray(bool)]  每顆 LN 的體素遮罩
+    shape        : tuple  標準腦的體素維度 (I, J, K)
+    回傳          : np.ndarray(float32)  平滑後的 v(r)
+    """
+    raise NotImplementedError  # TODO</code></pre>
+  <div class="todo"><b>待討論</b>：疊加是「條數」還是「有無」？論文寫的是「穿過該體素的纖維條數」，但從二值影像只能得到「有幾顆神經元覆蓋此體素」——這兩者不同，要決定怎麼近似並在課程裡講明。</div>
+
+  <h2 id="s2"><span class="pt">STEP 2</span>27 鄰域平滑與上四分位取熱點</h2>
+  <pre><code>from scipy import ndimage
+
+def smooth27(v):
+    """3x3x3 均值平滑（論文的 27 體素平均）。"""
+    return ndimage.uniform_filter(v, size=3)
+
+def hotspots(v, mask):
+    """在 neuropil 遮罩內取上四分位，回傳熱點體素座標 Z。"""
+    vals = v[mask]
+    qu = np.percentile(vals, 75)          # five-number summary 的 Q3
+    return np.argwhere(mask & (v >= qu))  # Z</code></pre>
+  <div class="todo"><b>待補</b>：印出五數綜合當教學素材；示範改動分位數對結果的影響。</div>
+
+  <h2 id="s3"><span class="pt">STEP 3</span>UPGMA 分群與 1% 篩選</h2>
+  <pre><code>from scipy.cluster.hierarchy import linkage, fcluster
+from scipy.spatial.distance import pdist
+
+def upgma_clusters(Z, n_voxels_in_neuropil, cut, min_frac=0.01):
+    """UPGMA 分群，只保留體素數 > neuropil 總體素 1% 的群。
+
+    cut : 樹的切割高度 —— 論文未給，需自行決定（見 PART 2 的總結）
+    """
+    d = pdist(Z.astype(np.float32))       # 歐氏距離
+    Ldg = linkage(d, method="average")    # UPGMA == average linkage
+    labels = fcluster(Ldg, t=cut, criterion="distance")
+    raise NotImplementedError  # TODO: 依 min_frac 篩選並回傳各群體素</code></pre>
+  <div class="danger"><b>記憶體警告：</b><code>pdist</code> 對 N 個體素會產生 N(N−1)/2 個距離。熱點若有十萬個體素，光距離矩陣就要約 20 GB。實作前必須先估算，並準備替代方案（空間分塊、下採樣、或改用連通元件＋分水嶺）。</div>
+  <div class="todo"><b>待討論</b>：<code>cut</code> 怎麼定？可能的作法：(a) 用已知答案的 VLP 反推一個切割高度，(b) 掃一段 cut 值看群數的穩定平台。這一步是整個重現工作的成敗關鍵。</div>
+
+  <h2 id="s4"><span class="pt">STEP 4</span>招募迴圈</h2>
+  <pre><code>def recruit(seed_mask, candidates, scale=4, overlap=0.5):
+    """滾雪球：體素放大 scale 倍後，與 source 重疊超過 overlap 的神經元就併入。"""
+    source = seed_mask
+    pool = list(candidates)
+    changed = True
+    while changed:
+        changed = False
+        for n in list(pool):
+            # TODO: 放大 scale 倍後計算 n 與 source 的體積重疊比
+            ...
+    return source</code></pre>
+  <div class="todo"><b>待討論</b>：論文的起始 LN 是<b>目視</b>挑的。自動化的候選作法：取該群內體積最小、且纖維完全落在群內的 LN。要不要保留一個手動指定的介面，讓課程可以示範「換一顆 seed 結果會不會變」？</div>
+
+  <h2 id="s5"><span class="pt">STEP 5</span>等值面抽邊界</h2>
+  <pre><code>from skimage.measure import marching_cubes
+
+def lpu_surface(v_recruited, level):
+    """去掉 primary neurite 與 soma 後，抽等值面當作 LPU 邊界。"""
+    verts, faces, normals, _ = marching_cubes(v_recruited, level=level)
+    return verts, faces</code></pre>
+  <div class="todo"><b>待討論</b>：<code>level</code>（等值面門檻）論文未給。另外「去掉 primary neurite 與 soma」在只有體素影像的情況下怎麼做？可能要靠形態學（soma 是大團、primary neurite 是細長管），這本身就是一個小題目。</div>
+
+  <h2 id="s6"><span class="pt">STEP 6</span>c 值計算</h2>
+  <pre><code>def c_value(v, region_mask, core_frac=0.8):
+    """均勻內縮到 core_frac 的體素當中心區 A，其餘為周邊 B，回傳 c。"""
+    # TODO: 用 distance transform 由表面往內排序，取前 core_frac 當 A
+    # c = mean(v[A]) / mean(v[B])
+    raise NotImplementedError</code></pre>
+  <div class="note">實作上「均勻內縮到剩 80% 體素」最直接的作法是對 <code>region_mask</code> 做距離轉換（<code>scipy.ndimage.distance_transform_edt</code>），依離表面的距離排序，取最內側的 80%。這樣不必真的做曲面內縮。</div>
+
+  <h2 id="s7"><span class="pt">STEP 7</span>畫出來</h2>
+  <div class="todo">
+    <b>要決定畫成什麼</b>
+    <ul>
+      <li>三視圖（沿用 EP1-2 已經驗證過的投影作法）？還是可轉動的 3D？</li>
+      <li>每個 LPU 一個顏色——可以接 EP04／EP05 已經做過的 Kaleido 配色演算法。</li>
+      <li>要不要做成能嵌進網頁的互動圖（plotly 或 three.js）？</li>
+    </ul>
+  </div>
+
+  <h2 id="s8"><span class="pt">驗證</span>跟論文的 41 個 LPU 對得上嗎</h2>
+  <div class="todo">
+    <b>這一節是整堂課的重點</b>
+    <ul>
+      <li>逐區比對：我們跑出來的候選 LPU，與論文 Figure 5 的 41 個對得上幾個？</li>
+      <li>三個關鍵檢查點：VLP 有沒有分成兩個？MB 有沒有維持一整個？四對 hub（OPTU／Nod／OG／IDLP）有沒有被正確判成沒有 LN？</li>
+      <li>對不上的地方，是參數的問題還是資料的問題？</li>
+      <li><b>照 BSC 的慣例，AI 在過程中犯的錯與被推翻的結論要一併寫進來，不要修飾成一路順利。</b></li>
+    </ul>
+  </div>
+
+  <div class="pager">
+    <a href="how-to-draw-lpu.html">← PART 2　如何畫出 LPU</a>
+    <a href="index.html">回首頁 →</a>
+  </div>
+</div>
+<div class="foot">BSC 腦空間體研究中心 · 專題課程 LPU · PART 3</div>
+</body>
+</html>

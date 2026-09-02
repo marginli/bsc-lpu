@@ -1,0 +1,87 @@
+/* LPU 課程網站共用樣式 — 沿用 BSC online_course 的視覺慣例 */
+:root{
+  --ink:#1b2733; --soft:#5a6b7b; --faint:#8b98a5;
+  --bg:#ffffff; --panel:#f7f8fa; --border:#e4e8ee;
+  --accent:#2563eb; --accent-soft:#eff4ff;
+  --maxw:920px; --radius:12px;
+  --green:#16a34a; --blue:#2563eb; --purple:#9333ea; --amber:#d97706; --red:#dc2626;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:-apple-system,"Segoe UI","Noto Sans TC","Microsoft JhengHei","PingFang TC",Roboto,Helvetica,Arial,sans-serif;
+  line-height:1.85; font-size:16.5px; -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:var(--maxw); margin:0 auto; padding:0 22px 110px}
+header.hero{max-width:var(--maxw); margin:0 auto; padding:54px 22px 22px}
+.eyebrow{color:var(--accent); font-weight:700; font-size:13px; letter-spacing:.08em; text-transform:uppercase; margin:0 0 10px}
+h1{font-size:33px; line-height:1.3; margin:0 0 12px; letter-spacing:-.01em; text-wrap:balance}
+.subtitle{font-size:18px; color:var(--soft); margin:0 0 8px}
+h2{font-size:25px; margin:60px 0 8px; padding-top:16px; border-top:2px solid var(--border); line-height:1.35; text-wrap:balance}
+h2 .pt{color:var(--accent); font-size:15px; display:block; font-weight:700; letter-spacing:.05em; margin-bottom:2px}
+h3{font-size:19px; margin:36px 0 10px; text-wrap:balance}
+h4{font-size:16px; margin:22px 0 6px}
+p{margin:12px 0}
+a{color:var(--accent); text-decoration:none}
+a:hover{text-decoration:underline}
+a:focus-visible,summary:focus-visible{outline:2px solid var(--accent); outline-offset:3px; border-radius:4px}
+code{background:var(--panel); border:1px solid var(--border); border-radius:5px; padding:1px 6px; font-family:"Cascadia Code",Consolas,Menlo,monospace; font-size:.86em}
+pre{background:#0f1622; color:#e6edf3; border-radius:10px; padding:16px 18px; overflow-x:auto; font-size:13.5px; line-height:1.6}
+pre code{background:none; border:none; color:inherit; padding:0}
+ul,ol{padding-left:22px}
+li{margin:7px 0}
+blockquote{margin:16px 0; padding:10px 18px; border-left:4px solid var(--accent); background:var(--accent-soft); border-radius:0 8px 8px 0}
+
+/* ── 首頁：三個按鈕 ── */
+.intro{background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:18px 24px; font-size:15.5px; margin:26px 0}
+.intro dt{font-weight:700; margin-top:12px}
+.intro dt:first-child{margin-top:0}
+.intro dd{margin:2px 0 0; color:var(--soft)}
+.btns{display:grid; gap:16px; margin:34px 0 10px}
+@media(min-width:760px){.btns{grid-template-columns:repeat(3,1fr)}}
+a.btn{
+  display:flex; flex-direction:column; gap:8px;
+  border:1px solid var(--border); border-left:5px solid var(--accent);
+  border-radius:var(--radius); background:var(--panel);
+  padding:22px 22px 24px; color:var(--ink); text-decoration:none;
+  transition:box-shadow .15s ease, transform .15s ease, background .15s ease;
+}
+a.btn:hover{background:#fff; box-shadow:0 10px 28px rgba(16,24,40,.10); transform:translateY(-2px); text-decoration:none}
+a.btn .no{font-size:12px; font-weight:700; letter-spacing:.08em; color:var(--accent)}
+a.btn .t{font-size:20px; font-weight:700; line-height:1.4}
+a.btn .s{font-size:14.5px; color:var(--soft); line-height:1.7; margin:0}
+a.btn .m{font-size:13px; color:var(--faint); margin:6px 0 0}
+a.btn.c2{border-left-color:var(--purple)}
+a.btn.c2 .no{color:var(--purple)}
+a.btn.c3{border-left-color:var(--green)}
+a.btn.c3 .no{color:var(--green)}
+
+.statgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin:20px 0}
+.stat{border:1px solid var(--border); border-radius:10px; padding:14px 16px; background:var(--panel)}
+.stat .v{font-size:26px; font-weight:700; color:var(--accent); font-variant-numeric:tabular-nums; line-height:1.2}
+.stat .k{font-size:13px; color:var(--soft); margin-top:3px}
+
+.tblwrap{overflow-x:auto; margin:18px 0}
+table{border-collapse:collapse; width:100%; font-size:14.5px}
+th,td{border:1px solid var(--border); padding:9px 12px; text-align:left; vertical-align:top}
+th{background:var(--panel); font-weight:700}
+
+.callout{background:#fffbeb; border:1px solid #fde68a; border-left:4px solid var(--amber); border-radius:0 8px 8px 0; padding:12px 16px; margin:18px 0; font-size:15px}
+.note{background:var(--accent-soft); border:1px solid #c7dbff; border-radius:8px; padding:12px 16px; margin:18px 0; font-size:15px}
+.danger{background:#fef2f2; border:1px solid #fecaca; border-left:4px solid var(--red); border-radius:0 8px 8px 0; padding:12px 16px; margin:18px 0; font-size:15px}
+.draft{background:#f5f3ff; border:1px solid #ddd6fe; border-left:4px solid var(--purple); border-radius:0 8px 8px 0; padding:12px 16px; margin:22px 0; font-size:15px}
+
+.crumb{max-width:var(--maxw); margin:0 auto; padding:20px 22px 0; font-size:14px; color:var(--faint)}
+.foot{max-width:var(--maxw); margin:0 auto; padding:28px 22px; color:var(--faint); font-size:13px; border-top:1px solid var(--border)}
+.pager{display:flex; justify-content:space-between; gap:14px; flex-wrap:wrap; margin:56px 0 0; padding-top:20px; border-top:1px solid var(--border); font-size:15px}
+
+/* 待填內容的佔位段落 */
+.todo{border:1px dashed var(--border); border-radius:10px; padding:14px 18px; margin:14px 0; background:#fcfcfd; color:var(--soft); font-size:14.5px}
+.todo b{color:var(--ink)}
+.todo ul{margin:8px 0 0}
+nav.toc{background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:18px 26px; margin:28px 0}
+nav.toc h2{border:none; margin:0 0 8px; padding:0; font-size:18px}
+nav.toc ol{margin:6px 0 0}
+nav.toc a{color:var(--ink)}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto} a.btn:hover{transform:none}}
