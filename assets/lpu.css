@@ -130,3 +130,23 @@ nav.toc a{color:var(--ink)}
 .case .badge.hub{background:rgba(217,119,6,.16); color:#b45309}
 .case .bd{font-size:14.5px; line-height:1.75}
 .case .bd b{display:block; margin-bottom:2px; font-size:15.5px}
+
+/* ── PART 2：流程圖、公式、步驟 ── */
+.fig svg{display:block; width:100%; height:auto; border:1px solid var(--border);
+  border-radius:10px; background:#fff}
+.formula{background:var(--panel); border:1px solid var(--border); border-radius:10px;
+  padding:14px 20px; margin:16px 0; font-size:16px; text-align:center;
+  font-family:"Cambria Math",Cambria,Georgia,serif; overflow-x:auto}
+.formula .sub{font-size:13px; color:var(--soft); font-family:inherit;
+  display:block; margin-top:8px; text-align:left}
+.plain{border-left:3px solid var(--green); background:rgba(34,197,94,.06);
+  border-radius:0 8px 8px 0; padding:11px 16px; margin:16px 0; font-size:15.5px}
+.plain b{color:#15803d}
+.stepmeta{display:flex; flex-wrap:wrap; gap:8px 20px; margin:6px 0 0; padding:0;
+  list-style:none; font-size:13.5px; color:var(--faint)}
+.gap{border:1px solid #fde68a; background:#fffbeb; border-radius:10px;
+  padding:6px 20px 14px; margin:22px 0}
+.gap h4{color:#b45309; margin:14px 0 4px; font-size:15px}
+.gap p{margin:4px 0; font-size:15px}
+svg text{font-family:-apple-system,"Segoe UI","Noto Sans TC","Microsoft JhengHei",
+  "PingFang TC",Roboto,Helvetica,Arial,sans-serif}

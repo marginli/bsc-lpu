@@ -19,7 +19,8 @@ doi:10.1016/j.cub.2010.11.056。
 
 ## 狀態
 
-**PART 1 已完成**，圖由 `scripts/make_figures.py` 從標準腦分區檔自製。
+**PART 1 與 PART 2 已完成。** 圖由 `scripts/make_figures.py` 與 `scripts/make_part2_figures.py` 產生：
+PART 1 的圖出自標準腦分區檔，PART 2 的圖是論文前三個步驟在本機資料上的實跑結果。
 PART 2 的數學條件已照論文補充材料填實，
 其餘內文待逐段補寫。PART 3 的程式碼尚未在真實資料上跑過。
 
