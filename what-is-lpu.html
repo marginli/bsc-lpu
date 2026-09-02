@@ -214,7 +214,13 @@
     <tr><td><b>hub</b><br><span style="color:var(--faint);font-size:13px">轉接區</span></td><td><b>沒有</b></td><td><b>有</b></td><td>沿用 neuropil 的邊界</td></tr>
   </table></div>
 
-  <p><b>但判定不是「一個 neuropil 進去、一個答案出來」。</b>論文一開頭的假設是「LPU 的範圍<b>等於或小於</b>一個解剖學 neuropil 的邊界」，流程也是在 neuropil <b>內部</b>找有沒有需要再細分。實際跑下來卻出現四種情況：</p>
+  <p><b>但判定不是「一個 neuropil 進去、一個答案出來」。</b>論文在導入 LPU 時立了一個前提：<b>LPU 的範圍等於或小於一個解剖學 neuropil 的邊界</b>，流程也只做「在 neuropil <b>內部</b>找有沒有需要再細分」。實際跑下來卻出現四種情況：</p>
+
+  <blockquote>
+    <p style="margin:0 0 6px">補充材料〈Defining an LPU〉一節的第一句：</p>
+    <p style="margin:0"><i>“Assuming an LPU is <b>equal to or smaller than</b> the boundary of an anatomically demarcated neuropil region, we detect whether a neuropil contains more than one population of LNs…”</i></p>
+    <p style="margin:8px 0 0; font-size:14px; color:var(--soft)">正文導入 LPU 的那句用的是同樣的說法，只是主語寫成「一個資訊處理單元」而不是 LPU：<i>“Assuming an information processing unit is equal or smaller than the boundary of an anatomically demarcated neuropil region such as the AL…”</i></p>
+  </blockquote>
 
   <div class="tblwrap"><table>
     <tr><th style="width:30%">情況</th><th>例子</th></tr>
@@ -225,7 +231,7 @@
   </table></div>
 
   <div class="callout">
-    <b>第三種情況與論文自己的假設不一致。</b>假設寫的是 LPU「等於或小於」一個 neuropil，但蕈狀體與中央複合體的處理是把<b>好幾個</b> neuropil 合起來當一個 LPU。論文沒有討論這個落差，也沒有修改那句假設。
+    <b>第三種情況與上面那個前提不一致。</b>前提寫的是 LPU「等於或小於」一個 neuropil，但蕈狀體與中央複合體的處理是把<b>好幾個</b> neuropil 合起來當一個 LPU。論文沒有討論這個落差，也沒有修改那句假設。
   </div>
 
   <div class="callout">
@@ -296,7 +302,7 @@
 
   <p><b>一、看得到纖維，看不到突觸。</b>這是光學顯微鏡解析度的圖譜。它說的是「哪一區的神經元把纖維伸進了哪一區」，不是「哪一顆神經元接到哪一顆神經元」。兩顆神經元的纖維在同一個區域裡出現，不代表它們之間有突觸。論文自己講得很清楚：在缺少突觸細節的情況下，要理解一個 LPU 內部如何處理資訊，還太早。</p>
 
-  <p><b>二、劃分規則本身不完全一致。</b>論文的假設寫的是 LPU「等於或小於」一個 neuropil 的邊界，流程也只做「在 neuropil 內部再細分」；但蕈狀體與中央複合體那兩例，實際上是把好幾個 neuropil 合起來當一個 LPU。論文沒有討論這個落差。要重跑這套流程的人會先卡在這裡——因為合併這一步不在那七個步驟裡。</p>
+  <p><b>二、劃分規則本身不完全一致。</b>論文導入 LPU 時的前提寫的是「等於或小於」一個 neuropil 的邊界（補充材料〈Defining an LPU〉第一句），流程也只做「在 neuropil 內部再細分」；但蕈狀體與中央複合體那兩例，實際上是把好幾個 neuropil 合起來當一個 LPU。論文沒有討論這個落差，也沒有修改那句前提。要重跑這套流程的人會先卡在這裡——因為合併這一步不在那七個步驟裡。</p>
 
   <p><b>三、41 不是一個穩定的數字。</b>VLP 已經被拆成兩個，論文明白承認其他 LPU 也可能有同樣情況，只是目前的解析度與取樣量還看不出來。這是一個當下的暫定值。</p>
 
