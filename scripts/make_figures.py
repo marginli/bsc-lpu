@@ -6,7 +6,8 @@
   FCWBNP 腦區分區標籤     natverse / Ito et al. 2014 Neuron 81:755-765     GPL-3 + 原論文
 
 產出：
-  assets/fig1-mb-four-vs-one.png   開場圖：MB 形態四塊 vs 功能一塊
+  assets/fig1-mb-parts.png         開場圖 A：MB 依形態切成四塊
+  assets/fig1-mb-whole.png         開場圖 B：同一個結構，一整塊
   assets/fig2-neuropils-75.png     替身圖：Ito 2014 的 75 個腦區標籤（41 個基本名）
 
 圖內不放任何中文，全部說明寫在 HTML 的圖說裡（避免 matplotlib 的 CJK 字型問題）。
@@ -138,7 +139,11 @@ def pad(im, m=24):
 
 
 def fig1(labels, table):
-    """開場圖：左＝MB 依形態切成四塊，右＝同一顆 MB 一整塊。"""
+    """開場圖：分成兩張獨立的圖，由 HTML 並排。
+
+    fig1-mb-parts.png  蕈狀體依形態切成四塊
+    fig1-mb-whole.png  同一個結構，一整塊
+    """
     ids_by_base = {}
     for rid, r in table.items():
         ids_by_base.setdefault(r["base_name"], []).append(rid)
@@ -157,9 +162,9 @@ def fig1(labels, table):
     m_f = shade(m_dep, m_mask)
 
     shape = m_lab.shape
-    crop = bbox(g_mask | m_mask, margin=8)
-    panels = []
-    for merged in (False, True):
+    crop = bbox(g_mask | m_mask, margin=6)      # 兩張用同一個裁切框，比例才一致
+
+    for name, merged in (("fig1-mb-parts.png", False), ("fig1-mb-whole.png", True)):
         layers = [(g_mask, GHOST, g_f)]
         if merged:
             layers.append((m_mask, hex2rgb(MB_ONE), m_f))
@@ -167,16 +172,10 @@ def fig1(labels, table):
             for base, hx in MB_PARTS.items():
                 sub = np.isin(m_lab, ids_by_base[base])
                 layers.append((sub, hex2rgb(hx), m_f))
-        panels.append(pad(to_image(compose(shape, layers)[crop])))
-
-    gap = 28
-    w = panels[0].width * 2 + gap
-    canvas = Image.new("RGB", (w, panels[0].height), tuple(BG.astype(int)))
-    canvas.paste(panels[0], (0, 0))
-    canvas.paste(panels[1], (panels[0].width + gap, 0))
-    p = OUT / "fig1-mb-four-vs-one.png"
-    canvas.save(p, optimize=True)
-    print(f"寫出 {p.name}  {canvas.size[0]}×{canvas.size[1]}")
+        # 外框與間距交給 CSS，圖檔只留很窄的邊
+        im = pad(to_image(compose(shape, layers)[crop]), m=8)
+        im.save(OUT / name, optimize=True)
+        print(f"寫出 {name}  {im.size[0]}×{im.size[1]}")
 
 
 def fig1b(labels, table):
