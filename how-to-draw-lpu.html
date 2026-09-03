@@ -154,22 +154,52 @@
 
   <h3>在我們自己的資料上做一次</h3>
 
-  <p>這一步不必只停在紙上。本機有兩樣現成的東西：D03 的標準腦分區（Ito 2014 的 75 個腦區）與 D06 的 28,573 顆 FlyCircuit 骨架體素。把「體素只落在單一腦區」的神經元挑出來當 LN 候選，得到 <b>2,664 顆，佔 9.3%</b>。分布是這樣：</p>
+  <p>這一步不必只停在紙上。本機有兩樣現成的東西：D03 的標準腦分區（Ito 2014 的 75 個腦區）與 D06 的 28,573 顆 FlyCircuit 骨架體素。把「體素只落在單一腦區」的神經元挑出來當 LN 候選，得到 <b>2,664 顆，佔 9.3%</b>，分布在 <b>75 個腦區中的 28 個</b>：</p>
 
   <figure class="fig">
-    <img src="assets/p2-ln-census.png" alt="長條圖：各腦區的 LN 候選數。AL 左 249、右 113，FB 233，PB 81，AVLP 兩側各約 70；而 EB、蕈狀體的四個部分、AOTU 皆為 0 或 1。">
-    <figcaption><b>各腦區有多少「纖維只待在這一區」的神經元。</b>藍色是有 LN 的區域，紅色的 0 是沒有。
+    <img src="assets/p2-ln-census.png" alt="左側為水平長條圖，列出 28 個有 LN 候選的腦區，由髓質 654 到多個腦區各 1，橫軸為對數尺度；右側以四欄列出其餘 47 個為零的腦區，其中蕈狀體四部分、橢球體與左側前視結節以紅色標出。">
+    <figcaption><b>全部 75 個腦區的 LN 候選普查——不是抽樣。</b>左：28 個有至少一顆的腦區（橫軸是<b>對數尺度</b>，否則右邊那些 1 和 2 會看不見）。右：其餘 47 個為 0。橘色與紅色是論文圖 5A 標為「−」的對照區。
     <span class="figsrc">本圖由 <code>scripts/make_part2_figures.py</code> 算出。資料：D06 的 28,573 顆骨架體素 ＋ D03 的腦區標籤。</span></figcaption>
   </figure>
 
   <div class="plain">
-    <b>這張圖獨立重現了論文圖 5A 的正負號。</b>觸角葉（AL）有大量 LN；扇形體（FB）、前腦橋（PB）也有。而<b>蕈狀體的四個部分全部是 0</b>、<b>橢球體（EB）是 0</b>、結節（NO）只有 2、視結節（AOTU）只有 1 和 0。
+    <b>這張圖獨立重現了論文圖 5A 的正負號。</b>觸角葉（AL）左右各有 249 與 113 顆；扇形體（FB）233、前腦橋（PB）81、腹外側前腦（AVLP）兩側各約 70。而<b>蕈狀體的四個部分全部是 0</b>、<b>橢球體（EB）是 0</b>、結節（NO）只有 2、視結節（AOTU）只有 1 和 0。
     <p style="margin-top:8px">我們用的是<b>不同的資料量</b>（28,573 顆 vs 論文的約 16,000 顆）、<b>不同的分區</b>（Ito 2014 vs Chiang 的舊分區）、<b>不同的管線</b>，判定卻一致。<b>這代表這個判準本身是穩的</b>，不是特定資料集的產物。</p>
     <p style="margin-top:8px">它也順帶支持了 <a href="what-is-lpu.html#s6">PART 1 的坑三</a>：EB 確實沒有自己的 LN 族群，圖 5A 給它「−」是對的。</p>
   </div>
 
   <div class="note">
     <b>兩個要說清楚的差異。</b>我們的 9.3% 與論文的「約 26% 屬於 LPU-LN」不是同一個數字——我們的分區更細（75 區，蕈狀體還被切成四塊），區分得越細，能「完全待在單一區內」的神經元就越少。另外我們是用<b>腦區</b>當單位，論文是用 <b>LPU</b> 當單位。
+  </div>
+
+  <h3>28 個腦區有 LN，論文卻數出 41 個 LPU——怎麼回事</h3>
+
+  <p>這個對不上是有原因的，而原因本身很值得先講清楚，否則後面七個步驟會被誤解成「LPU 是被這條演算法算出來的」。</p>
+
+  <div class="callout">
+    <b>41 這個數字，主要不是七步驟的產物。</b>論文的原話是：「<i>Most anatomically demarcated neuropil regions, with a few exceptions, satisfied the criteria of an LPU</i>」——<b>多數解剖學上劃好的 neuropil，本來就通過 LPU 的條件</b>。所以預設是「一個 neuropil ＝ 一個 LPU」，七個步驟只在<b>需要細分時</b>才出手。
+    <p style="margin-top:8px">而它出手成功了幾次？<b>全腦一次。</b>論文寫「<i>In only one case (i.e., VLP), we found two LPUs in one neuropil</i>」。</p>
+  </div>
+
+  <p>把 41 拆開來看，就更清楚了。論文自己給了組成：<b>19 對左右成對的 neuropil（×2 ＝ 38）＋ 3 個中央不成對的（PCB、FB、EB）＝ 41</b>。也就是說只有 <b>22 個不同的名字</b>，41 是把左右分開數的結果。</p>
+
+  <p>再回頭看我們那 28 個。其中 <b>9 對是左右都有</b>的（ME、LO、LOP、AL、AVLP、SMP、LH、IPS、PLP），另外 10 個是單側或本來就不成對的。換算成「名字」是 19 個。<b>19 對 22，其實相當接近</b>——只是這兩個數的意義不同，不該直接相減。</p>
+
+  <div class="danger">
+    <b>更要緊的是：我們的 0 不能當成「這個腦區沒有 LN」。</b>那 47 個 0 裡，有一部分是我們的判準太嚴造成的。
+    <p style="margin-top:8px">我們用的 LN 判準是 <code>n_LPU_touched == 1</code>，門檻是「在某腦區留下 5 個以上的 2 µm 體素才算進入該區」。一顆真正的在地神經元，只要有一小截分枝越過邊界、在隔壁區留下 5 個體素，就會被算成「碰到兩個區」而<b>整顆被丟掉</b>。分區切得越細，邊界越多，被誤殺的就越多——而 Ito 的 75 區正是比 Chiang 的 58 區細。</p>
+  </div>
+
+  <p>另一個方向的問題更根本：<b>一個腦區在我們的普查裡是 0，在論文裡卻可以是某個 LPU 的一部分。</b>蕈狀體就是現成的例子。論文的原話是：</p>
+
+  <blockquote>LN analysis indicated that <b>the entire MB was one LPU</b> because <b>neither the calyx nor the MB lobe had its own populations of LNs</b>.</blockquote>
+
+  <p>讀一次這句的邏輯：蕈狀體的兩個部分<b>都沒有</b>自己的 LN 族群——所以它們<b>合成一個 LPU</b>。我們的表上 MB_CA、MB_PED、MB_VL、MB_ML 四塊全是 0，跟論文說的是同一件事；但在論文那邊，這四個 0 最後貢獻了<b>一對 LPU</b>，不是零個。</p>
+
+  <div class="note">
+    <b>所以這張普查圖能證明什麼、不能證明什麼。</b><br>
+    能：某個腦區<b>有沒有</b>自己的 LN 族群——這正是圖 5A 那一欄正負號在講的事，我們重現了它。<br>
+    不能：直接數出有幾個 LPU。從「哪些區有 LN」走到「有幾個 LPU」，中間還隔著<b>合併</b>（本頁最後一節）與<b>細分</b>（STEP 1–7）兩道手續，而這兩道手續論文都沒有留下可以照著跑的參數。
   </div>
 
   <h2 id="s1"><span class="pt">STEP 1</span>數 LN 纖維，得到密度場 v(r)</h2>

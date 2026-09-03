@@ -74,27 +74,48 @@ def style(ax):
 
 
 # ── 圖 A：各腦區的 LN 候選數 ────────────────────────────────────────────
-def fig_census(rows, n2l):
+def fig_census(rows, n2l, names):
+    """全部 75 個腦區的 LN 候選普查——不是抽樣。"""
     import collections
     c = collections.Counter(m["primary_LPU"] for r in rows
                             if (m := n2l.get(r["name"])) and m["n_LPU_touched"] == "1")
-    show = ["AL_L", "AL_R", "FB", "PB", "AVLP_R", "AVLP_L", "LH_R",
-            "NO", "AOTU_R", "AOTU_L", "EB", "MB_CA_R", "MB_CA_L",
-            "MB_PED_R", "MB_VL_R", "MB_ML_R"]
-    vals = [c.get(k, 0) for k in show]
-    fig, ax = plt.subplots(figsize=(9.2, 4.0), dpi=170)
-    cols = [ACC if v > 0 else "#dc2626" for v in vals]
-    ax.bar(range(len(show)), vals, color=cols, width=.68)
-    for i, v in enumerate(vals):
-        ax.text(i, v + 4, str(v), ha="center", fontsize=9,
-                color=INK if v else "#dc2626", fontweight="bold")
-    ax.set_xticks(range(len(show)))
-    ax.set_xticklabels(show, rotation=45, ha="right", fontsize=9)
-    ax.set_ylabel("neurons confined to this region", fontsize=10, color=INK)
-    ax.set_ylim(0, max(vals) * 1.18)
-    style(ax); fig.tight_layout()
+    nz = sorted([(n, c[n]) for n in names if c.get(n, 0) > 0], key=lambda t: t[1])
+    zero = [n for n in names if c.get(n, 0) == 0]
+    # 圖 5A 上被標成「−」而我們也拿來對照的幾個
+    WATCH = {"MB_CA_R", "MB_CA_L", "MB_PED_R", "MB_PED_L", "MB_VL_R", "MB_VL_L",
+             "MB_ML_R", "MB_ML_L", "EB", "AOTU_L", "AOTU_R", "NO"}
+
+    fig, (ax, bx) = plt.subplots(1, 2, figsize=(11.4, 6.6), dpi=170,
+                                 gridspec_kw={"width_ratios": [1.6, 1]})
+    ys = range(len(nz))
+    ax.barh(list(ys), [v for _, v in nz],
+            color=["#d97706" if n in WATCH else ACC for n, _ in nz], height=.7)
+    for i, (n, v) in enumerate(nz):
+        ax.text(v * 1.14, i, str(v), va="center", fontsize=8, color=INK)
+    ax.set_yticks(list(ys))
+    ax.set_yticklabels([n for n, _ in nz], fontsize=8)
+    ax.set_xscale("log"); ax.set_xlim(.7, 1600)
+    ax.set_xlabel("neurons confined to this region  (log scale)", fontsize=9.5, color=INK)
+    ax.set_title(f"{len(nz)} of {len(names)} regions have at least one",
+                 fontsize=10.5, color=INK, loc="left")
+    style(ax)
+
+    bx.axis("off")
+    bx.set_title(f"the other {len(zero)} regions: zero",
+                 fontsize=10.5, color="#dc2626", loc="left")
+    per = (len(zero) + 3) // 4
+    cols = [zero[i * per:(i + 1) * per] for i in range(4)]
+    for ci, col in enumerate(cols):
+        for ri, n in enumerate(col):
+            bx.text(ci * .26, .93 - ri * .073, n, fontsize=7.4, transform=bx.transAxes,
+                    color="#dc2626" if n in WATCH else GREY,
+                    fontweight="bold" if n in WATCH else "normal")
+    bx.text(0, -.02, "orange / red = marked \u2212 in the paper's Figure 5A",
+            fontsize=8, transform=bx.transAxes, color=GREY)
+    fig.tight_layout()
     fig.savefig(f"{OUT}/p2-ln-census.png"); plt.close(fig)
-    print("寫出 p2-ln-census.png", dict(zip(show, vals)))
+    print("寫出 p2-ln-census.png：非零 %d／%d，LN 候選共 %d"
+          % (len(nz), len(names), sum(v for _, v in nz)))
 
 
 # ── 圖 B：v(r) 的空間分布 ───────────────────────────────────────────────
@@ -196,7 +217,7 @@ def fig_clusters(lab, name2id, rows, vox, nid, n2l, region="AL_R", cut=8.0):
 
 def main():
     lab, names, name2id, rows, vox, nid, n2l = load()
-    fig_census(rows, n2l)
+    fig_census(rows, n2l, names[1:])
     fig_density(lab, name2id, rows, vox, nid, n2l)
     fig_fivenum(lab, name2id, rows, vox, nid, n2l)
     fig_cutheight(lab, name2id, rows, vox, nid, n2l)
