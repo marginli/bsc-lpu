@@ -236,33 +236,46 @@ def fig_fivenum(lab, name2id, rows, vox, nid, n2l, region="AL_R"):
 
 
 # ── 圖 D：切割高度決定答案（核心圖）────────────────────────────────────
+NPERM = 8                  # 打亂體素順序重跑幾次（UPGMA 的平手要靠輸入順序決定）
+
+
 def fig_cutheight(lab, name2id, rows, vox, nid, n2l):
+    """切割高度掃描。每個高度重跑 NPERM 次、每次打亂體素順序，畫成帶狀。"""
     regions = ["AL_R", "AL_L", "AVLP_R", "AVLP_L", "FB", "PB"]
     cuts = np.arange(4, 26, 1.0)
-    fig, ax = plt.subplots(figsize=(9.2, 4.4), dpi=170)
+    rng = np.random.default_rng(0)
+    fig, ax = plt.subplots(figsize=(9.6, 4.6), dpi=170)
     cmap = plt.get_cmap("tab10")
     res = {}
     for k, region in enumerate(regions):
         mask, sm, n = field_of(region, lab, name2id, rows, vox, nid, n2l)
         q = np.percentile(sm[mask], 75)
-        Z = np.argwhere(mask & (sm >= q)).astype(np.float32)
-        L = linkage(pdist(Z), method="average")
+        P = np.argwhere(mask & (sm >= q)).astype(np.float32)
         thr = 0.01 * mask.sum()
-        ys = []
-        for c in cuts:
-            cl = fcluster(L, t=c, criterion="distance")
-            ys.append(int((np.bincount(cl)[1:] > thr).sum()))
-        res[region] = ys
-        ax.plot(cuts, ys, "-o", ms=3.2, lw=1.7, color=cmap(k), label=f"{region} (n={n})")
+        runs = []
+        for t in range(NPERM):
+            Q = P if t == 0 else P[rng.permutation(len(P))]
+            L = linkage(pdist(Q), method="average")
+            runs.append([int((np.bincount(fcluster(L, t=c, criterion="distance"))[1:] > thr).sum())
+                         for c in cuts])
+        A = np.array(runs)
+        lo, hi, mid = A.min(0), A.max(0), np.median(A, 0)
+        res[region] = (lo, hi, mid)
+        ax.fill_between(cuts, lo, hi, color=cmap(k), alpha=.18, lw=0)
+        ax.plot(cuts, mid, "-", lw=1.8, color=cmap(k), label=f"{region} (n={n})")
     ax.set_xlabel("UPGMA cut height  (analysis voxels)", fontsize=10, color=INK)
     ax.set_ylabel("candidate LPUs found\n(clusters > 1% of region)", fontsize=10, color=INK)
     ax.axhline(1, color=GREY, ls=":", lw=1)
+    ax.set_title(f"line = median of {NPERM} runs;  band = min\u2013max over shuffled voxel order",
+                 fontsize=9.5, color=GREY, loc="left")
     ax.legend(fontsize=8.5, frameon=False, ncol=3)
     style(ax); fig.tight_layout()
     fig.savefig(f"{OUT}/p2-cutheight.png"); plt.close(fig)
-    print("寫出 p2-cutheight.png")
-    for r, ys in res.items():
-        print(f"   {r:8s} 群數範圍 {min(ys)}–{max(ys)}")
+    print("寫出 p2-cutheight.png（%d 次打亂）" % NPERM)
+    for r, (lo, hi, mid) in res.items():
+        w = int((hi - lo).max())
+        print("   %-8s 中位範圍 %d–%d；同一高度因順序而變動最多 %d 個"
+              % (r, int(mid.min()), int(mid.max()), w))
     return res
 
 
