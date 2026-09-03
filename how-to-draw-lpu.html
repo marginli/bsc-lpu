@@ -925,14 +925,45 @@
     <tr>
       <td><b>蕈狀體</b></td>
       <td>萼 ＋ 葉<br>兩個 neuropil → 一個 LPU</td>
-      <td>兩者都沒有自己的 LN 族群，所以都不能各自成為 LPU；加上 Kenyon cell 在對外連結上的樣式高度相似</td>
+      <td>Kenyon cell 的樹突在萼、軸突在葉——<b>它跨在兩部分之間</b>，所以切開之後不是任一邊的 LN，合起來才是整個蕈狀體的 LN 族群。論文另外還加了一條理由：MB 裡的 KC 有相似的長程連結樣式</td>
     </tr>
     <tr>
       <td><b>中央複合體</b></td>
       <td>橢球體 ＋ 兩個側三角<br>三個 neuropil → 一個 LPU</td>
-      <td>每一顆橢球體的 LN 把樹突長在同側的側三角、軸突環繞中央的環。原文的語氣是「<b>可以視為</b>（may be considered as）」</td>
+      <td>同一個結構：論文明寫「<i>Each EB LN gives dendrites at ipsilateral lateral triangle and axons surrounding the center ring</i>」——<b>EB 的 LN 本來就跨在側三角與中央環之間</b>。原文的語氣是「<b>可以視為</b>（may be considered as）」</td>
     </tr>
   </table></div>
+
+  <h3>為什麼「都沒有 LN」反而變成合併的理由</h3>
+
+  <p>論文那句話讀起來很奇怪：「<i>the entire MB was one LPU <b>because</b> neither the calyx nor the MB lobe had its own populations of LNs</i>」——<b>兩邊都沒有 LN，怎麼會是合起來就有 LN 的理由？</b></p>
+
+  <div class="plain">
+    <b>關鍵在於 LN 是相對於「哪一塊區域」定義的。</b>「LN」的意思是「神經突完全侷限在<b>某一個區域</b>之內」。同一顆神經元，<b>在細的分區下不是 LN，在粗的分區下可能就是</b>。
+    <p style="margin-top:6px">蕈狀體正是這樣：<b>Kenyon cell 的樹突在萼、軸突在葉。</b>把萼和葉當成兩個區，KC 就是「跨區」的投射神經元，兩邊都不算它的 LN——所以兩邊都沒有 LN 族群。<b>但把整個蕈狀體當成一區，這 2,500 顆 KC 就全部變成它的 LN 族群。</b></p>
+    <p style="margin-top:6px"><b>所以「切開後兩邊都沒有 LN」不是「這裡沒有 LN」，而是「切錯地方了」。</b>該有的 LN 就跨在那條切線上。</p>
+  </div>
+
+  <p>這在我們的資料上量得出來。把蕈狀體的四塊合併成一個區域，重跑 LN 普查：</p>
+
+  <div class="tblwrap"><table>
+    <tr><th></th><th>切成四塊時</th><th>合併成整個蕈狀體</th></tr>
+    <tr><td>右側</td><td>萼 1、柄 0、垂直葉 0、水平葉 0</td><td><b>596</b></td></tr>
+    <tr><td>左側</td><td>四塊全是 0</td><td><b>619</b></td></tr>
+  </table></div>
+
+  <p><b>從幾乎全是 0，一口氣變成上千顆。</b>那些神經元一直都在，只是在細的分區下不符合「LN」的定義。</p>
+
+  <div class="note">
+    <b>中央複合體是同一回事。</b>論文寫「<i>Each EB LN gives dendrites at ipsilateral lateral triangle and axons surrounding the center ring</i>」——EB 的 LN 樹突在側三角、軸突在中央環，一樣跨在兩塊之間。我們把 EB 與兩側的側三角合起來，LN 候選從 <b>11 顆</b>增加到 <b>18 顆</b>（再加上 GA 則是 24 顆）。方向一致，但幅度遠不如蕈狀體——<a href="#s0">EB 本來就是全篇最不穩定的那一個</a>。<br>把蕈狀體與中央複合體這三組都併回去，全腦的 LN 候選從 <b>6,922</b> 增加到 <b>8,143</b> 顆（<code>scripts/merge_check.py</code>）。
+  </div>
+
+  <div class="callout">
+    <b>論文對蕈狀體其實給了兩條理由，分別對應 LPU 的兩個條件。</b><br>
+    <b>條件一（要有自己的 LN 族群）</b>：切開後兩邊都沒有 → 合起來才有。<br>
+    <b>條件二（要有自己的長程神經束）</b>：「<i>KCs in an MB share similar long-range connectivity patterns</i>」——蕈狀體裡的 KC 對外連結的樣式相似，所以把它當一個單位看是合理的。<br>
+    本頁前面那張表的「理由」欄把兩條都列了，但真正撐起「合併」這個動作的是<b>第一條</b>。
+  </div>
 
   <p>這兩個合併在<b>圖 5A 那張正負號表上留下了痕跡</b>：表裡同時有 <code>Cal</code>（−）、<code>MB</code>（−）與 <code>Cal＋MB</code>（＋），也同時有 <code>Lat Tri</code>（−）、<code>EB</code>（−）與 <code>Lat Tri＋EB</code>（＋）。<b>那兩列合併項，就是這一步的存在證據。</b></p>
 
