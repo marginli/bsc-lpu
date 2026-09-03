@@ -221,7 +221,7 @@ def fig_fivenum(lab, name2id, rows, vox, nid, n2l, region="AL_R"):
     q = np.percentile(vals, [0, 25, 50, 75, 100])
     fig, ax = plt.subplots(figsize=(9.2, 3.8), dpi=170)
     ax.hist(vals, bins=70, color="#c7dbff", edgecolor="#93b4f5", linewidth=.4)
-    for lv, lb, col in zip(q[1:4], ["Q1", "median", "Q_U (upper quartile)"],
+    for lv, lb, col in zip(q[1:4], ["lower quartile", "median", "upper quartile  Q_U"],
                            [GREY, GREY, "#dc2626"]):
         ax.axvline(lv, color=col, lw=1.8 if col != GREY else 1.1,
                    ls="-" if col != GREY else "--")

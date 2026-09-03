@@ -90,7 +90,7 @@
 
       <path class="ln" d="M330 346 L330 380"/>
       <rect class="bx" x="120" y="382" width="420" height="42"/>
-      <text class="n" x="136" y="402">4</text><text class="t" x="156" y="402">從最小的群裡挑一顆 LN 當種子，滾雪球招募</text>
+      <text class="n" x="136" y="402">4</text><text class="t" x="156" y="402">從最小的候選 LPU 裡挑一顆 LN 當種子，滾雪球招募</text>
       <text class="s" x="156" y="418">體素放大 4 倍，重疊超過 50% 就併入</text>
 
       <path class="ln" d="M330 424 L330 448"/>
@@ -157,7 +157,7 @@
   <p>這一步不必只停在紙上。本機有兩樣現成的東西：D03 的標準腦分區（Ito 2014 的 75 個腦區）與 D06 的 28,573 顆 FlyCircuit 骨架體素。缺的只有一樣——<b>怎麼判定一顆神經元是不是 LN</b>。</p>
 
   <div class="callout">
-    <b>論文的定義是一句話。</b><i>local interneurons (LNs), whose processes are <b>restricted within a single brain region</b></i>——神經突完全侷限在單一個腦區之內。<br>
+    <b>論文的定義是一句話。</b><i>local interneurons (LNs), whose processes are <b>restricted within a single brain region</b></i>——<b>在地神經元</b>，神經突完全侷限在單一個腦區之內。本頁之後一律簡稱 <b>LN</b>。<br>
     但論文是<b>目視判讀</b>每一顆神經元的支配範圍（<i>visually inspected and delineated</i>），我們沒有那雙眼睛，得把這句話翻成一條算得出來的規則。
   </div>
 
@@ -274,10 +274,10 @@
     <span class="sub">為了壓掉密度的抖動，實際使用的 v(r) 是以 r 為中心的 <b>3×3×3 ＝ 27 個體素</b>的平均。</span>
   </div>
 
-  <div class="plain"><b>白話。</b>把很多顆 LN 疊在一起，變成一個三維的「哪裡比較密」的地圖。3×3×3 平均就是把地圖稍微模糊一下，免得單一格的雜訊被當成訊號。</div>
+  <div class="plain"><b>白話。</b>把很多顆 LN 疊在一起，變成一個三維的「哪裡比較密」的地圖。3×3×3 平均就是把地圖稍微模糊一下，免得單一體素的雜訊被當成訊號。</div>
 
   <figure class="fig">
-    <svg viewBox="0 0 720 250" role="img" aria-label="示意圖：體素格點上有三條纖維穿過，中央那一格被三條穿過所以 v 等於 3；右側示意 3 乘 3 的平均視窗。">
+    <svg viewBox="0 0 720 250" role="img" aria-label="示意圖：體素格點上有三條纖維穿過，中央那個體素被三條穿過所以 v 等於 3；右側示意 3 乘 3 的平均視窗。">
       <style>
         .g{fill:none;stroke:#e4e8ee;stroke-width:1}
         .hit{fill:rgba(37,99,235,.13);stroke:#2563eb;stroke-width:2}
@@ -286,7 +286,7 @@
         .cap{font-size:13px;fill:#5a6b7b}
         .ttl{font-size:13.5px;fill:#1b2733;font-weight:700}
       </style>
-      <text class="ttl" x="14" y="22">數纖維：一格裡有幾條</text>
+      <text class="ttl" x="14" y="22">數纖維：一個體素裡有幾條</text>
       <g transform="translate(14,36)">
         <g class="g">
           <path d="M0 0h300M0 40h300M0 80h300M0 120h300M0 160h300"/>
@@ -297,7 +297,7 @@
         <path class="fb" d="M-4 92 C 70 70, 108 58, 168 62 S 250 92, 304 78" stroke="#16a34a"/>
         <path class="fb" d="M20 164 C 60 120, 120 96, 150 42 S 200 -2, 240 -4" stroke="#9333ea"/>
         <text class="cap" x="186" y="66">v ＝ 3</text>
-        <text class="cap" x="0" y="186">三條纖維穿過藍色那一格，所以它的值是 3</text>
+        <text class="cap" x="0" y="186">三條纖維穿過藍色那個體素，所以它的值是 3</text>
       </g>
       <text class="ttl" x="404" y="22">再取 27 個體素的平均</text>
       <g transform="translate(404,36)">
@@ -308,7 +308,7 @@
         <rect class="win" x="0" y="0" width="180" height="120"/>
         <rect class="hit" x="60" y="40" width="60" height="40"/>
         <text class="cap" x="0" y="146">圖上畫的是 3×3，實際是 3×3×3 的立方體</text>
-        <text class="cap" x="0" y="166">中央那一格的值 ＝ 這 27 格的平均</text>
+        <text class="cap" x="0" y="166">中央那個體素的值 ＝ 這 27 個體素的平均</text>
       </g>
     </svg>
     <figcaption>示意圖，非論文原圖。</figcaption>
@@ -324,7 +324,7 @@
 
   <div class="gap">
     <h4>我們自己那張圖做了論文沒做的事</h4>
-    <p>上面那張 AL_R 的密度圖，除了論文那個 3×3×3 的平均，還先做了一次<b>真正的併格</b>：<code>make_part2_figures.py</code> 裡 <code>B = 4</code>，把 4×4×4 個格子併成一個分析體素，體素數變成原本的 1/64。</p>
+    <p>上面那張 AL_R 的密度圖，除了論文那個 3×3×3 的平均，還先做了一次<b>真正的併格</b>：<code>make_part2_figures.py</code> 裡 <code>B = 4</code>，把 4×4×4 個體素併成一個<b>分析體素</b>，體素數變成原本的 1/64。</p>
     <p style="margin-top:8px">理由是 STEP 3 的距離矩陣——不併格的話，熱點體素數乘進 N(N−1)/2 會直接爆掉記憶體（下面 STEP 3 會再談這件事）。<b>這是我們的工程妥協，不是論文的步驟。</b>代價是：小於一個分析體素的密度結構，在我們的圖上根本不會出現。所以我們掃切割高度掃出來的那些數字，也要放在這個尺度下讀。</p>
   </div>
 
@@ -333,19 +333,20 @@
     <p>論文有兩種說法：</p>
     <p>· 補充材料〈Defining an LPU〉：<i>the number of <b>LN fibers</b> passing through the voxel</i>（穿過該體素的<b>纖維條數</b>）</p>
     <p>· 圖 S5D(b) 的圖說：<i>the number of <b>repetitive registrations</b> of every single voxel</i>（該體素被<b>重複註冊</b>的次數）</p>
-    <p style="margin-top:8px"><b>這兩件事不一樣。</b>「一顆神經元的三條分枝都穿過同一格」在前者算 3、在後者算 1。而從二值化的體素影像，你只做得到後者。我們上面那張圖用的也是後者。</p>
+    <p style="margin-top:8px"><b>這兩件事不一樣。</b>「一顆神經元的三條分枝都穿過同一個體素」在前者算 3、在後者算 1。而從二值化的體素影像，你只做得到後者。我們上面那張圖用的也是後者。</p>
   </div>
 
   <h2 id="s2"><span class="pt">STEP 2</span>取上四分位，留下熱點</h2>
 
-  <p>對某個 neuropil 內所有的 <code>v(r)</code> 做<b>五數綜合</b>（five-number summary：最小值、第一四分位、中位數、第三四分位、最大值）。取上四分位數 <code>Q<sub>U</sub></code>，定義熱點集合：</p>
+  <p>對某個 neuropil 內所有的 <code>v(r)</code> 做<b>五數綜合</b>（five-number summary：最小值、<b>下四分位</b>、中位數、<b>上四分位</b>、最大值）。取上四分位 <code>Q<sub>U</sub></code>，定義熱點集合：</p>
 
   <div class="formula">
     Z ＝ { r : v(r) ≥ Q<sub>U</sub> }
     <span class="sub">只留下這個腦區裡密度最高的那 25% 體素，其餘丟掉。</span>
   </div>
 
-  <div class="plain"><b>白話。</b>像把一張地形圖只保留最高的四分之一——低窪處全部抹平，剩下的山頭才是後面要分群的對象。</div>
+  <div class="plain"><b>白話。</b>像把一張地形圖只保留最高的四分之一——低窪處全部抹平，剩下的山頭才是後面要分群的對象。
+    <p style="margin-top:6px"><b>上四分位</b>就是把所有數字由小排到大之後，位在 <b>75%</b> 那個位置的值。有些書叫它「第三四分位」或 <code>Q3</code>，是同一個東西；<b>本頁一律用「上四分位」</b>，因為論文用的是 <i>upper quartile</i>（<code>Q<sub>U</sub></code>）。</p></div>
 
   <p><b>論文沒有說明為什麼選四分位</b>，不過用四分位而不是一個固定的數字，效果是看得見的：門檻是<b>每個腦區各自算的</b>，所以不論哪一區、LN 有多少顆，都恰好留下自己最密的四分之一。我們在六個腦區上實測，留下的比例是 25.0%–25.2%——這是四分位的定義使然，不是巧合。</p>
 
@@ -354,7 +355,7 @@
   </div>
 
   <figure class="fig">
-    <img src="assets/p2-fivenum.png" alt="直方圖：右側觸角葉內所有體素的密度值分布，標出第一四分位 51.4、中位數 92.9、上四分位 136.5，上四分位右側區域以紅色淡底標示為熱點。">
+    <img src="assets/p2-fivenum.png" alt="直方圖：右側觸角葉內所有體素的密度值分布，標出下四分位 51.4、中位數 92.9、上四分位 136.5，上四分位右側區域以紅色淡底標示為熱點。">
     <figcaption><b>右側觸角葉的真實分布。</b>五數綜合是 0.6 ／ 51.4 ／ 92.9 ／ <b>136.5</b> ／ 206.6。紅線是上四分位 <code>Q<sub>U</sub></code> ＝ 136.5，右邊那塊淡紅色區域就是熱點集合 Z。
     <span class="figsrc">由 <code>scripts/make_part2_figures.py</code> 算出。</span></figcaption>
   </figure>
@@ -425,11 +426,11 @@
 
   <h2 id="s4"><span class="pt">STEP 4</span>從一顆 LN 開始滾雪球</h2>
 
-  <p>在<b>最小</b>的候選群裡，用目視挑一顆纖維侷限在該群內、體積最小的 LN 當作起始的 source。接著：</p>
+  <p>在<b>最小</b>的候選 LPU 裡，用目視挑一顆纖維侷限在該候選 LPU 內、體積最小的 LN 當作起始的<b>種子</b>（論文的原字是 <i>initial source</i>）。接著：</p>
 
   <div class="formula">
-    把所有體素放大 <b>4 倍</b>；若某顆神經元有超過 <b>50%</b> 的體積與 source 重疊，就把它招募進來
-    <span class="sub">被招募的神經元與原 source 合併成新的 source，再去招募下一顆。反覆到找不到新目標為止。</span>
+    把所有體素放大 <b>4 倍</b>；若某顆神經元有超過 <b>50%</b> 的體積與種子重疊，就把它招募進來
+    <span class="sub">被招募的神經元與原本的種子合併成新的種子，再去招募下一顆。反覆到找不到新目標為止。</span>
   </div>
 
   <div class="plain"><b>白話。</b>這是一個「跟我夠像的就算我這一群」的滾雪球。雪球越滾越大，能吸附的對象也越來越多，直到沒有東西可以再吸為止。</div>
@@ -464,7 +465,7 @@
         <circle class="cand" cx="34" cy="140" r="17"/>
         <text class="no" x="6" y="166">×</text>
         <text class="cap" x="20" y="176">重疊不到一半，不收</text>
-        <text class="cap" x="0" y="194">收進來的兩顆合併成新的 source</text>
+        <text class="cap" x="0" y="194">收進來的兩顆合併成新的種子</text>
       </g>
       <g transform="translate(486,26)">
         <text class="stp" x="0" y="0">③ 反覆到收不到為止</text>
@@ -483,7 +484,7 @@
   <div class="gap">
     <h4>兩個要注意的地方</h4>
     <p><b>一、「放大 4 倍」本身就有兩種讀法。</b>原文是 <i>with all voxel units enlarged 4 folds</i>——是每個方向各放大 4 倍（體積變 64 倍），還是體積放大 4 倍（每個方向約 1.6 倍）？兩種讀法差 16 倍，而它直接決定誰會被招募進來。論文沒有再說明，也沒有給這個 4 的推導。<br>（論文也沒有說為什麼要放大。放大顯然是在容忍纖維之間的空隙與跨樣本的對位誤差——但這是我們的解讀，不是論文寫的。）</p>
-    <p><b>二、起始的 LN 是「目視」挑的。</b>這是整條流程唯一明白寫著要人介入的一步。想自動化，就得自己定一條規則（例如：該群內體積最小、且纖維完全落在群內的那一顆），而<b>換一顆種子，招募出來的結果可能不同</b>。</p>
+    <p><b>二、起始的 LN 是「目視」挑的。</b>這是整條流程唯一明白寫著要人介入的一步。想自動化，就得自己定一條規則（例如：該候選 LPU 內體積最小、且纖維完全落在其中的那一顆），而<b>換一顆種子，招募出來的結果可能不同</b>。</p>
   </div>
 
   <h2 id="s5"><span class="pt">STEP 5</span>抽等值面，定出邊界</h2>
