@@ -154,31 +154,61 @@ def coarsen(C, names):
 
 
 def fig_threshold(lab, names, rows, vox, nid):
+    """兩種 LN 代用判準的參數敏感度。左：絕對體素門檻。右：比例門檻。"""
     C = neuron_region_counts(lab, names, rows, vox, nid)
     Cc, kc = coarsen(C, names)
-    N = C.shape[0]
-    ts = np.arange(1, 41)
-    f75 = [((C  >= t).sum(1) == 1).mean() * 100 for t in ts]
-    f61 = [((Cc >= t).sum(1) == 1).mean() * 100 for t in ts]
+    ts = np.unique(np.round(np.logspace(0, np.log10(400), 90)).astype(int))
+    f75 = np.array([((C  >= t).sum(1) == 1).mean() * 100 for t in ts])
+    f61 = np.array([((Cc >= t).sum(1) == 1).mean() * 100 for t in ts])
 
-    fig, ax = plt.subplots(figsize=(9.2, 4.4), dpi=170)
-    ax.axhline(26, color="#dc2626", lw=1.6, ls="--")
-    ax.text(40, 26.8, "the paper: ~26%", ha="right", fontsize=9.5,
+    fig, (ax, bx) = plt.subplots(1, 2, figsize=(11.6, 4.6), dpi=170,
+                                 gridspec_kw={"width_ratios": [1.55, 1]})
+
+    ax.axhline(26, color="#dc2626", lw=1.5, ls="--")
+    ax.text(390, 27.2, "the paper: ~26%", ha="right", fontsize=9,
             color="#dc2626", fontweight="bold")
     ax.plot(ts, f75, color=ACC, lw=2.2, label=f"{len(names)-1} Ito regions")
-    ax.plot(ts, f61, color="#d97706", lw=2.2, label=f"{kc} regions (merged toward Chiang's 58)")
-    ax.plot([5], [f75[4]], "o", color=ACC, ms=7)
-    ax.annotate(f"our figure: {f75[4]:.1f}%\n(threshold = 5 voxels)", (5, f75[4]),
-                textcoords="offset points", xytext=(14, -30), fontsize=9, color=INK,
+    ax.plot(ts, f61, color="#d97706", lw=2.2, label=f"{kc} regions (merged toward 58)")
+    pk = ts[f75.argmax()]
+    ax.plot([pk], [f75.max()], "v", color=ACC, ms=8)
+    ax.text(pk, f75.max() + 2.5, f"peak {f75.max():.0f}% at t\u2248{pk}",
+            ha="center", fontsize=9, color=ACC, fontweight="bold")
+    ax.plot([5], [f75[list(ts).index(5)]], "o", color=ACC, ms=7)
+    ax.annotate("our figure: 9.3%\n(t = 5)", (5, f75[list(ts).index(5)]),
+                textcoords="offset points", xytext=(6, -34), fontsize=9, color=INK,
                 arrowprops=dict(arrowstyle="->", color=GREY, lw=1))
-    ax.set_xlabel("voxels required before a neuron counts as entering a region", fontsize=10, color=INK)
-    ax.set_ylabel("neurons confined to one region  (%)", fontsize=10, color=INK)
-    ax.set_xlim(1, 40); ax.set_ylim(0, 42)
-    ax.legend(frameon=False, fontsize=9.5, loc="upper left")
-    style(ax); fig.tight_layout()
-    fig.savefig(f"{OUT}/p2-threshold.png"); plt.close(fig)
-    print("寫出 p2-threshold.png：門檻 5 → %.1f%%，門檻 20 → %.1f%%；併到 %d 區、門檻 5 → %.1f%%"
-          % (f75[4], f75[19], kc, f61[4]))
+    # 26% 被穿過兩次
+    for i in range(1, len(ts)):
+        if (f75[i-1] - 26) * (f75[i] - 26) < 0:
+            ax.plot([ts[i]], [26], "x", color="#dc2626", ms=9, mew=2.2)
+    ax.set_xscale("log"); ax.set_xlim(1, 400); ax.set_ylim(0, 58)
+    ax.set_xticks([1, 2, 5, 10, 20, 50, 100, 200, 400])
+    ax.get_xaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
+    ax.set_xlabel("t = voxels required to count as entering a region  (log)", fontsize=9.5, color=INK)
+    ax.set_ylabel("neurons confined to one region  (%)", fontsize=9.5, color=INK)
+    ax.set_title("an absolute voxel threshold", fontsize=10.5, color=INK, loc="left")
+    ax.legend(frameon=False, fontsize=9, loc="upper left")
+    style(ax)
+
+    tot = C.sum(1); top = C.max(1); big = tot > 0
+    fs = np.linspace(.5, 1.0, 60)
+    g = [((big & (top >= f * tot)).mean()) * 100 for f in fs]
+    bx.axhline(26, color="#dc2626", lw=1.5, ls="--")
+    bx.plot(fs * 100, g, color="#16a34a", lw=2.2)
+    for f in (.95, 1.0):
+        v = (big & (top >= f * tot)).mean() * 100
+        bx.plot([f * 100], [v], "o", color="#16a34a", ms=6)
+        bx.text(f * 100 - 1, v + 2, f"{v:.1f}%", ha="right", fontsize=9,
+                color="#16a34a", fontweight="bold")
+    bx.set_xlim(50, 101); bx.set_ylim(0, 58)
+    bx.set_xlabel("f = % of the neuron's arbour that must stay in one region", fontsize=9.5, color=INK)
+    bx.set_title("a proportional threshold", fontsize=10.5, color=INK, loc="left")
+    style(bx)
+
+    fig.tight_layout(); fig.savefig(f"{OUT}/p2-threshold.png"); plt.close(fig)
+    cross = [int(ts[i]) for i in range(1, len(ts)) if (f75[i-1]-26)*(f75[i]-26) < 0]
+    print("寫出 p2-threshold.png：t=5 → %.1f%%，峰值 %.1f%% 在 t≈%d，穿過 26%% 的 t = %s"
+          % (f75[list(ts).index(5)], f75.max(), pk, cross))
 
 
 # ── 圖 B：v(r) 的空間分布 ───────────────────────────────────────────────
