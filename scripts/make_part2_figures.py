@@ -118,6 +118,69 @@ def fig_census(rows, n2l, names):
           % (len(nz), len(names), sum(v for _, v in nz)))
 
 
+# ── 圖 A2：LN 比例對「進入腦區」門檻的敏感度 ─────────────────────────────
+# Chiang 是目視判讀，我們是設一個體素門檻。這張圖量的就是這個代用品的代價。
+MERGE = {                       # Ito 明顯把 Chiang 的一區切開的幾組
+    "MB":   ["MB_CA", "MB_PED", "MB_VL", "MB_ML"],   # Chiang: Cal + MB
+    "SOG":  ["GNG", "SAD", "PRW", "FLA", "CAN"],     # Chiang: SOG
+    "VLP":  ["AVLP", "PVLP"],                        # Chiang: VLP
+    "EBLT": ["EB", "BU", "GA"],                      # Chiang: EB + Lat Tri（BU＝舊稱側三角）
+}
+
+
+def neuron_region_counts(lab, names, rows, vox, nid):
+    """神經元 × 腦區的體素數表。"""
+    R, N = len(names), len(rows)
+    ix = vox % GX; iy = (vox // GX) % GY; iz = vox // (GX * GY)
+    L = np.zeros(len(vox), np.int16)
+    ok = ((2*iz < lab.shape[0]) & (2*iy < lab.shape[1]) & (2*ix < lab.shape[2]))
+    L[ok] = lab[2*iz[ok], 2*iy[ok], 2*ix[ok]]
+    k = nid.astype(np.int64) * R + L
+    C = np.bincount(k, minlength=N * R).reshape(N, R); C[:, 0] = 0
+    return C
+
+
+def coarsen(C, names):
+    """把 MERGE 列出的組併起來，逼近 Chiang 的分區粗細。"""
+    n2i = {n: i for i, n in enumerate(names)}
+    C2 = C.copy(); drop = set()
+    for mem in MERGE.values():
+        for side in ("_R", "_L", ""):
+            idx = [n2i[m + side] for m in mem if m + side in n2i]
+            if len(idx) < 2: continue
+            C2[:, idx[0]] = C[:, idx].sum(1); drop |= set(idx[1:])
+    keep = [i for i in range(C.shape[1]) if i not in drop]
+    return C2[:, keep], len(keep) - 1
+
+
+def fig_threshold(lab, names, rows, vox, nid):
+    C = neuron_region_counts(lab, names, rows, vox, nid)
+    Cc, kc = coarsen(C, names)
+    N = C.shape[0]
+    ts = np.arange(1, 41)
+    f75 = [((C  >= t).sum(1) == 1).mean() * 100 for t in ts]
+    f61 = [((Cc >= t).sum(1) == 1).mean() * 100 for t in ts]
+
+    fig, ax = plt.subplots(figsize=(9.2, 4.4), dpi=170)
+    ax.axhline(26, color="#dc2626", lw=1.6, ls="--")
+    ax.text(40, 26.8, "the paper: ~26%", ha="right", fontsize=9.5,
+            color="#dc2626", fontweight="bold")
+    ax.plot(ts, f75, color=ACC, lw=2.2, label=f"{len(names)-1} Ito regions")
+    ax.plot(ts, f61, color="#d97706", lw=2.2, label=f"{kc} regions (merged toward Chiang's 58)")
+    ax.plot([5], [f75[4]], "o", color=ACC, ms=7)
+    ax.annotate(f"our figure: {f75[4]:.1f}%\n(threshold = 5 voxels)", (5, f75[4]),
+                textcoords="offset points", xytext=(14, -30), fontsize=9, color=INK,
+                arrowprops=dict(arrowstyle="->", color=GREY, lw=1))
+    ax.set_xlabel("voxels required before a neuron counts as entering a region", fontsize=10, color=INK)
+    ax.set_ylabel("neurons confined to one region  (%)", fontsize=10, color=INK)
+    ax.set_xlim(1, 40); ax.set_ylim(0, 42)
+    ax.legend(frameon=False, fontsize=9.5, loc="upper left")
+    style(ax); fig.tight_layout()
+    fig.savefig(f"{OUT}/p2-threshold.png"); plt.close(fig)
+    print("寫出 p2-threshold.png：門檻 5 → %.1f%%，門檻 20 → %.1f%%；併到 %d 區、門檻 5 → %.1f%%"
+          % (f75[4], f75[19], kc, f61[4]))
+
+
 # ── 圖 B：v(r) 的空間分布 ───────────────────────────────────────────────
 def fig_density(lab, name2id, rows, vox, nid, n2l, region="AL_R"):
     mask, sm, n = field_of(region, lab, name2id, rows, vox, nid, n2l)
@@ -218,6 +281,7 @@ def fig_clusters(lab, name2id, rows, vox, nid, n2l, region="AL_R", cut=8.0):
 def main():
     lab, names, name2id, rows, vox, nid, n2l = load()
     fig_census(rows, n2l, names[1:])
+    fig_threshold(lab, names, rows, vox, nid)
     fig_density(lab, name2id, rows, vox, nid, n2l)
     fig_fivenum(lab, name2id, rows, vox, nid, n2l)
     fig_cutheight(lab, name2id, rows, vox, nid, n2l)
