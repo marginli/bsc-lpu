@@ -764,7 +764,31 @@
 
   <div class="plain"><b>白話。</b>等值面就像地形圖上的等高線，只是在三維裡它是一個封閉的曲面。你先決定「密度到多少算是在裡面」，這條線就自己畫出來了。</div>
 
-  <p><b>細胞本體位在腦的表層，初級神經突只是把本體接到工作區的一條線</b>——兩者都不在這一區裡工作。留著它們，抽出來的等值面會被硬生生拉出這個腦區。</p>
+  <h3>為什麼要去掉細胞本體與初級神經突</h3>
+
+  <p><b>論文在這一步沒有給理由</b>（原句就是 <i>after removing their primary neurites and soma</i>，沒有下文）。但理由在解剖學上很清楚，而且可以量出來。</p>
+
+  <div class="plain">
+    <b>果蠅的神經細胞本體不在神經纖維網（neuropil）裡。</b>它們排在腦的<b>表層</b>，像果皮一樣包在外面；纖維網在裡面。<b>初級神經突</b>就是從表層的細胞本體伸進纖維網的那一段——它只是條<b>通勤路線</b>，不在任何一區「工作」。
+    <p style="margin-top:6px">論文自己的圖說給了一個例子：某一群神經元「<i>Their cell bodies are located in the ventral brain, and their primary neurites (arrows) project dorsally along the brain midline</i>」——細胞本體在腹側，初級神經突卻沿著腦的中線一路往背側走。<b>這一段路橫跨了好幾個腦區，但它在每一區都只是路過。</b></p>
+  </div>
+
+  <p>把它們留著會怎樣？<b>密度場會在腦區外面多出一團</b>，等值面跟著被拉出去，算出來的「候選 LPU 邊界」就不再是那個腦區的形狀了。這件事在我們的資料上看得很清楚：</p>
+
+  <div class="tblwrap"><table>
+    <tr><th>離細胞本體的路徑深度</th><th>體素數</th><th>落在右觸角葉<b>之外</b></th><th>落在<b>任何腦區之外</b></th></tr>
+    <tr><td><b>0–5（最靠近本體）</b></td><td>4,271</td><td><b>63.2%</b></td><td><b>61.7%</b></td></tr>
+    <tr><td>5–10</td><td>5,647</td><td>39.0%</td><td>37.4%</td></tr>
+    <tr><td>10–20</td><td>22,581</td><td>15.2%</td><td>13.2%</td></tr>
+    <tr><td>20–35</td><td>100,280</td><td>7.9%</td><td>4.9%</td></tr>
+    <tr><td>35–65（中段）</td><td>614,497</td><td>8.0%</td><td>5.3%</td></tr>
+    <tr><td>65–100（末梢）</td><td>549,195</td><td>17.1%</td><td>13.0%</td></tr>
+  </table></div>
+
+  <div class="plain">
+    <b>最靠近細胞本體的那一段，有六成以上根本不在任何一個腦區裡</b>——它就在細胞本體所在的表層，那裡不屬於任何 neuropil。越往裡面走，落在腦區外的比例掉到 8% 左右。<b>去掉本體與初級神經突，去掉的正是這一段「還沒進到工作區」的通勤路線。</b>（<code>scripts/neurite_check.py</code>）
+    <p style="margin-top:6px">順帶一提，論文在別處也是這樣處理的：FlyCircuit 的空間分布分析「<i>the soma was excluded</i>」，圖 S2 的圖說也註明「<i>The soma was excluded</i>」。<b>細胞本體被排除是這套資料的慣例；初級神經突則是在 LPU 這一步才額外去掉的。</b></p>
+  </div>
 
   <figure class="fig">
     <svg viewBox="0 0 720 230" role="img" aria-label="示意圖：同一團神經纖維點雲，取不同的等值面門檻會得到大小相差很多的邊界。">
