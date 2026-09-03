@@ -5,10 +5,10 @@
   D03  標準腦分區（FCWBNP／Ito 2014），以及搬到 FC12_warp 座標框的標籤體積
   D06  28,573 顆 FlyCircuit 骨架的 2 µm 體素化結果與神經元→腦區對照表
 
-「LN 候選」的定義：D06 的 n_LPU_touched == 1，
-即該神經元的體素只落在單一個腦區內——這正是論文對 local neuron 的判準
-（processes are restricted within a single brain region），
-只是分區用的是 Ito 2014 的 75 區，不是 Chiang 2011 的 58 區。
+「LN 候選」的定義：該神經元落在腦區內的體素，有 F_LN 以上集中在同一個腦區。
+論文的原句是 processes are restricted within a single brain region，
+用比例而不是體素數，是因為比例不受神經元大小影響。
+分區用的是 Ito 2014 的 75 區，不是 Chiang 2011 的 58 區。
 
 座標框注意：FC12_warp 的一格不是一個真實微米。
 D03 的 affine 行列式 0.154，奇異值 0.626／0.605／0.406，
@@ -30,6 +30,7 @@ D06 = "/home/wanjuli/claude_linux/BSC_plan/D06"
 OUT = "/home/wanjuli/claude_linux/BSC_plan/specific_topics/LPU/assets"
 GX, GY = 512, 512
 B = 4                      # 分析體素 = 4 個 FC 格，控制距離矩陣大小
+F_LN = 0.80                # LN 候選：至少八成的分枝要待在同一個腦區
 INK, ACC, GREY = "#1b2733", "#2563eb", "#8b98a5"
 
 
@@ -43,11 +44,22 @@ def load():
     return lab, names, {n: i for i, n in enumerate(names)}, rows, vox, nid, n2l
 
 
-def ln_of(region, rows, n2l):
-    """該腦區的 LN 候選：體素只落在這一個腦區裡的神經元。"""
-    return [i for i, r in enumerate(rows)
-            if (m := n2l.get(r["name"])) and m["n_LPU_touched"] == "1"
-            and m["primary_LPU"] == region]
+def ln_table(lab, names, rows, vox, nid, f=F_LN):
+    """回傳 {腦區名: [神經元索引…]}：至少 f 比例的分枝待在該區的神經元。"""
+    C = neuron_region_counts(lab, names, rows, vox, nid)
+    tot = C.sum(1); top = C.max(1); arg = C.argmax(1)
+    out = {}
+    for i in np.flatnonzero((tot > 0) & (top >= f * tot)):
+        out.setdefault(names[arg[i]], []).append(int(i))
+    return out
+
+
+LNTAB = {}                 # 腦區 -> LN 候選的神經元索引；main() 裡建好
+
+
+def ln_of(region, *_):
+    """該腦區的 LN 候選（索引串列）。"""
+    return LNTAB.get(region, [])
 
 
 def field_of(region, lab, name2id, rows, vox, nid, n2l):
@@ -74,28 +86,25 @@ def style(ax):
 
 
 # ── 圖 A：各腦區的 LN 候選數 ────────────────────────────────────────────
-def fig_census(rows, n2l, names):
+def fig_census(names):
     """全部 75 個腦區的 LN 候選普查——不是抽樣。"""
-    import collections
-    c = collections.Counter(m["primary_LPU"] for r in rows
-                            if (m := n2l.get(r["name"])) and m["n_LPU_touched"] == "1")
+    c = {n: len(v) for n, v in LNTAB.items()}
     nz = sorted([(n, c[n]) for n in names if c.get(n, 0) > 0], key=lambda t: t[1])
     zero = [n for n in names if c.get(n, 0) == 0]
-    # 圖 5A 上被標成「−」而我們也拿來對照的幾個
     WATCH = {"MB_CA_R", "MB_CA_L", "MB_PED_R", "MB_PED_L", "MB_VL_R", "MB_VL_L",
              "MB_ML_R", "MB_ML_L", "EB", "AOTU_L", "AOTU_R", "NO"}
 
-    fig, (ax, bx) = plt.subplots(1, 2, figsize=(11.4, 6.6), dpi=170,
+    fig, (ax, bx) = plt.subplots(1, 2, figsize=(11.4, 7.2), dpi=170,
                                  gridspec_kw={"width_ratios": [1.6, 1]})
     ys = range(len(nz))
     ax.barh(list(ys), [v for _, v in nz],
-            color=["#d97706" if n in WATCH else ACC for n, _ in nz], height=.7)
+            color=["#d97706" if n in WATCH else ACC for n, _ in nz], height=.72)
     for i, (n, v) in enumerate(nz):
         ax.text(v * 1.14, i, str(v), va="center", fontsize=8, color=INK)
-    ax.set_yticks(list(ys))
-    ax.set_yticklabels([n for n, _ in nz], fontsize=8)
-    ax.set_xscale("log"); ax.set_xlim(.7, 1600)
-    ax.set_xlabel("neurons confined to this region  (log scale)", fontsize=9.5, color=INK)
+    ax.set_yticks(list(ys)); ax.set_yticklabels([n for n, _ in nz], fontsize=8)
+    ax.set_xscale("log"); ax.set_xlim(.7, 4000)
+    ax.set_xlabel(f"neurons with \u2265{F_LN:.0%} of their arbour in this region  (log scale)",
+                  fontsize=9.5, color=INK)
     ax.set_title(f"{len(nz)} of {len(names)} regions have at least one",
                  fontsize=10.5, color=INK, loc="left")
     style(ax)
@@ -104,16 +113,14 @@ def fig_census(rows, n2l, names):
     bx.set_title(f"the other {len(zero)} regions: zero",
                  fontsize=10.5, color="#dc2626", loc="left")
     per = (len(zero) + 3) // 4
-    cols = [zero[i * per:(i + 1) * per] for i in range(4)]
-    for ci, col in enumerate(cols):
-        for ri, n in enumerate(col):
-            bx.text(ci * .26, .93 - ri * .073, n, fontsize=7.4, transform=bx.transAxes,
+    for ci in range(4):
+        for ri, n in enumerate(zero[ci * per:(ci + 1) * per]):
+            bx.text(ci * .26, .95 - ri * .068, n, fontsize=7.4, transform=bx.transAxes,
                     color="#dc2626" if n in WATCH else GREY,
                     fontweight="bold" if n in WATCH else "normal")
     bx.text(0, -.02, "orange / red = marked \u2212 in the paper's Figure 5A",
             fontsize=8, transform=bx.transAxes, color=GREY)
-    fig.tight_layout()
-    fig.savefig(f"{OUT}/p2-ln-census.png"); plt.close(fig)
+    fig.tight_layout(); fig.savefig(f"{OUT}/p2-ln-census.png"); plt.close(fig)
     print("寫出 p2-ln-census.png：非零 %d／%d，LN 候選共 %d"
           % (len(nz), len(names), sum(v for _, v in nz)))
 
@@ -153,62 +160,40 @@ def coarsen(C, names):
     return C2[:, keep], len(keep) - 1
 
 
-def fig_threshold(lab, names, rows, vox, nid):
-    """兩種 LN 代用判準的參數敏感度。左：絕對體素門檻。右：比例門檻。"""
+def fig_criterion(lab, names, rows, vox, nid):
+    """比例判準的敏感度：f 從 50% 掃到 100%。"""
     C = neuron_region_counts(lab, names, rows, vox, nid)
-    Cc, kc = coarsen(C, names)
-    ts = np.unique(np.round(np.logspace(0, np.log10(400), 90)).astype(int))
-    f75 = np.array([((C  >= t).sum(1) == 1).mean() * 100 for t in ts])
-    f61 = np.array([((Cc >= t).sum(1) == 1).mean() * 100 for t in ts])
+    tot = C.sum(1); top = C.max(1); arg = C.argmax(1); big = tot > 0
+    fs = np.unique(np.append(np.linspace(.5, 1.0, 60), F_LN))
+    g = np.array([(big & (top >= f * tot)).mean() * 100 for f in fs])
+    nreg = np.array([len({arg[i] for i in np.flatnonzero(big & (top >= f * tot))})
+                     for f in fs])
 
-    fig, (ax, bx) = plt.subplots(1, 2, figsize=(11.6, 4.6), dpi=170,
-                                 gridspec_kw={"width_ratios": [1.55, 1]})
-
+    fig, (ax, bx) = plt.subplots(1, 2, figsize=(11.2, 4.2), dpi=170)
+    for a_, y, lab_, col in ((ax, g, "neurons judged LN  (%)", "#16a34a"),
+                             (bx, nreg, "regions with at least one LN", ACC)):
+        a_.plot(fs * 100, y, color=col, lw=2.2)
+        i = int(np.argmin(abs(fs - F_LN)))
+        a_.plot([F_LN * 100], [y[i]], "o", color=col, ms=8)
+        txt = f"f = {F_LN:.0%}\n{y[i]:.1f}%" if col == "#16a34a" else f"f = {F_LN:.0%}\n{y[i]:.0f} regions"
+        a_.annotate(txt, (F_LN * 100, y[i]), textcoords="offset points",
+                    xytext=(-14, -34), ha="right", fontsize=9.5, color=INK,
+                    fontweight="bold", arrowprops=dict(arrowstyle="->", color=GREY, lw=1))
+        a_.set_xlabel("f = % of the neuron's arbour that must stay in one region",
+                      fontsize=9.5, color=INK)
+        a_.set_ylabel(lab_, fontsize=9.5, color=INK)
+        a_.set_xlim(50, 101); style(a_)
     ax.axhline(26, color="#dc2626", lw=1.5, ls="--")
-    ax.text(390, 27.2, "the paper: ~26%", ha="right", fontsize=9,
+    ax.text(100, 27.5, "the paper: ~26%", ha="right", fontsize=9,
             color="#dc2626", fontweight="bold")
-    ax.plot(ts, f75, color=ACC, lw=2.2, label=f"{len(names)-1} Ito regions")
-    ax.plot(ts, f61, color="#d97706", lw=2.2, label=f"{kc} regions (merged toward 58)")
-    pk = ts[f75.argmax()]
-    ax.plot([pk], [f75.max()], "v", color=ACC, ms=8)
-    ax.text(pk, f75.max() + 2.5, f"peak {f75.max():.0f}% at t\u2248{pk}",
-            ha="center", fontsize=9, color=ACC, fontweight="bold")
-    ax.plot([5], [f75[list(ts).index(5)]], "o", color=ACC, ms=7)
-    ax.annotate("our figure: 9.3%\n(t = 5)", (5, f75[list(ts).index(5)]),
-                textcoords="offset points", xytext=(6, -34), fontsize=9, color=INK,
-                arrowprops=dict(arrowstyle="->", color=GREY, lw=1))
-    # 26% 被穿過兩次
-    for i in range(1, len(ts)):
-        if (f75[i-1] - 26) * (f75[i] - 26) < 0:
-            ax.plot([ts[i]], [26], "x", color="#dc2626", ms=9, mew=2.2)
-    ax.set_xscale("log"); ax.set_xlim(1, 400); ax.set_ylim(0, 58)
-    ax.set_xticks([1, 2, 5, 10, 20, 50, 100, 200, 400])
-    ax.get_xaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
-    ax.set_xlabel("t = voxels required to count as entering a region  (log)", fontsize=9.5, color=INK)
-    ax.set_ylabel("neurons confined to one region  (%)", fontsize=9.5, color=INK)
-    ax.set_title("an absolute voxel threshold", fontsize=10.5, color=INK, loc="left")
-    ax.legend(frameon=False, fontsize=9, loc="upper left")
-    style(ax)
-
-    tot = C.sum(1); top = C.max(1); big = tot > 0
-    fs = np.linspace(.5, 1.0, 60)
-    g = [((big & (top >= f * tot)).mean()) * 100 for f in fs]
-    bx.axhline(26, color="#dc2626", lw=1.5, ls="--")
-    bx.plot(fs * 100, g, color="#16a34a", lw=2.2)
-    for f in (.95, 1.0):
-        v = (big & (top >= f * tot)).mean() * 100
-        bx.plot([f * 100], [v], "o", color="#16a34a", ms=6)
-        bx.text(f * 100 - 1, v + 2, f"{v:.1f}%", ha="right", fontsize=9,
-                color="#16a34a", fontweight="bold")
-    bx.set_xlim(50, 101); bx.set_ylim(0, 58)
-    bx.set_xlabel("f = % of the neuron's arbour that must stay in one region", fontsize=9.5, color=INK)
-    bx.set_title("a proportional threshold", fontsize=10.5, color=INK, loc="left")
-    style(bx)
-
-    fig.tight_layout(); fig.savefig(f"{OUT}/p2-threshold.png"); plt.close(fig)
-    cross = [int(ts[i]) for i in range(1, len(ts)) if (f75[i-1]-26)*(f75[i]-26) < 0]
-    print("寫出 p2-threshold.png：t=5 → %.1f%%，峰值 %.1f%% 在 t≈%d，穿過 26%% 的 t = %s"
-          % (f75[list(ts).index(5)], f75.max(), pk, cross))
+    bx.axhline(41, color="#dc2626", lw=1.5, ls="--")
+    bx.text(100, 42.5, "the paper: 41 LPUs", ha="right", fontsize=9,
+            color="#dc2626", fontweight="bold")
+    ax.set_ylim(0, 62); bx.set_ylim(0, 62)
+    fig.tight_layout(); fig.savefig(f"{OUT}/p2-criterion.png"); plt.close(fig)
+    i = int(np.argmin(abs(fs - F_LN)))
+    print("寫出 p2-criterion.png：f=%.0f%% → %.1f%% 的神經元、%d 個腦區"
+          % (F_LN * 100, g[i], nreg[i]))
 
 
 # ── 圖 B：v(r) 的空間分布 ───────────────────────────────────────────────
@@ -310,8 +295,9 @@ def fig_clusters(lab, name2id, rows, vox, nid, n2l, region="AL_R", cut=8.0):
 
 def main():
     lab, names, name2id, rows, vox, nid, n2l = load()
-    fig_census(rows, n2l, names[1:])
-    fig_threshold(lab, names, rows, vox, nid)
+    LNTAB.update(ln_table(lab, names, rows, vox, nid))
+    fig_census(names[1:])
+    fig_criterion(lab, names, rows, vox, nid)
     fig_density(lab, name2id, rows, vox, nid, n2l)
     fig_fivenum(lab, name2id, rows, vox, nid, n2l)
     fig_cutheight(lab, name2id, rows, vox, nid, n2l)
