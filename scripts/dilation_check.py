@@ -29,6 +29,14 @@ def run(region="AL_R", nsample=60, seed=0):
         k = (n == i); a = np.zeros(sh, bool)
         a[iz[k]-z0+4, iy[k]-y0+4, ix[k]-x0+4] = True; return a
 
+    # 先看「一個體素被幾顆神經元佔用」——體素比纖維粗，共用是常態
+    uv, cnt = np.unique(v, return_counts=True)
+    print(f"{region}：{len(S)} 顆共佔 {len(uv)} 個相異體素；"
+          f"每格被佔用的神經元數 中位 {int(np.median(cnt))}、平均 {cnt.mean():.1f}、最大 {cnt.max()}")
+    print(f"   只被 1 顆佔用 {(cnt==1).sum()}（{(cnt==1).mean()*100:.1f}%）、"
+          f"2 顆以上 {(cnt>=2).sum()}（{(cnt>=2).mean()*100:.1f}%）、"
+          f"10 顆以上 {(cnt>=10).sum()}（{(cnt>=10).mean()*100:.1f}%）")
+
     M = {i: mask_of(i) for i in ids}
     st = ndimage.generate_binary_structure(3, 1)
     print(f"{region}：LN 候選 {len(S)} 顆，抽 {len(ids)} 顆；每顆體素數中位 "
