@@ -23,6 +23,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
+      # _notes/ 是給教材設計者的修正紀錄，不對外發布
+      - run: rm -rf _notes
       - uses: actions/upload-pages-artifact@v3
         with:
           path: .
