@@ -14,6 +14,12 @@ m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
 GX, GY = 512, 512
 
 
+def ref(a, k=1):
+    """參考形狀撐大 k 格後的體積倍率——倍率取決於形狀的表面體積比，不是常數。"""
+    p = np.pad(a, k + 1)
+    return ndimage.binary_dilation(p, ndimage.generate_binary_structure(3, 1), iterations=k).sum() / a.sum()
+
+
 def run(region="AL_R", nsample=60, seed=0):
     lab, names, n2i, rows, vox, nid, n2l = m.load()
     m.LNTAB.update(m.ln_table(lab, names, rows, vox, nid))
@@ -50,6 +56,13 @@ def run(region="AL_R", nsample=60, seed=0):
     print("\n撐大幾格 → 體積幾倍（中位）：", {k: round(float(np.median(
         [ndimage.binary_dilation(M[i], st, iterations=k).sum()/M[i].sum() for i in ids])), 1)
         for k in (1, 2, 3, 4)})
+    f1 = np.array([ndimage.binary_dilation(M[i], st, 1).sum()/M[i].sum() for i in ids])
+    print(f"   撐大 1 格的倍率分布：中位 {np.median(f1):.1f}，範圍 {f1.min():.1f}–{f1.max():.1f}")
+    # 這個倍率不是常數，取決於形狀的表面體積比
+    print("   對照（撐大 1 格）：", {
+        "單一體素": round(float(ref(np.ones((1, 1, 1), bool))), 1),
+        "一格寬直線": round(float(ref(np.ones((1, 1, 50), bool))), 1),
+        **{f"實心{L}立方": round(float(ref(np.ones((L, L, L), bool))), 1) for L in (4, 8, 16, 32)}})
     print()
     print(f"{region}：LN 候選 {len(S)} 顆，抽 {len(ids)} 顆；每顆體素數中位 "
           f"{int(np.median([M[i].sum() for i in ids]))}")
