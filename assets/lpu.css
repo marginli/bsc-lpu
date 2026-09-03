@@ -157,3 +157,16 @@ nav.toc a{color:var(--ink)}
 .gap p{margin:4px 0; font-size:15px}
 svg text{font-family:-apple-system,"Segoe UI","Noto Sans TC","Microsoft JhengHei",
   "PingFang TC",Roboto,Helvetica,Arial,sans-serif}
+
+/* PART 3：可直接複製的指令框 */
+.prompt{border:1px solid #cbd5e1; border-left:5px solid #334155; background:#f8fafc;
+  border-radius:10px; padding:16px 20px 18px; margin:14px 0 18px}
+.prompt .lbl{font-size:12px; font-weight:700; letter-spacing:.06em; color:#475569; margin:0 0 8px}
+.prompt pre{margin:0; padding:0; background:none; border-radius:0; overflow:visible;
+  white-space:pre-wrap; word-break:break-word;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Noto Sans TC",monospace;
+  font-size:14.5px; line-height:1.9; color:#0f172a}
+.cmd{border-top:2px solid var(--border); margin:44px 0 0; padding-top:22px}
+.cmd h3{margin:0 0 4px}
+.cmd .meta{font-size:13px; color:var(--faint); margin:0 0 14px}
+.cmd h4{font-size:15px; margin:18px 0 6px; color:var(--ink)}
