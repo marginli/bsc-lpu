@@ -560,17 +560,17 @@
   </figure>
 
   <div class="tblwrap"><table>
-    <tr><th>腦區</th><th>LN 候選數</th><th>候選 LPU 數的範圍</th></tr>
-    <tr><td>AL_R（右觸角葉）</td><td>723</td><td>0 – 12</td></tr>
+    <tr><th>腦區</th><th>LN 候選數</th><th>候選 LPU 數的範圍<br><span style="font-weight:400;color:var(--faint)">（高度 4–25 × 八次打亂）</span></th></tr>
+    <tr><td>AL_R（右觸角葉）</td><td>723</td><td>0 – 16</td></tr>
     <tr><td>AL_L（左觸角葉）</td><td>780</td><td>0 – 15</td></tr>
     <tr><td>AVLP_R</td><td>163</td><td>0 – 16</td></tr>
-    <tr><td>AVLP_L</td><td>270</td><td>0 – 13</td></tr>
-    <tr><td>FB（扇形體）</td><td>1,354</td><td>1 – 12</td></tr>
+    <tr><td>AVLP_L</td><td>270</td><td>0 – 15</td></tr>
+    <tr><td>FB（扇形體）</td><td>1,354</td><td>1 – 13</td></tr>
     <tr><td>PB（前腦橋）</td><td>106</td><td>1 – 10</td></tr>
   </table></div>
 
   <div class="danger">
-    <b>同一個觸角葉，可以被判成 0 個、1 個，也可以被判成 12 個。</b>差別只在規則 ① 剪在哪裡（0 那個是規則 ② 把 50 群全刷掉的結果）。
+    <b>同一個觸角葉，可以被判成 0 個、1 個，也可以被判成 16 個。</b>差別只在規則 ① 剪在哪裡、以及體素用什麼順序排（0 那個是規則 ② 把 50 群全刷掉的結果）。
     <p style="margin-top:8px">曲線中段確實有平台，但<b>每個腦區的平台高度不一樣</b>。切割高度 14 到 20 這一段是最穩的：</p>
     <div class="tblwrap"><table>
       <tr><th>切割高度 14–20</th><th>AL_R</th><th>AL_L</th><th>AVLP_R</th><th>AVLP_L</th><th>FB</th><th>PB</th></tr>
@@ -622,7 +622,7 @@
         <circle class="cand" cx="124" cy="52" r="19"/>
         <circle class="cand" cx="118" cy="106" r="16"/>
         <circle class="cand" cx="52" cy="132" r="17"/>
-        <text class="cap" x="0" y="176">最小群裡體積最小的 LN</text>
+        <text class="cap" x="0" y="176">最小的候選 LPU 裡最小的 LN</text>
         <text class="cap" x="0" y="194">虛線＝放大 4 倍後的範圍</text>
       </g>
       <g transform="translate(250,26)">
@@ -662,7 +662,7 @@
 
   <div class="plain"><b>白話。</b>等值面就像地形圖上的等高線，只是在三維裡它是一個封閉的曲面。你先決定「密度到多少算是在裡面」，這條線就自己畫出來了。</div>
 
-  <p><b>為什麼要去掉細胞本體與初級神經突？</b>因為它們不是「在這一區工作」的部分。細胞本體位在腦的表層，初級神經突只是把本體接到工作區的一條線。把它們算進去，邊界會被硬生生拉出這個區域。</p>
+  <p><b>細胞本體位在腦的表層，初級神經突只是把本體接到工作區的一條線</b>——兩者都不在這一區裡工作。留著它們，抽出來的等值面會被硬生生拉出這個腦區。</p>
 
   <figure class="fig">
     <svg viewBox="0 0 720 230" role="img" aria-label="示意圖：同一團神經纖維點雲，取不同的等值面門檻會得到大小相差很多的邊界。">
@@ -701,7 +701,7 @@
   </figure>
 
   <div class="gap">
-    <h4>第二個沒給的參數</h4>
+    <h4>又一個沒給的參數</h4>
     <p>等值面的門檻要設多少，論文沒有寫。而它直接決定候選 LPU 的<b>體積</b>——也就直接影響下一步的 c 值。</p>
   </div>
 
@@ -819,7 +819,7 @@
 
   <div class="tblwrap"><table>
     <tr><th style="width:20%">在哪一步</th><th style="width:30%">缺什麼</th><th>影響</th></tr>
-    <tr><td>STEP 3</td><td><b>UPGMA 樹的切割高度</b></td><td>直接決定找到幾個候選 LPU。上面那張圖顯示同一個觸角葉可以是 1 個、也可以是 12 個</td></tr>
+    <tr><td>STEP 3</td><td><b>UPGMA 樹的切割高度</b></td><td>直接決定找到幾個候選 LPU。同一個右觸角葉可以是 1 個，也可以是 16 個</td></tr>
     <tr><td>STEP 5</td><td><b>等值面的門檻</b></td><td>決定候選 LPU 的體積，連帶影響 c 值</td></tr>
     <tr><td>STEP 4</td><td><b>起始 LN 靠目視挑</b></td><td>整條流程唯一明寫要人介入的一步；換一顆種子，招募結果可能不同</td></tr>
   </table></div>
