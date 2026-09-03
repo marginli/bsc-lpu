@@ -598,7 +598,7 @@
   <p><b>這一步要做什麼，論文說得很清楚：把屬於這個候選 LPU 的 LN 全部收集起來。</b>正文第四步的標題是「<i>recruiting LNs into each subdivision</i>」（把 LN 招募進每一個細分區）；補充材料則說被招募的神經元「<i>designated as <b>building blocks</b> for the candidate LPU</i>」——它們就是這個候選 LPU 的組成單位，而下一步的邊界就是繞著它們畫出來的。</p>
 
   <div class="plain">
-    <b>為什麼不能直接用 STEP 3 的那群體素當邊界？</b>因為那群體素只是「密度高的地方」，是一團沒有身分的格子。<b>LPU 的定義講的是「有自己的 LN 族群」，所以最後要交出來的是一份神經元名單，不是一團體素。</b>這一步就是從一顆種子出發，把整份名單找齊。
+    <b>為什麼不能直接用 STEP 3 的那群體素當邊界？</b>因為那群體素只是「密度高的地方」，是一團沒有身分的體素。<b>LPU 的定義講的是「有自己的 LN 族群」，所以最後要交出來的是一份神經元名單，不是一團體素。</b>這一步就是從一顆種子出發，把整份名單找齊。
   </div>
 
   <p>作法是：在<b>最小</b>的候選 LPU 裡，用目視挑一顆纖維侷限在該候選 LPU 內、體積最小的 LN 當作起始的<b>種子</b>（論文的原字是 <i>initial source</i>）。接著：</p>
@@ -783,11 +783,15 @@
   </table></div>
 
   <div class="gap">
-    <h4>一個先後順序的問題</h4>
-    <p>步驟七要用「有沒有神經束」來驗證 LPU。但論文辨識神經束的方法是——</p>
-    <p style="margin:8px 0"><i>“we clustered neurons based on whether they follow a similar trajectory path <b>linking specific LPUs</b>”</i>（依據神經元是否沿著相似的軌跡路徑<b>連接特定的 LPU</b> 來分群）</p>
-    <p><b>也就是說：要找神經束，得先有 LPU；要驗證 LPU，又要先有神經束。</b>論文沒有交代這兩件事的先後。</p>
-    <p style="margin-top:8px">合理的猜測是步驟七用的是比較寬鬆的「有沒有長程纖維束經過這裡」，而不是那正式的 58 條——但論文沒有這樣寫。<b>實作時你得自己決定先做哪一個。</b></p>
+    <h4>神經束是連接 LPU 還是連接 neuropil？論文兩處寫得不一樣</h4>
+    <p>步驟七要用「有沒有神經束」來驗證 LPU。那神經束本身是怎麼定出來的？<b>論文的正文與補充材料給了不同的答案。</b></p>
+    <div class="tblwrap"><table>
+      <tr><th style="width:22%">出處</th><th>原文</th><th style="width:20%">節點是</th></tr>
+      <tr><td><b>正文</b></td><td><i>we clustered neurons based on whether they follow a similar trajectory path linking specific <b>LPUs</b></i></td><td><b>LPU</b></td></tr>
+      <tr><td><b>補充材料<br>〈Searching Neural Tracts〉</b></td><td><i>For a selected neuron linking two <b>neuropils</b>, an average position of all terminals within each of the two regions was first determined…paths within the two selected <b>neuropils</b> were removed</i></td><td><b>neuropil</b></td></tr>
+    </table></div>
+    <p style="margin-top:8px"><b>差別很要緊。</b>照正文那句，要找神經束得先有 LPU，而驗證 LPU 又要先有神經束——那是個循環。<b>但照補充材料的演算法，神經束是在 neuropil 之間找的，根本用不到 LPU，循環就不存在。</b></p>
+    <p style="margin-top:8px">兩處哪一個算數，論文沒有說。<b>實作時建議照補充材料</b>——那是唯一寫出可執行步驟的地方（兩端平均終點位置相距 &lt; 30 個體素、總路徑長度相似度 &gt; 60%），而且它讓步驟七跑得起來。</p>
   </div>
 
   <h2 id="sx"><span class="pt">步驟以外</span>合併：論文做了，但沒有寫成步驟</h2>
@@ -837,7 +841,7 @@
     <tr><td>STEP 1</td><td><b>v(r) 是數纖維條數，還是數重疊的神經元數</b></td><td>補充材料與圖 S5D 的說法不同。從二值化影像只做得到後者</td></tr>
     <tr><td>STEP 4</td><td><b>「放大 4 倍」是每個方向 4 倍，還是體積 4 倍</b></td><td>兩種讀法差 16 倍，直接決定招募到誰</td></tr>
     <tr><td>STEP 3</td><td><b>UPGMA 平手時挑哪一對</b></td><td>體素在規則格點上，距離大量重複（489 萬對只有 573 種值）。演算法沒有規定，實作按輸入順序挑；打亂順序，同一個高度的答案可差 7 個</td></tr>
-    <tr><td>STEP 7</td><td><b>神經束與 LPU 的先後</b></td><td>找神經束要先有 LPU，驗證 LPU 又要先有神經束</td></tr>
+    <tr><td>STEP 7</td><td><b>神經束的節點是 LPU 還是 neuropil</b></td><td>正文寫 LPU（會造成循環），補充材料的演算法寫 neuropil（不會）。兩處不一致，論文沒有裁決</td></tr>
   </table></div>
 
   <h3>還有兩件不在七個步驟裡的</h3>
