@@ -893,7 +893,7 @@
   </figure>
 
   <div class="note">
-    <b>實作上有個小訣竅。</b>「把表面均勻內縮到剩 80% 體素」聽起來要做曲面運算，其實不必：對候選區域做一次<b>距離轉換</b>（算每個體素離表面多遠），依距離排序，取最內側的 80% 就是 A。這一點 <a href="python-lpu.html">PART 3</a> 會用到。
+    <b>實作上有個小訣竅。</b>「把表面均勻內縮到剩 80% 體素」聽起來要做曲面運算，其實不必：對候選區域做一次<b>距離轉換</b>（算每個體素離表面多遠），依距離排序，取最內側的 80% 就是 A。這一點 <a href="python-lpu.html">PART 5</a> 會用到。
   </div>
 
   <h2 id="s7"><span class="pt">STEP 7</span>驗證：有沒有自己的長程神經束</h2>
@@ -1026,12 +1026,12 @@
   </div>
 
   <div class="note">
-    看完了怎麼算，下一步是自己動手算一次。<b>上面那六張真實資料的圖，其實就是 STEP 0 到 STEP 3 的產出</b>——程式在 <code>scripts/make_part2_figures.py</code>。<a href="python-lpu.html">PART 3</a> 會把七個步驟完整地接成一條管線，並且逐一面對這九個要自己決定的地方。
+    看完了怎麼算，下一步是自己動手算一次。<b>上面那六張真實資料的圖，其實就是 STEP 0 到 STEP 3 的產出</b>——程式在 <code>scripts/make_part2_figures.py</code>。<a href="agent-prompts.html">PART 3</a> 會把這條流程拆成一串交給 AI Agent 的指令，<a href="agent-run.html">PART 4</a> 真的讓它跑一遍，<a href="python-lpu.html">PART 5</a> 則是不靠 AI、自己寫程式做一次。<b>那九個要自己決定的地方，三者都躲不掉。</b>
   </div>
 
   <div class="pager">
     <a href="what-is-lpu.html">← PART 1　什麼是 LPU</a>
-    <a href="python-lpu.html">PART 3　用 Python 實作 →</a>
+    <a href="agent-prompts.html">PART 3　要怎麼交代 AI Agent →</a>
   </div>
 </div>
 <div class="foot">BSC 腦空間體研究中心 · 專題課程 LPU · PART 2　｜　真實資料圖由 <code>scripts/make_part2_figures.py</code> 以 D03 分區與 D06 骨架體素算出；流程圖與示意圖為自行繪製，非論文原圖重製</div>

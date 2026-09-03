@@ -21,9 +21,9 @@
     <dt>為什麼值得單獨開一堂</dt>
     <dd>把腦切成幾塊、每塊的邊界畫在哪裡，決定了後面所有網路分析的結論。LPU 提供的不是一張圖，而是一個<b>可計算、可重跑、可被推翻</b>的劃分準則。看懂它，等於看懂「一個腦區的定義如何被寫成演算法」。</dd>
     <dt>怎麼讀</dt>
-    <dd>按下面三個按鈕的順序：先弄懂概念，再看論文怎麼劃，最後自己用 Python 跑一次。</dd>
+    <dd>按下面五個按鈕的順序：先弄懂概念（1）、看論文怎麼劃（2），再看怎麼把這件事交代給 AI Agent（3）、AI 真的跑起來會怎樣（4），最後是不靠 AI、自己寫程式做一次（5）。</dd>
     <dt>需要什麼基礎</dt>
-    <dd>前兩部分不需要程式基礎。第三部分需要能跑 Python 與 NumPy。</dd>
+    <dd>PART 1、2、3 不需要程式基礎。PART 4 只要看得懂「AI 做了什麼」即可。PART 5 需要能跑 Python 與 NumPy。</dd>
   </dl></div>
 
   <div class="btns">
@@ -39,11 +39,23 @@
       <p class="s">論文用七個步驟把「一個腦區」變成一段可執行的流程。但七個步驟不是全部——照著跑，會發現有九件事得自己決定：三個沒給的參數、四處定義含糊，加上兩件論文做了卻沒寫成步驟的事。</p>
       <p class="m">方法為主 · 公式都配白話 · 已完成</p>
     </a>
-    <a class="btn c3" href="python-lpu.html">
+    <a class="btn c4 soon" href="agent-prompts.html">
       <span class="no">PART 3</span>
-      <span class="t">如何用 Python 實作畫出 LPU</span>
-      <p class="s">把 PART 2 的七個步驟一一對應到可以跑的程式碼：NumPy 體素場、SciPy 的 UPGMA、marching cubes 抽等值面，最後畫出來。</p>
-      <p class="m">實作為主 · 需要 Python 與 NumPy</p>
+      <span class="t">要怎麼交代 AI Agent</span>
+      <p class="s">把 PART 2 的流程拆成一串可以直接貼給 AI Agent 的指令。重點不在「叫它寫程式」，而在<b>那九個論文沒交代的決定，要在哪一句指令裡講清楚</b>。</p>
+      <p class="m">指令設計 · 不需程式基礎 · 規劃中</p>
+    </a>
+    <a class="btn c5 soon" href="agent-run.html">
+      <span class="no">PART 4</span>
+      <span class="t">真的讓 AI Agent 跑一遍</span>
+      <p class="s">把 PART 3 那串指令一口氣交給 AI Agent，完整記錄它做了什麼、在哪裡卡住、產出什麼。<b>目標是拿到一張我們自己算出來的全腦 LPU 圖。</b></p>
+      <p class="m">實跑紀錄 · 過程與錯誤都保留 · 規劃中</p>
+    </a>
+    <a class="btn c3 soon" href="python-lpu.html">
+      <span class="no">PART 5</span>
+      <span class="t">自己用 Python 做一遍</span>
+      <p class="s">不靠 AI Agent，把 PART 2 的七個步驟一一對應到可以跑的程式碼：NumPy 體素場、SciPy 的 UPGMA、marching cubes 抽等值面。</p>
+      <p class="m">實作為主 · 需要 Python 與 NumPy · 規劃中</p>
     </a>
   </div>
 
@@ -64,7 +76,7 @@
   <p>LPU 的完整操作型定義不在正文，而在<b>補充材料的 Supplemental Experimental Procedures ／「Defining an LPU」</b>一節；正文只給了七個步驟的條列摘要與 VLP 的實例（Figure S5D）。PART 2 主要重建的就是那一節。</p>
 
   <div class="draft">
-    <b>進度。</b><a href="what-is-lpu.html">PART 1</a> 與 <a href="how-to-draw-lpu.html">PART 2</a> 已完成。PART 2 把論文的前三個步驟在本機資料上實跑了一次，圖都是真實結果。PART 3 目前仍是<b>大綱骨架</b>。首頁的三個按鈕之後也可能增減。
+    <b>進度。</b><a href="what-is-lpu.html">PART 1</a> 與 <a href="how-to-draw-lpu.html">PART 2</a> 已完成。PART 2 把論文的前三個步驟在本機資料上實跑了一次，圖都是真實結果。<b>PART 3、4、5 規劃中</b>——PART 3 寫指令、PART 4 讓 AI Agent 實跑、PART 5 是原本的「用 Python 實作」。按鈕之後仍可能增減。
   </div>
 
 </div>

@@ -39,7 +39,8 @@ blockquote{margin:16px 0; padding:10px 18px; border-left:4px solid var(--accent)
 .intro dt:first-child{margin-top:0}
 .intro dd{margin:2px 0 0; color:var(--soft)}
 .btns{display:grid; gap:16px; margin:34px 0 10px}
-@media(min-width:760px){.btns{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:640px){.btns{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:940px){.btns{grid-template-columns:repeat(3,1fr)}}
 a.btn{
   display:flex; flex-direction:column; gap:8px;
   border:1px solid var(--border); border-left:5px solid var(--accent);
@@ -56,6 +57,12 @@ a.btn.c2{border-left-color:var(--purple)}
 a.btn.c2 .no{color:var(--purple)}
 a.btn.c3{border-left-color:var(--green)}
 a.btn.c3 .no{color:var(--green)}
+a.btn.c4{border-left-color:var(--amber)}
+a.btn.c4 .no{color:var(--amber)}
+a.btn.c5{border-left-color:var(--red)}
+a.btn.c5 .no{color:var(--red)}
+a.btn.soon{background:#fbfbfc; border-style:dashed}
+a.btn.soon .t{color:var(--soft)}
 
 .statgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin:20px 0}
 .stat{border:1px solid var(--border); border-radius:10px; padding:14px 16px; background:var(--panel)}
