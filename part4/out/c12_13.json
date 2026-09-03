@@ -1,0 +1,93 @@
+{
+ "tract_relaxed": {
+  "LAL_R": 941,
+  "VES_R": 750,
+  "LH_R": 648,
+  "CRE_R": 489,
+  "FLA_R": 481,
+  "MB_CA_R": 449,
+  "SCL_R": 442,
+  "WED_R": 349,
+  "GNG": 338,
+  "AL_L": 286
+ },
+ "merge_named": {
+  "MB_R": 596,
+  "MB_L": 619,
+  "EBLT": 18
+ },
+ "n0": 6922,
+ "n1": 8143,
+ "top10": [
+  {
+   "gain": 903,
+   "a": "LO_R",
+   "b": "PVLP_R",
+   "after": 1252,
+   "before": 349
+  },
+  {
+   "gain": 902,
+   "a": "LO_L",
+   "b": "PVLP_L",
+   "after": 1255,
+   "before": 353
+  },
+  {
+   "gain": 614,
+   "a": "LO_L",
+   "b": "ME_L",
+   "after": 1955,
+   "before": 1341
+  },
+  {
+   "gain": 546,
+   "a": "LO_R",
+   "b": "ME_R",
+   "after": 1907,
+   "before": 1361
+  },
+  {
+   "gain": 429,
+   "a": "LOP_R",
+   "b": "ME_R",
+   "after": 1597,
+   "before": 1168
+  },
+  {
+   "gain": 363,
+   "a": "LO_L",
+   "b": "LOP_L",
+   "after": 872,
+   "before": 509
+  },
+  {
+   "gain": 345,
+   "a": "LO_R",
+   "b": "LOP_R",
+   "after": 840,
+   "before": 495
+  },
+  {
+   "gain": 314,
+   "a": "LOP_L",
+   "b": "ME_L",
+   "after": 1458,
+   "before": 1144
+  },
+  {
+   "gain": 305,
+   "a": "AVLP_R",
+   "b": "PVLP_R",
+   "after": 473,
+   "before": 168
+  },
+  {
+   "gain": 232,
+   "a": "AVLP_L",
+   "b": "PVLP_L",
+   "after": 502,
+   "before": 270
+  }
+ ]
+}

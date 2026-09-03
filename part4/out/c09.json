@@ -1,0 +1,12 @@
+{
+ "seed": "VGlut-F-700246",
+ "grow": 2,
+ "n_recruited": 1,
+ "n_pool": 723,
+ "rounds": [],
+ "vol_factor": {
+  "1": 6.2,
+  "2": 16.9,
+  "3": 29.7
+ }
+}

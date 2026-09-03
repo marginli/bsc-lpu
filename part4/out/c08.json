@@ -1,0 +1,59 @@
+{
+ "cluster": 2,
+ "seed": "VGlut-F-700246",
+ "seed_frac": 0.2266,
+ "seed_size": 128,
+ "rule": "替代規則：比例最高前十顆取體積最小",
+ "top10": [
+  {
+   "name": "VGlut-F-600348",
+   "frac": 0.2356,
+   "size": 174
+  },
+  {
+   "name": "VGlut-F-700246",
+   "frac": 0.2266,
+   "size": 128
+  },
+  {
+   "name": "5HT1A-M-600001",
+   "frac": 0.2108,
+   "size": 166
+  },
+  {
+   "name": "VGlut-F-600298",
+   "frac": 0.2,
+   "size": 180
+  },
+  {
+   "name": "VGlut-F-600100",
+   "frac": 0.1875,
+   "size": 224
+  },
+  {
+   "name": "VGlut-F-200461",
+   "frac": 0.1856,
+   "size": 167
+  },
+  {
+   "name": "Gad1-F-300048",
+   "frac": 0.183,
+   "size": 235
+  },
+  {
+   "name": "VGlut-F-800116",
+   "frac": 0.1765,
+   "size": 221
+  },
+  {
+   "name": "VGlut-F-700564",
+   "frac": 0.1761,
+   "size": 176
+  },
+  {
+   "name": "VGlut-F-400245",
+   "frac": 0.1758,
+   "size": 182
+  }
+ ]
+}

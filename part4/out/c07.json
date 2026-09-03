@@ -1,0 +1,100 @@
+{
+ "AL_R": {
+  "n_ln": 723,
+  "n_hot": 3130,
+  "root": 13.1,
+  "lo": 0,
+  "hi": 15,
+  "span": 5,
+  "n_pairs": 4896885,
+  "n_distinct": 557,
+  "plateau": [
+   1,
+   1
+  ],
+  "at6": [
+   13,
+   13,
+   13,
+   14,
+   14,
+   14,
+   15,
+   15,
+   15
+  ],
+  "h4_raw": 50,
+  "h4_pass": 0,
+  "h4_max": 114
+ },
+ "AL_L": {
+  "n_ln": 780,
+  "n_hot": 3130,
+  "root": 13.47,
+  "lo": 0,
+  "hi": 14,
+  "span": 7,
+  "n_pairs": 4896885,
+  "n_distinct": 621,
+  "plateau": [
+   1,
+   2
+  ]
+ },
+ "AVLP_R": {
+  "n_ln": 163,
+  "n_hot": 3323,
+  "root": 21.24,
+  "lo": 0,
+  "hi": 14,
+  "span": 8,
+  "n_pairs": 5519503,
+  "n_distinct": 1020,
+  "plateau": [
+   2,
+   2
+  ]
+ },
+ "AVLP_L": {
+  "n_ln": 270,
+  "n_hot": 4012,
+  "root": 19.39,
+  "lo": 0,
+  "hi": 16,
+  "span": 5,
+  "n_pairs": 8046066,
+  "n_distinct": 933,
+  "plateau": [
+   1,
+   2
+  ]
+ },
+ "FB": {
+  "n_ln": 1354,
+  "n_hot": 1879,
+  "root": 21.93,
+  "lo": 1,
+  "hi": 16,
+  "span": 6,
+  "n_pairs": 1764381,
+  "n_distinct": 991,
+  "plateau": [
+   2,
+   3
+  ]
+ },
+ "PB": {
+  "n_ln": 106,
+  "n_hot": 457,
+  "root": 20.84,
+  "lo": 1,
+  "hi": 11,
+  "span": 2,
+  "n_pairs": 104196,
+  "n_distinct": 895,
+  "plateau": [
+   2,
+   2
+  ]
+ }
+}

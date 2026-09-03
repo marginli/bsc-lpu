@@ -1,0 +1,609 @@
+{
+ "ok": [
+  "ME_L",
+  "ME_R",
+  "GNG",
+  "LO_L",
+  "LO_R",
+  "AVLP_L",
+  "LOP_R",
+  "LOP_L",
+  "AVLP_R",
+  "AL_R",
+  "AL_L",
+  "SMP_L",
+  "SMP_R",
+  "SLP_L",
+  "SLP_R",
+  "FB",
+  "LH_R",
+  "IPS_L",
+  "LH_L",
+  "EB",
+  "PB"
+ ],
+ "too_big": [],
+ "too_few": [
+  "SAD",
+  "SPS_L",
+  "PLP_R",
+  "PVLP_R",
+  "IPS_R",
+  "SPS_R",
+  "PLP_L",
+  "PVLP_L",
+  "CRE_L",
+  "CRE_R",
+  "PRW",
+  "MB_ML_R",
+  "LAL_R",
+  "LAL_L",
+  "MB_ML_L",
+  "ICL_L",
+  "SCL_R",
+  "VES_L",
+  "SCL_L",
+  "ICL_R",
+  "VES_R",
+  "WED_L",
+  "MB_CA_R",
+  "SIP_R",
+  "MB_CA_L",
+  "SIP_L",
+  "WED_R",
+  "AMMC_L",
+  "IB_R",
+  "AOTU_L",
+  "AMMC_R",
+  "IB_L",
+  "AOTU_R",
+  "MB_VL_L",
+  "FLA_L",
+  "MB_PED_L",
+  "MB_VL_R",
+  "FLA_R",
+  "MB_PED_R",
+  "GOR_R",
+  "GOR_L",
+  "ATL_R",
+  "NO",
+  "ATL_L",
+  "EPA_R",
+  "EPA_L",
+  "CAN_L",
+  "AME_L",
+  "CAN_R",
+  "AME_R",
+  "BU_L",
+  "GA_L",
+  "GA_R",
+  "BU_R"
+ ],
+ "per_region": [
+  {
+   "region": "ME_L",
+   "ln": 988,
+   "vox": 60374,
+   "hot": 15093,
+   "mem_GB": 0.85
+  },
+  {
+   "region": "ME_R",
+   "ln": 1017,
+   "vox": 59972,
+   "hot": 14993,
+   "mem_GB": 0.84
+  },
+  {
+   "region": "GNG",
+   "ln": 160,
+   "vox": 44306,
+   "hot": 11076,
+   "mem_GB": 0.46
+  },
+  {
+   "region": "LO_L",
+   "ln": 353,
+   "vox": 22364,
+   "hot": 5591,
+   "mem_GB": 0.12
+  },
+  {
+   "region": "LO_R",
+   "ln": 344,
+   "vox": 21786,
+   "hot": 5446,
+   "mem_GB": 0.11
+  },
+  {
+   "region": "AVLP_L",
+   "ln": 270,
+   "vox": 16011,
+   "hot": 4002,
+   "mem_GB": 0.06
+  },
+  {
+   "region": "LOP_R",
+   "ln": 151,
+   "vox": 14510,
+   "hot": 3627,
+   "mem_GB": 0.05
+  },
+  {
+   "region": "LOP_L",
+   "ln": 156,
+   "vox": 14109,
+   "hot": 3527,
+   "mem_GB": 0.05
+  },
+  {
+   "region": "AVLP_R",
+   "ln": 163,
+   "vox": 13285,
+   "hot": 3321,
+   "mem_GB": 0.04
+  },
+  {
+   "region": "AL_R",
+   "ln": 723,
+   "vox": 12511,
+   "hot": 3127,
+   "mem_GB": 0.04
+  },
+  {
+   "region": "AL_L",
+   "ln": 780,
+   "vox": 12511,
+   "hot": 3127,
+   "mem_GB": 0.04
+  },
+  {
+   "region": "SAD",
+   "ln": 0,
+   "vox": 11846,
+   "hot": 2961,
+   "mem_GB": 0.03
+  },
+  {
+   "region": "SMP_L",
+   "ln": 82,
+   "vox": 11472,
+   "hot": 2868,
+   "mem_GB": 0.03
+  },
+  {
+   "region": "SMP_R",
+   "ln": 74,
+   "vox": 11448,
+   "hot": 2862,
+   "mem_GB": 0.03
+  },
+  {
+   "region": "SLP_L",
+   "ln": 12,
+   "vox": 10113,
+   "hot": 2528,
+   "mem_GB": 0.02
+  },
+  {
+   "region": "SLP_R",
+   "ln": 14,
+   "vox": 9762,
+   "hot": 2440,
+   "mem_GB": 0.02
+  },
+  {
+   "region": "SPS_L",
+   "ln": 2,
+   "vox": 8189,
+   "hot": 2047,
+   "mem_GB": 0.02
+  },
+  {
+   "region": "PLP_R",
+   "ln": 3,
+   "vox": 8011,
+   "hot": 2002,
+   "mem_GB": 0.01
+  },
+  {
+   "region": "PVLP_R",
+   "ln": 5,
+   "vox": 7979,
+   "hot": 1994,
+   "mem_GB": 0.01
+  },
+  {
+   "region": "IPS_R",
+   "ln": 5,
+   "vox": 7558,
+   "hot": 1889,
+   "mem_GB": 0.01
+  },
+  {
+   "region": "FB",
+   "ln": 1354,
+   "vox": 7511,
+   "hot": 1877,
+   "mem_GB": 0.01
+  },
+  {
+   "region": "SPS_R",
+   "ln": 1,
+   "vox": 6981,
+   "hot": 1745,
+   "mem_GB": 0.01
+  },
+  {
+   "region": "PLP_L",
+   "ln": 3,
+   "vox": 6746,
+   "hot": 1686,
+   "mem_GB": 0.01
+  },
+  {
+   "region": "LH_R",
+   "ln": 66,
+   "vox": 6420,
+   "hot": 1605,
+   "mem_GB": 0.01
+  },
+  {
+   "region": "IPS_L",
+   "ln": 13,
+   "vox": 6109,
+   "hot": 1527,
+   "mem_GB": 0.01
+  },
+  {
+   "region": "LH_L",
+   "ln": 45,
+   "vox": 5832,
+   "hot": 1458,
+   "mem_GB": 0.01
+  },
+  {
+   "region": "PVLP_L",
+   "ln": 0,
+   "vox": 5753,
+   "hot": 1438,
+   "mem_GB": 0.01
+  },
+  {
+   "region": "CRE_L",
+   "ln": 3,
+   "vox": 5114,
+   "hot": 1278,
+   "mem_GB": 0.01
+  },
+  {
+   "region": "CRE_R",
+   "ln": 6,
+   "vox": 5092,
+   "hot": 1273,
+   "mem_GB": 0.01
+  },
+  {
+   "region": "PRW",
+   "ln": 3,
+   "vox": 4518,
+   "hot": 1129,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "MB_ML_R",
+   "ln": 0,
+   "vox": 4514,
+   "hot": 1128,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "LAL_R",
+   "ln": 3,
+   "vox": 4461,
+   "hot": 1115,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "LAL_L",
+   "ln": 0,
+   "vox": 4351,
+   "hot": 1087,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "MB_ML_L",
+   "ln": 0,
+   "vox": 4319,
+   "hot": 1079,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "ICL_L",
+   "ln": 0,
+   "vox": 4148,
+   "hot": 1037,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "SCL_R",
+   "ln": 0,
+   "vox": 4144,
+   "hot": 1036,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "VES_L",
+   "ln": 0,
+   "vox": 4094,
+   "hot": 1023,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "SCL_L",
+   "ln": 0,
+   "vox": 4042,
+   "hot": 1010,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "ICL_R",
+   "ln": 0,
+   "vox": 3960,
+   "hot": 990,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "VES_R",
+   "ln": 0,
+   "vox": 3870,
+   "hot": 967,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "WED_L",
+   "ln": 3,
+   "vox": 3627,
+   "hot": 906,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "MB_CA_R",
+   "ln": 1,
+   "vox": 3567,
+   "hot": 891,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "SIP_R",
+   "ln": 0,
+   "vox": 3469,
+   "hot": 867,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "MB_CA_L",
+   "ln": 0,
+   "vox": 3405,
+   "hot": 851,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "SIP_L",
+   "ln": 0,
+   "vox": 3390,
+   "hot": 847,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "WED_R",
+   "ln": 0,
+   "vox": 3269,
+   "hot": 817,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "AMMC_L",
+   "ln": 0,
+   "vox": 2912,
+   "hot": 728,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "EB",
+   "ln": 11,
+   "vox": 2599,
+   "hot": 649,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "IB_R",
+   "ln": 1,
+   "vox": 2508,
+   "hot": 627,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "AOTU_L",
+   "ln": 0,
+   "vox": 2478,
+   "hot": 619,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "AMMC_R",
+   "ln": 0,
+   "vox": 2453,
+   "hot": 613,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "IB_L",
+   "ln": 0,
+   "vox": 2449,
+   "hot": 612,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "AOTU_R",
+   "ln": 1,
+   "vox": 2354,
+   "hot": 588,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "MB_VL_L",
+   "ln": 0,
+   "vox": 2320,
+   "hot": 580,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "FLA_L",
+   "ln": 0,
+   "vox": 2234,
+   "hot": 558,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "MB_PED_L",
+   "ln": 0,
+   "vox": 2031,
+   "hot": 507,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "MB_VL_R",
+   "ln": 0,
+   "vox": 2020,
+   "hot": 505,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "FLA_R",
+   "ln": 0,
+   "vox": 1955,
+   "hot": 488,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "MB_PED_R",
+   "ln": 0,
+   "vox": 1917,
+   "hot": 479,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "PB",
+   "ln": 106,
+   "vox": 1821,
+   "hot": 455,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "GOR_R",
+   "ln": 0,
+   "vox": 1220,
+   "hot": 305,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "GOR_L",
+   "ln": 0,
+   "vox": 1072,
+   "hot": 268,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "ATL_R",
+   "ln": 0,
+   "vox": 1012,
+   "hot": 253,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "NO",
+   "ln": 0,
+   "vox": 943,
+   "hot": 235,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "ATL_L",
+   "ln": 0,
+   "vox": 893,
+   "hot": 223,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "EPA_R",
+   "ln": 0,
+   "vox": 821,
+   "hot": 205,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "EPA_L",
+   "ln": 0,
+   "vox": 771,
+   "hot": 192,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "CAN_L",
+   "ln": 0,
+   "vox": 491,
+   "hot": 122,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "AME_L",
+   "ln": 0,
+   "vox": 397,
+   "hot": 99,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "CAN_R",
+   "ln": 0,
+   "vox": 347,
+   "hot": 86,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "AME_R",
+   "ln": 0,
+   "vox": 308,
+   "hot": 77,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "BU_L",
+   "ln": 0,
+   "vox": 296,
+   "hot": 74,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "GA_L",
+   "ln": 0,
+   "vox": 260,
+   "hot": 65,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "GA_R",
+   "ln": 0,
+   "vox": 239,
+   "hot": 59,
+   "mem_GB": 0.0
+  },
+  {
+   "region": "BU_R",
+   "ln": 0,
+   "vox": 216,
+   "hot": 54,
+   "mem_GB": 0.0
+  }
+ ]
+}
