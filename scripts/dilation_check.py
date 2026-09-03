@@ -39,6 +39,18 @@ def run(region="AL_R", nsample=60, seed=0):
 
     M = {i: mask_of(i) for i in ids}
     st = ndimage.generate_binary_structure(3, 1)
+    D2 = {i: ndimage.binary_dilation(M[i], st, iterations=2) for i in ids}
+    print("\n撐大 2 格時，『撐大誰』的差別：")
+    for name, f in (("只撐大 source", lambda a, b: (D2[a] & M[b]).sum() / M[b].sum()),
+                    ("只撐大 target", lambda a, b: (M[a] & D2[b]).sum() / M[b].sum()),
+                    ("兩邊都撐大，分母用原體積", lambda a, b: (D2[a] & D2[b]).sum() / M[b].sum()),
+                    ("兩邊都撐大，分母用撐大後體積", lambda a, b: (D2[a] & D2[b]).sum() / D2[b].sum())):
+        fr = np.array([f(a, b) for a in ids for b in ids if a != b])
+        print(f"   {name:26s} 中位 {np.median(fr):6.3f}   >50% 的配對 {(fr>0.5).mean()*100:5.1f}%")
+    print("\n撐大幾格 → 體積幾倍（中位）：", {k: round(float(np.median(
+        [ndimage.binary_dilation(M[i], st, iterations=k).sum()/M[i].sum() for i in ids])), 1)
+        for k in (1, 2, 3, 4)})
+    print()
     print(f"{region}：LN 候選 {len(S)} 顆，抽 {len(ids)} 顆；每顆體素數中位 "
           f"{int(np.median([M[i].sum() for i in ids]))}")
     print(" 膨脹  有交集  重疊率中位  最大重疊  >50% 的配對")
