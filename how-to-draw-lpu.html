@@ -26,7 +26,7 @@
       <li><a href="#s0">STEP 0　你得先有兩樣東西（論文沒有列為步驟）</a></li>
       <li><a href="#s1">STEP 1　數 LN 纖維，得到密度場 v(r)</a></li>
       <li><a href="#s2">STEP 2　取上四分位，留下熱點</a></li>
-      <li><a href="#s3">STEP 3　分群——以及那個沒有人給的參數</a></li>
+      <li><a href="#s3">STEP 3　分群——兩條規則要一起用</a></li>
       <li><a href="#s4">STEP 4　從一顆 LN 開始滾雪球</a></li>
       <li><a href="#s5">STEP 5　抽等值面，定出邊界</a></li>
       <li><a href="#s6">STEP 6　算 c 值：中心要比周邊密</a></li>
@@ -76,7 +76,7 @@
       <path class="ln" d="M330 212 L330 236"/>
       <rect class="bx" x="120" y="238" width="420" height="42"/>
       <text class="n" x="136" y="258">3</text><text class="t" x="156" y="258">對 Z 做 UPGMA 分群</text>
-      <text class="s" x="156" y="274">只留體素數超過該區 1% 的群</text>
+      <text class="s" x="156" y="274">① 樹剪在某個高度　② 只留超過該區 1% 的群</text>
 
       <path class="ln" d="M330 280 L330 304"/>
       <rect class="dia" x="120" y="306" width="420" height="40"/>
@@ -360,13 +360,27 @@
     <span class="figsrc">由 <code>scripts/make_part2_figures.py</code> 算出。</span></figcaption>
   </figure>
 
-  <h2 id="s3"><span class="pt">STEP 3</span>分群——以及那個沒有人給的參數</h2>
+  <h2 id="s3"><span class="pt">STEP 3</span>分群——兩條規則要一起用</h2>
 
   <p>對 <code>Z</code> 裡的體素兩兩算歐氏距離，構成距離矩陣：</p>
 
   <div class="formula">
     D(r, r′) ＝ √[ (i−i′)² ＋ (j−j′)² ＋ (k−k′)² ]
     <span class="sub">就是兩個體素在空間中的直線距離。</span>
+  </div>
+
+  <div class="callout">
+    <b>這一步不是「分完群就有答案」。要拿到候選 LPU，得同時用上兩條規則：</b>
+    <div class="tblwrap"><table>
+      <tr><th style="width:8%"></th><th style="width:34%">規則</th><th>出處</th></tr>
+      <tr><td><b>①</b></td><td><b>把 UPGMA 的樹剪在某個高度</b>——剪出幾枝，就有幾群</td><td><b>論文沒有給這個高度</b></td></tr>
+      <tr><td><b>②</b></td><td><b>只留體素數大於「該 neuropil 總體素的 1%」的群</b></td><td>論文明寫：<i>Those clusters with voxel numbers larger than 1% of the total voxel number in the neuropil are LPU candidates</i></td></tr>
+    </table></div>
+    <p style="margin-top:8px"><b>兩條缺一不可，而且會互相牽制。</b>剪得越細，群越多但每一群越小、越容易被規則 ② 刷掉；剪得越粗，群越少但每一群都過得了。下面會看到這個交互作用直接決定了答案。</p>
+  </div>
+
+  <div class="note">
+    <b>規則 ② 的分母是整個 neuropil，不是熱點。</b>這一點很容易寫錯。以右觸角葉為例：腦區內共 12,511 個分析體素，1% 就是 <b>125 個</b>；而熱點（STEP 2 留下的那 25%）只有 3,128 個。<b>所以門檻雖然寫成「1%」，實際上是要求一群佔掉熱點的 4%。</b>把分母誤寫成熱點數，門檻會鬆四倍。
   </div>
 
   <h3>體素在整齊的格點上，所以距離會大量重複</h3>
@@ -383,9 +397,28 @@
 
   <div class="plain"><b>白話。</b>489 萬對體素，只有 573 種不同的距離。<b>平均每一種距離都有八千多對並列。</b>光是「距離剛好等於 1」（正上下左右相鄰）的就有 8,339 對。</div>
 
-  <p>再用 <b>UPGMA</b>（unweighted pair group method with arithmetic mean，中譯「不加權平均連結法」）把體素分群。<b>體素數超過該 neuropil 總體素 1%</b> 的群，才算候選 LPU。</p>
+  <p>再用 <b>UPGMA</b>（unweighted pair group method with arithmetic mean，中譯「不加權平均連結法」）把體素分群（<b>規則 ①</b>），再把體素數不到該 neuropil 總體素 1% 的群丟掉（<b>規則 ②</b>），剩下的才算候選 LPU。</p>
 
   <div class="plain"><b>白話。</b>UPGMA 是這樣運作的：一開始每個體素自成一群，然後反覆把「彼此平均距離最近」的兩群併成一群，一路併到只剩一群為止。過程會長出一棵樹。<b>你要在樹的某個高度把它剪斷，剪出來的分枝數就是群數。</b></div>
+
+  <h3>兩條規則怎麼互相牽制</h3>
+
+  <p>把右觸角葉的每一個切割高度攤開，分別看「樹剪出幾群」與「有幾群過得了 1%」：</p>
+
+  <div class="tblwrap"><table>
+    <tr><th>切割高度</th><th>規則 ① 剪出的群數</th><th>規則 ② 通過的群數<br><span style="font-weight:400;color:var(--faint)">（＝候選 LPU）</span></th><th>最大的一群有多少體素<br><span style="font-weight:400;color:var(--faint)">（門檻是 125）</span></th></tr>
+    <tr><td><b>4</b></td><td><b>50</b></td><td><b>0</b></td><td>116　<span style="color:var(--red)">← 連最大的都不到 125</span></td></tr>
+    <tr><td>5</td><td>26</td><td>12</td><td>195</td></tr>
+    <tr><td>6</td><td>12</td><td>12</td><td>397</td></tr>
+    <tr><td>8</td><td>6</td><td>6</td><td>635</td></tr>
+    <tr><td>10</td><td>3</td><td>3</td><td>1,567</td></tr>
+    <tr><td>14</td><td>1</td><td>1</td><td>3,128</td></tr>
+  </table></div>
+
+  <div class="plain">
+    <b>看第一列。</b>切割高度 4 的時候，樹其實剪出了 <b>50 群</b>——但每一群都太小，<b>一群都沒過</b>，答案是 0。<b>那個 0 不是「分不出群」，是「分出太多群、每一群都不夠大」。</b>
+    <p style="margin-top:8px">高度 5 是兩條規則同時在起作用的唯一一段：剪出 26 群，只有 12 群過關，被丟掉的體素佔了熱點的 41%。<b>高度 6 以後規則 ② 就不再刷掉任何東西了</b>——群夠大，全部通過，答案完全由規則 ① 決定。</p>
+  </div>
 
   <div class="danger">
     <b>平手的時候，UPGMA 挑誰？</b>它每一步要挑「平均距離最近」的兩群併起來。既然有八千多對並列第一，<b>就得有人決定挑哪一對</b>——而演算法本身沒有規定。<code>scipy</code> 的作法是挑索引最小的那一對，也就是<b>按你把體素餵進去的順序</b>。
@@ -410,15 +443,15 @@
     <span class="figsrc">由 <code>scripts/make_part2_figures.py</code> 算出。</span></figcaption>
   </figure>
 
-  <h3>樹要剪在哪裡？論文沒有說</h3>
+  <h3>規則 ① 的高度，論文沒有給</h3>
 
-  <p>這是整條流程最大的空缺。UPGMA 會給你一棵樹，但<b>要在哪個高度剪斷，決定了你會找到幾個候選 LPU</b>——而論文從頭到尾沒有給這個數字。</p>
+  <p>兩條規則裡，規則 ② 的 1% 論文寫得清清楚楚，<b>規則 ① 的高度卻從頭到尾沒有出現</b>。這是整條流程最大的空缺——而上面那張表已經顯示，高度一動，答案就從 0 跳到 12。</p>
 
   <p>這不是雞蛋裡挑骨頭。我們把六個腦區的切割高度從 4 掃到 25，看每個高度會得到幾個候選 LPU：</p>
 
   <figure class="fig">
     <img src="assets/p2-cutheight.png" alt="折線圖：六個腦區在不同 UPGMA 切割高度下得到的候選 LPU 數量，每條線是八次打亂體素順序的中位數，外圍淡色帶是最小到最大。切割高度 5 到 6 之間帶最寬，最多相差 6 個；高度 14 以上帶幾乎閉合，22 以上全部收斂到 1。">
-    <figcaption><b>橫軸是切割高度，縱軸是找到的候選 LPU 數。實線是八次打亂體素順序的中位數，淡色帶是最小到最大。</b>剪得太細（高度 4）時，四個腦區連一群都大不過「該區體素的 1%」，答案是 0（扇形體與前腦橋例外）；高度 5–6 衝到十幾個，<b>而且這裡的帶最寬——同一個高度光靠順序就能差 6 個</b>；高度 14 以上帶幾乎閉合，22 以上六個區全部收斂到 1。
+    <figcaption><b>橫軸是切割高度，縱軸是找到的候選 LPU 數。實線是八次打亂體素順序的中位數，淡色帶是最小到最大。</b>剪得太細（高度 4）時，樹其實剪出了幾十群，但沒有一群大得過規則 ② 的 1%，所以四個腦區的答案是 0（扇形體與前腦橋例外）；高度 5–6 衝到十幾個，<b>而且這裡的帶最寬——同一個高度光靠順序就能差 6 個</b>；高度 14 以上帶幾乎閉合，22 以上六個區全部收斂到 1。
     <span class="figsrc">由 <code>scripts/make_part2_figures.py</code> 算出，資料同前。</span></figcaption>
   </figure>
 
@@ -433,7 +466,7 @@
   </table></div>
 
   <div class="danger">
-    <b>同一個觸角葉，可以被判成 0 個、1 個，也可以被判成 12 個。</b>差別只在你把樹剪在哪裡。
+    <b>同一個觸角葉，可以被判成 0 個、1 個，也可以被判成 12 個。</b>差別只在規則 ① 剪在哪裡（0 那個是規則 ② 把 50 群全刷掉的結果）。
     <p style="margin-top:8px">曲線中段確實有平台，但<b>每個腦區的平台高度不一樣</b>。切割高度 14 到 20 這一段是最穩的：</p>
     <div class="tblwrap"><table>
       <tr><th>切割高度 14–20</th><th>AL_R</th><th>AL_L</th><th>AVLP_R</th><th>AVLP_L</th><th>FB</th><th>PB</th></tr>
@@ -443,7 +476,7 @@
   </div>
 
   <div class="note">
-    <b>要公平地說：</b>這是我們在自己的資料上跑出來的，用的是 Ito 的分區而不是論文的分區，體素尺度也不同。論文團隊手上的資料可能表現得比較乾淨。<b>但這個參數確實沒有出現在論文或補充材料的任何一處</b>，所以任何人想重跑，都得自己決定它。
+    <b>要公平地說：</b>這是我們在自己的資料上跑出來的，用的是 Ito 的分區而不是論文的分區，體素尺度也不同。論文團隊手上的資料可能表現得比較乾淨。<b>但規則 ① 的高度確實沒有出現在論文或補充材料的任何一處</b>，所以任何人想重跑，都得自己決定它。
   </div>
 
   <div class="danger">
