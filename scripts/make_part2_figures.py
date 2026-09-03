@@ -236,7 +236,7 @@ def fig_fivenum(lab, name2id, rows, vox, nid, n2l, region="AL_R"):
 
 
 # ── 圖 D：切割高度決定答案（核心圖）────────────────────────────────────
-NPERM = 8                  # 打亂體素順序重跑幾次（UPGMA 的平手要靠輸入順序決定）
+NPERM = 9                  # 打亂體素順序重跑幾次；取奇數，中位數才會落在真的出現過的值上
 
 
 def fig_cutheight(lab, name2id, rows, vox, nid, n2l):
