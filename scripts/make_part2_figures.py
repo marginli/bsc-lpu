@@ -184,11 +184,8 @@ def fig_criterion(lab, names, rows, vox, nid):
         a_.set_ylabel(lab_, fontsize=9.5, color=INK)
         a_.set_xlim(50, 101); style(a_)
     ax.axhline(26, color="#dc2626", lw=1.5, ls="--")
-    ax.text(100, 27.5, "the paper: ~26%", ha="right", fontsize=9,
-            color="#dc2626", fontweight="bold")
-    bx.axhline(41, color="#dc2626", lw=1.5, ls="--")
-    bx.text(100, 42.5, "the paper: 41 LPUs", ha="right", fontsize=9,
-            color="#dc2626", fontweight="bold")
+    ax.text(100, 27.5, "the paper: ~26%  (crossed at f \u2248 78%)", ha="right",
+            fontsize=9, color="#dc2626", fontweight="bold")
     ax.set_ylim(0, 62); bx.set_ylim(0, 62)
     fig.tight_layout(); fig.savefig(f"{OUT}/p2-criterion.png"); plt.close(fig)
     i = int(np.argmin(abs(fs - F_LN)))
