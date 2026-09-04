@@ -173,7 +173,8 @@ svg text{font-family:-apple-system,"Segoe UI","Noto Sans TC","Microsoft JhengHei
 
 /* ── PART 5：讀程式 ── */
 pre .cm{color:#7f93a8}                                    /* 註解 */
-pre .hl{background:rgba(96,165,250,.24); border-radius:3px}
+pre .hl{display:block; margin:0 -18px; padding:0 18px 0 15px;
+  background:rgba(96,165,250,.20); box-shadow:inset 3px 0 0 #60a5fa}
 pre b{color:#fff}
 .filecard{display:grid; gap:12px; margin:22px 0}
 @media(min-width:760px){.filecard{grid-template-columns:repeat(3,1fr)}}
@@ -186,3 +187,7 @@ pre b{color:#fff}
 .ask .q{font-weight:700; font-size:16px; margin:0 0 3px}
 .ask p{margin:3px 0; font-size:14.5px; color:var(--soft)}
 .lineno{font-family:"Cascadia Code",Consolas,Menlo,monospace; font-size:13px; color:var(--faint); white-space:nowrap}
+
+/* 頁首的前後連結：跟頁尾同一組，只是線畫在下面 */
+.pager.top{margin:26px 0 4px; padding:0 0 18px;
+  border-top:none; border-bottom:1px solid var(--border); font-size:14.5px}

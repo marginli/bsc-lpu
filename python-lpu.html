@@ -16,6 +16,10 @@
 
 <div class="wrap">
 
+  <div class="pager top">
+    <a href="agent-run.html">← PART 4　真的讓 AI Agent 跑一遍</a>
+    <a href="index.html">回首頁 →</a>
+  </div>
   <div class="note">
     <b><a href="agent-run.html">PART 4</a> 交出了十六支程式、733 行。</b>這一頁不是逐行講解那 733 行——<b>沒有人會逐行讀程式</b>，AI 寫的更不會。這一頁做兩件事：先把十六支整理成三個帶得走的檔案，再示範專業的讀法。
   </div>
@@ -205,14 +209,7 @@ class Config:
     c_threshold: float = 2.0        <span class="cm"># 步驟 7：c &gt; 2 才算 LPU</span>
 
     <span class="cm"># ── 論文沒給、我們自己決定的（PART 4 結論五）──</span>
-    <span class="hl">f_ln: float = 0.80              # 指令 2：多少比例的分枝待在同一區才算 LN</span>
-    <span class="hl">bin_factor: int = 4             # 指令 4：幾格併成一個分析體素</span>
-    <span class="hl">n_shuffle: int = 9              # 指令 7：打亂體素順序重跑幾次</span>
-    <span class="hl">grow: int = 4                   # 指令 9：招募時撐大幾格</span>
-    <span class="hl">depth_cut: int = 10             # 指令 10：離本體幾格以內視為初級神經突</span>
-    <span class="hl">min_ln_to_cluster: int = 10     # 指令 14：LN 少於幾顆就不分群</span>
-    <span class="hl">min_vox_touch: int = 5          # 指令 12：碰到幾個體素才算「碰到」這一區</span>
-
+<span class="hl">    f_ln: float = 0.80              # 指令 2：多少比例的分枝待在同一區才算 LN</span><span class="hl">    bin_factor: int = 4             # 指令 4：幾格併成一個分析體素</span><span class="hl">    n_shuffle: int = 9              # 指令 7：打亂體素順序重跑幾次</span><span class="hl">    grow: int = 4                   # 指令 9：招募時撐大幾格</span><span class="hl">    depth_cut: int = 10             # 指令 10：離本體幾格以內視為初級神經突</span><span class="hl">    min_ln_to_cluster: int = 10     # 指令 14：LN 少於幾顆就不分群</span><span class="hl">    min_vox_touch: int = 5          # 指令 12：碰到幾個體素才算「碰到」這一區</span>
     <span class="cm"># ── 資料格式常數（跟著 D03／D06 走，不要改）──</span>
     d06_grid: int = 512             <span class="cm"># D06 體素編號的 X、Y 邊長</span>
     d06_step: int = 2               <span class="cm"># 一個 D06 體素等於幾個 1 µm 標籤格</span></code></pre>
@@ -222,7 +219,7 @@ class Config:
   </div>
 
   <div class="callout">
-    <b>藍色標起來的那七行，就是 <a href="agent-run.html">PART 4 結論五</a>那張表。</b>論文沒有給這些數字，是我們自己決定的。它們跟上面那組（論文給的）長得一模一樣、寫在同一個地方、用起來也沒有差別——<b>而這正是最容易出事的地方</b>。把它們分成兩組並註明來源，是為了讓讀的人一眼看出「哪幾個數字是有出處的，哪幾個是我們選的」。
+    <b>藍底標起來的那七行，就是 <a href="agent-run.html">PART 4 結論五</a>那張表。</b>論文沒有給這些數字，是我們自己決定的。它們跟上面那組（論文給的）長得一模一樣、寫在同一個地方、用起來也沒有差別——<b>而這正是最容易出事的地方</b>。把它們分成兩組並註明來源，是為了讓讀的人一眼看出「哪幾個數字是有出處的，哪幾個是我們選的」。
   </div>
 
   <h3>它每一次跑都會把這組數字印出來</h3>
