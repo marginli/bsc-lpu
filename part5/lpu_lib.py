@@ -133,7 +133,7 @@ class Brain:
         self.cfg = cfg
         d03, d06 = Path(cfg.d03), Path(cfg.d06)
 
-        # 分區標籤。1.7 億個 int16，約 174 MB。
+        # 分區標籤。1.8 億個 uint8，約 174 MB。
         self.lab = _load_array(d03 / "work" / "labels_fc_1um.npy")
         self.meta = json.loads((d03 / "work" / "labels_fc_meta.json").read_text())
         # 第 0 號是腦區外，所以名字要往後推一格
@@ -150,6 +150,7 @@ class Brain:
         self.nid = _load_array(d06 / "work" / "nid.npy")
 
         # 體素編號 → 三個軸的索引。只算這一次。
+        # ix ＝ 左右、iy ＝ 背腹、iz ＝ 前後（軸序由指令 1 的解剖關係反推，標頭沒寫）
         G = cfg.d06_grid
         self.ix = (self.vox % G).astype(np.int64)
         self.iy = ((self.vox // G) % G).astype(np.int64)

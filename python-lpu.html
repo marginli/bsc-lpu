@@ -25,13 +25,13 @@
   </div>
 
   <div class="callout">
-    <b>讀程式不等於看懂每一行。</b>整合後的程式有 1,721 行。真正決定結論的，是其中<b>十個數字</b>；真正需要盯住的，是<b>五個地方</b>。這一頁就是那五個地方。
+    <b>讀程式不等於看懂每一行。</b>整合後的四個檔案合計 1,723 行。真正決定結論的，是其中<b>十個數字</b>；真正需要盯住的，是<b>五個地方</b>。這一頁就是那五個地方。
   </div>
 
   <nav class="toc">
     <h2>本頁章節</h2>
     <ol>
-      <li><a href="#s1">先講三個詞</a></li>
+      <li><a href="#s1">先講四個詞</a></li>
       <li><a href="#s2">五個問題</a></li>
       <li><a href="#s3">先看形狀：十六支變成三個檔案</a></li>
       <li><a href="#s4">問題一：哪些數字決定了結論</a></li>
@@ -44,9 +44,9 @@
     </ol>
   </nav>
 
-  <h2 id="s1"><span class="pt">開場</span>先講三個詞</h2>
+  <h2 id="s1"><span class="pt">開場</span>先講四個詞</h2>
 
-  <p>這一頁會反覆出現三個字眼。先各給一句話，之後不再解釋。</p>
+  <p>這一頁會反覆出現四個字眼。先各給一句話，之後不再解釋。</p>
 
   <div class="terms">
     <div class="term">
@@ -87,8 +87,8 @@
   <div class="tblwrap"><table>
     <tr><th style="width:44%"></th><th style="width:28%">PART 4</th><th style="width:28%">PART 5</th></tr>
     <tr><td>檔案數</td><td>16 支</td><td><b>3 個</b>（＋一份驗收表）</td></tr>
-    <tr><td>行數</td><td>733</td><td>1,721</td></tr>
-    <tr><td>程式敘述數</td><td>934</td><td>1,066</td></tr>
+    <tr><td>行數</td><td>733（16 支 <code>.py</code>）</td><td>1,723（四個檔案合計）</td></tr>
+    <tr><td>程式敘述數（只算 <code>.py</code>）</td><td>934</td><td>1,066</td></tr>
     <tr><td>會去載入分區標籤的檔案</td><td>10 支</td><td><b>1 處</b></td></tr>
     <tr><td>自己寫一次體素編號換算的檔案</td><td>9 支</td><td><b>1 處</b></td></tr>
     <tr><td>把資料路徑寫死的檔案</td><td>14 支</td><td><b>1 處</b>（而且可以從命令列覆寫）</td></tr>
@@ -113,12 +113,12 @@
     <div class="f">
       <div class="nm">run_lpu.py</div>
       <span class="role">順序</span>
-      <p>十四條指令一條一個函式。它只管<b>先做什麼、再做什麼、把什麼印出來</b>，不管怎麼算。1,049 行。</p>
+      <p>十四條指令收成十二個函式（指令 10＋11、12＋13 各併成一個）。它只管<b>先做什麼、再做什麼、把什麼印出來</b>，不管怎麼算。1,050 行。</p>
     </div>
     <div class="f">
       <div class="nm">lpu_lib.py</div>
       <span class="role">做法</span>
-      <p>參數、資料、七個步驟的演算法、畫圖。<b>要改結論就改這裡</b>。552 行。</p>
+      <p>參數、資料、七個步驟的演算法、畫圖。<b>要改結論就改這裡</b>。553 行。</p>
     </div>
   </div>
 
@@ -153,7 +153,7 @@
 
       <rect class="bx" x="280" y="120" width="320" height="90"/>
       <text class="ti" x="300" y="146">run_lpu.py　主程式</text>
-      <text class="sb" x="300" y="169">十四條指令，一條一個函式</text>
+      <text class="sb" x="300" y="169">十四條指令，十二個函式</text>
       <text class="sb" x="300" y="189">只管先做什麼、再做什麼</text>
 
       <rect class="bx" x="280" y="240" width="320" height="112"/>
@@ -209,7 +209,9 @@ class Config:
     c_threshold: float = 2.0        <span class="cm"># 步驟 7：c &gt; 2 才算 LPU</span>
 
     <span class="cm"># ── 論文沒給、我們自己決定的（PART 4 結論五）──</span>
-<span class="hl">    f_ln: float = 0.80              # 指令 2：多少比例的分枝待在同一區才算 LN</span><span class="hl">    bin_factor: int = 4             # 指令 4：幾格併成一個分析體素</span><span class="hl">    n_shuffle: int = 9              # 指令 7：打亂體素順序重跑幾次</span><span class="hl">    grow: int = 4                   # 指令 9：招募時撐大幾格</span><span class="hl">    depth_cut: int = 10             # 指令 10：離本體幾格以內視為初級神經突</span><span class="hl">    min_ln_to_cluster: int = 10     # 指令 14：LN 少於幾顆就不分群</span><span class="hl">    min_vox_touch: int = 5          # 指令 12：碰到幾個體素才算「碰到」這一區</span>
+<span class="hl">    f_ln: float = 0.80              # 指令 2：多少比例的分枝待在同一區才算 LN</span><span class="hl">    bin_factor: int = 4             # 指令 4：幾格併成一個分析體素</span><span class="hl">    n_shuffle: int = 9              # 指令 7：打亂體素順序重跑幾次</span><span class="hl">    grow: int = 4                   # 指令 9：招募時撐大幾格（2 格招不到任何一顆）</span><span class="hl">    depth_cut: int = 10             # 指令 10：離本體幾格以內視為初級神經突</span><span class="hl">    min_ln_to_cluster: int = 10     # 指令 14：LN 少於幾顆就不分群</span><span class="hl">    min_vox_touch: int = 5          # 指令 12：碰到幾個體素才算「碰到」這一區</span><span class="hl">    rng_seed: int = 0               # 打亂順序用的亂數種子</span>
+<span class="hl">    # 切割高度：論文沒給。掃 4 到 25，平台取 14–20。</span><span class="hl">    cut_lo: float = 4.0</span><span class="hl">    cut_hi: float = 26.0</span><span class="hl">    cut_step: float = 1.0</span><span class="hl">    plateau: tuple = (14.0, 20.0)</span>
+
     <span class="cm"># ── 資料格式常數（跟著 D03／D06 走，不要改）──</span>
     d06_grid: int = 512             <span class="cm"># D06 體素編號的 X、Y 邊長</span>
     d06_step: int = 2               <span class="cm"># 一個 D06 體素等於幾個 1 µm 標籤格</span></code></pre>
@@ -219,7 +221,7 @@ class Config:
   </div>
 
   <div class="callout">
-    <b>藍底標起來的那七行，就是 <a href="agent-run.html">PART 4 結論五</a>那張表。</b>論文沒有給這些數字，是我們自己決定的。它們跟上面那組（論文給的）長得一模一樣、寫在同一個地方、用起來也沒有差別——<b>而這正是最容易出事的地方</b>。把它們分成兩組並註明來源，是為了讓讀的人一眼看出「哪幾個數字是有出處的，哪幾個是我們選的」。
+    <b>藍底標起來的那兩段，就是 <a href="agent-run.html">PART 4 結論五</a>那張表——十三行程式碼、十項決定。</b>論文沒有給這些數字，是我們自己決定的。它們跟上面那組（論文給的）長得一模一樣、寫在同一個地方、用起來也沒有差別——<b>而這正是最容易出事的地方</b>。把它們分成兩組並註明來源，是為了讓讀的人一眼看出「哪幾個數字是有出處的，哪幾個是我們選的」。
   </div>
 
   <h3>它每一次跑都會把這組數字印出來</h3>
@@ -261,16 +263,17 @@ class Config:
   <p>「編在一起」的意思是：一個整數同時記著三個軸的位置，要用的時候得拆開。<code>Brain</code> 在載入的當下就拆一次，之後全程共用：</p>
 
   <pre><code>G = cfg.d06_grid                          <span class="cm"># 512</span>
-self.ix = (self.vox % G).astype(np.int64)         <span class="cm"># 左右</span>
-self.iy = ((self.vox // G) % G).astype(np.int64)  <span class="cm"># 前後</span>
-self.iz = (self.vox // (G * G)).astype(np.int64)  <span class="cm"># 上下</span></code></pre>
+self.ix = (self.vox % G).astype(np.int64)         <span class="cm"># ← 左右</span>
+self.iy = ((self.vox // G) % G).astype(np.int64)  <span class="cm"># ← 背腹</span>
+self.iz = (self.vox // (G * G)).astype(np.int64)  <span class="cm"># ← 前後</span></code></pre>
 
   <div class="plain">
     <b>白話：這是「除法與餘數」而已。</b>想像門牌號碼寫成 <code>樓層 × 10000 ＋ 排 × 100 ＋ 號</code>，要拆回來就是除一除、取餘數。<code>%</code> 是取餘數、<code>//</code> 是取商。<b>整條管線只有這四行在做這件事</b>，PART 4 有九份各自寫過一次。
   </div>
 
   <div class="danger">
-    <b>注意右邊那三個註解。</b><code>ix</code> 是左右、<code>iy</code> 是前後、<code>iz</code> 是上下——<b>這件事不是從檔案的標頭讀來的，是從解剖形狀推出來的</b>（果蠅腦左右最寬，所以最寬的那個軸就是左右）。這種「靠外部知識確定的事」，是讀 AI 寫的程式時最該停下來查的一類：<b>程式把軸接反了也照樣跑得完，只是所有結果都左右顛倒。</b>
+    <b>右邊那三個註解是這一頁排版時加的</b>（原始碼裡寫成上一行的一句話）。而重點正在這裡：<code>ix</code> 是左右、<code>iy</code> 是背腹、<code>iz</code> 是前後這件事，<b>不是從檔案的標頭讀來的</b>——標頭沒寫。它是 <a href="agent-run.html">PART 4 的指令 1</a> 用三組解剖關係反推出來的：兩側視葉的重心相差 668 格，而且幾乎只差在同一個軸上，那個軸就是左右。
+    <p style="margin-top:8px">這種「靠外部知識才能確定的事」，是讀 AI 寫的程式時最該停下來查的一類。<b>程式把軸接反了也照樣跑得完，只是所有結果都左右顛倒，而且不會報錯。</b></p>
   </div>
 
   <h3>後面所有步驟共用的那張表</h3>
@@ -294,7 +297,7 @@ def contact(self) -&gt; np.ndarray:
   </div>
 
   <div class="note">
-    <b><code>if self._C is None</code> 那一行是「算一次就好」的寫法。</b>第一次有人要這張表時才算，算完存在 <code>self._C</code> 裡；第二次以後直接拿現成的。這張表要掃過一億四千萬筆紀錄，重算十次就是白白多花十倍時間。<b>讀程式時看到這個形狀，就知道它下面那段是「貴」的。</b>
+    <b><code>if self._C is None</code> 那一行是「算一次就好」的寫法。</b>第一次有人要這張表時才算，算完存在 <code>self._C</code> 裡；第二次以後直接拿現成的。這張表要掃過 1,189 萬筆「某顆神經元經過某個體素」的紀錄，重算十次就是白白多花十倍時間。<b>讀程式時看到這個形狀，就知道它下面那段是「貴」的。</b>
   </div>
 
   <h2 id="s6"><span class="pt">4</span>問題三：這一段在做哪一步</h2>
@@ -389,8 +392,8 @@ ORDER = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "12", "14"]</code></
   <p><a href="agent-prompts.html">PART 3</a> 每一條指令後面都附了一張「怎麼確認它做對了」的表。這一版把那些表整份搬進 <code>expected.json</code>——<b>不是文件，是程式會去讀的檔案</b>：</p>
 
   <pre><code>{"指令": 1,  "說明": "神經元數",           "path": "c01/神經元數",   "want": 28573}
-{"指令": 6,  "說明": "1% 門檻",             "path": "c06/thr",       "want": 125.11, "tol": 0.01}
-{"指令": 9,  "說明": "有操作區間的格子數",   "path": "c09/partial_cells", "want": 0}
+{"指令": 6,  "說明": "1% 門檻（分母是整個腦區）", "path": "c06/thr", "want": 125.11, "tol": 0.01}
+{"指令": 9,  "說明": "20 種參數組合裡「只收一部分」的有幾個", "path": "c09/partial_cells", "want": 0}
 {"指令": 14, "說明": "判定為單一 LPU",       "path": "c14/單一 LPU",   "want": 8}
 {"指令": 14, "說明": "判定為候選 hub",       "path": "c14/候選 hub",   "want": 54}</code></pre>
 
@@ -403,7 +406,7 @@ ORDER = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "12", "14"]</code></
 全部通過。</code></pre>
 
   <div class="callout">
-    <b>最有用的驗收項，是那幾條「預期它失敗」的。</b>上面第三行 <code>partial_cells: 0</code> 記的是「指令 9 應該找不到任何可用的參數組合」。<b>如果哪天這一項變成不是 0，代表資料換了、或是招募那一步被改動過</b>——而那正是最需要被通知的時候。
+    <b>最有用的驗收項，是那幾條「預期它失敗」的。</b>上面那條 <code>partial_cells</code> 的 <code>want: 0</code> 記的是「指令 9 應該找不到任何可用的參數組合」。<b>如果哪天這一項變成不是 0，代表資料換了、或是招募那一步被改動過</b>——而那正是最需要被通知的時候。
     <p style="margin-top:8px">驗收表不只用來確認成功，也用來釘住已知的失敗。</p>
   </div>
 
@@ -532,7 +535,7 @@ ORDER = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "12", "14"]</code></
    合計                        277.0 MB →    38.6 MB   （14%）</code></pre>
 
   <div class="plain">
-    <b>白話：分區標籤壓到原本的 0.6%。</b>那個檔案是 1.7 億個格子，絕大多數是「腦區外」的零，剩下的也是一大片一大片同樣的號碼——這種東西壓縮率極高。<b>程式讀得懂壓縮檔，所以另一台機器不必先解開</b>，代價是載入多花 0.4 秒。
+    <b>白話：分區標籤壓到原本的 0.6%。</b>那個檔案是 1.8 億個格子，絕大多數是「腦區外」的零，剩下的也是一大片一大片同樣的號碼——這種東西壓縮率極高。<b>程式讀得懂壓縮檔，所以另一台機器不必先解開</b>，代價是載入多花 0.4 秒。
   </div>
 
   <div class="note">
