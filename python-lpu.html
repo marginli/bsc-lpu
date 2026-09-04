@@ -25,7 +25,7 @@
   </div>
 
   <div class="callout">
-    <b>讀程式不等於看懂每一行。</b>整合後的四個檔案合計 1,723 行。真正決定結論的，是其中<b>十個數字</b>；真正需要盯住的，是<b>五個地方</b>。這一頁就是那五個地方。
+    <b>讀程式不等於看懂每一行。</b>整合後的四個檔案合計 1,731 行。真正決定結論的，是其中<b>十個數字</b>；真正需要盯住的，是<b>五個地方</b>。這一頁就是那五個地方。
   </div>
 
   <nav class="toc">
@@ -87,7 +87,7 @@
   <div class="tblwrap"><table>
     <tr><th style="width:44%"></th><th style="width:28%">PART 4</th><th style="width:28%">PART 5</th></tr>
     <tr><td>檔案數</td><td>16 支</td><td><b>3 個</b>（＋一份驗收表）</td></tr>
-    <tr><td>行數</td><td>733（16 支 <code>.py</code>）</td><td>1,723（四個檔案合計）</td></tr>
+    <tr><td>行數</td><td>733（16 支 <code>.py</code>）</td><td>1,731（四個檔案合計）</td></tr>
     <tr><td>程式敘述數（只算 <code>.py</code>）</td><td>934</td><td>1,066</td></tr>
     <tr><td>會去載入分區標籤的檔案</td><td>10 支</td><td><b>1 處</b></td></tr>
     <tr><td>自己寫一次體素編號換算的檔案</td><td>9 支</td><td><b>1 處</b></td></tr>
@@ -118,7 +118,7 @@
     <div class="f">
       <div class="nm">lpu_lib.py</div>
       <span class="role">做法</span>
-      <p>參數、資料、七個步驟的演算法、畫圖。<b>要改結論就改這裡</b>。553 行。</p>
+      <p>參數、資料、七個步驟的演算法、畫圖。<b>要改結論就改這裡</b>。561 行。</p>
     </div>
   </div>
 
@@ -201,12 +201,12 @@ class Config:
     out: Path = Path("out")
 
     <span class="cm"># ── 論文明確給定的參數 ──</span>
-    quartile: float = 75.0          <span class="cm"># 步驟 3：取上四分位當熱點</span>
-    smooth_size: int = 3            <span class="cm"># 步驟 2：3x3x3 移動平均</span>
-    min_cluster_frac: float = 0.01  <span class="cm"># 步驟 4：群要大於腦區體積的 1%</span>
-    overlap: float = 0.50           <span class="cm"># 步驟 5：重疊超過 50% 才招募</span>
-    core_frac: float = 0.80         <span class="cm"># 步驟 7：中心 80% 對周邊 20%</span>
-    c_threshold: float = 2.0        <span class="cm"># 步驟 7：c &gt; 2 才算 LPU</span>
+    quartile: float = 75.0          <span class="cm"># STEP 2：取上四分位當熱點</span>
+    smooth_size: int = 3            <span class="cm"># STEP 1：3x3x3 移動平均</span>
+    min_cluster_frac: float = 0.01  <span class="cm"># STEP 3：群要大於腦區體積的 1%</span>
+    overlap: float = 0.50           <span class="cm"># STEP 4：重疊超過 50% 才招募</span>
+    core_frac: float = 0.80         <span class="cm"># STEP 6：中心 80% 對周邊 20%</span>
+    c_threshold: float = 2.0        <span class="cm"># STEP 6：c &gt; 2 才算 LPU</span>
 
     <span class="cm"># ── 論文沒給、我們自己決定的（PART 4 結論五）──</span>
 <span class="hl">    f_ln: float = 0.80              # 指令 2：多少比例的分枝待在同一區才算 LN</span><span class="hl">    bin_factor: int = 4             # 指令 4：幾格併成一個分析體素</span><span class="hl">    n_shuffle: int = 9              # 指令 7：打亂體素順序重跑幾次</span><span class="hl">    grow: int = 4                   # 指令 9：招募時撐大幾格（2 格招不到任何一顆）</span><span class="hl">    depth_cut: int = 10             # 指令 10：離本體幾格以內視為初級神經突</span><span class="hl">    min_ln_to_cluster: int = 10     # 指令 14：LN 少於幾顆就不分群</span><span class="hl">    min_vox_touch: int = 5          # 指令 12：碰到幾個體素才算「碰到」這一區</span><span class="hl">    rng_seed: int = 0               # 打亂順序用的亂數種子</span>
@@ -308,15 +308,16 @@ def contact(self) -&gt; np.ndarray:
   </div>
 
   <div class="tblwrap"><table>
-    <tr><th style="width:26%">PART 2 的步驟</th><th style="width:8%">指令</th><th style="width:32%">函式</th><th>在哪個檔案</th></tr>
-    <tr><td>（前置）誰是 LN</td><td>2、3</td><td><code>ln_selection</code>／<code>ln_by_region</code></td><td><code>lpu_lib.py</code></td></tr>
-    <tr><td>1、2　密度場 v(r) 與平滑</td><td>4</td><td><code>density_field</code></td><td><code>lpu_lib.py</code></td></tr>
-    <tr><td>3　取上四分位當熱點</td><td>5</td><td><code>five_number</code>／<code>hotspots</code></td><td><code>lpu_lib.py</code></td></tr>
-    <tr><td>4　UPGMA 分群與 1% 過濾</td><td>6、7</td><td><code>cluster_hotspots</code>／<code>cut_sweep</code></td><td><code>lpu_lib.py</code></td></tr>
-    <tr><td>5　挑種子、滾雪球招募</td><td>8、9</td><td><code>pick_seed</code>／<code>recruit</code>／<code>recruit_regime</code></td><td><code>lpu_lib.py</code></td></tr>
-    <tr><td>6　去初級神經突、抽等值面</td><td>10</td><td><code>depth_profile</code></td><td><code>lpu_lib.py</code></td></tr>
-    <tr><td>7　算 c 值</td><td>11</td><td><code>c_value</code></td><td><code>lpu_lib.py</code></td></tr>
-    <tr><td>（收尾）相鄰與合併</td><td>12、13</td><td><code>adjacency</code>／<code>merge_gain</code></td><td><code>lpu_lib.py</code></td></tr>
+    <tr><th style="width:30%">PART 2 的步驟</th><th style="width:8%">指令</th><th style="width:32%">函式</th><th>在哪個檔案</th></tr>
+    <tr><td>STEP 0　誰是 LN（前置）</td><td>2、3</td><td><code>ln_selection</code>／<code>ln_by_region</code></td><td><code>lpu_lib.py</code></td></tr>
+    <tr><td>STEP 1　密度場 v(r) 與 3×3×3 平滑</td><td>4</td><td><code>density_field</code></td><td><code>lpu_lib.py</code></td></tr>
+    <tr><td>STEP 2　取上四分位當熱點</td><td>5</td><td><code>five_number</code>／<code>hotspots</code></td><td><code>lpu_lib.py</code></td></tr>
+    <tr><td>STEP 3　UPGMA 分群與 1% 過濾</td><td>6、7</td><td><code>cluster_hotspots</code>／<code>cut_sweep</code></td><td><code>lpu_lib.py</code></td></tr>
+    <tr><td>STEP 4　挑種子、滾雪球招募</td><td>8、9</td><td><code>pick_seed</code>／<code>recruit</code>／<code>recruit_regime</code></td><td><code>lpu_lib.py</code></td></tr>
+    <tr><td>STEP 5　去初級神經突、抽等值面</td><td>10</td><td><code>depth_profile</code></td><td><code>lpu_lib.py</code></td></tr>
+    <tr><td>STEP 6　算 c 值</td><td>11</td><td><code>c_value</code></td><td><code>lpu_lib.py</code></td></tr>
+    <tr><td>STEP 7　長程神經束驗證</td><td>12</td><td><code>adjacency</code>（論文的演算法在 D06 上做不到，這是降級版）</td><td><code>lpu_lib.py</code></td></tr>
+    <tr><td>步驟以外　合併判斷</td><td>13</td><td><code>merge_gain</code></td><td><code>lpu_lib.py</code></td></tr>
     <tr><td>全腦跑一遍</td><td>14</td><td><code>step14</code></td><td><code>run_lpu.py</code></td></tr>
   </table></div>
 
@@ -347,7 +348,7 @@ ORDER = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "12", "14"]</code></
     return mask &amp; (v &gt;= np.percentile(v[mask], q))</code></pre>
 
   <div class="plain">
-    <b>白話，一行拆成三件事：</b>先 <code>v[mask]</code> 把腦區內的密度值挑出來；再 <code>np.percentile(..., 75)</code> 找出排到 75% 那個位置的值；最後 <code>mask &amp; (v &gt;= 那個值)</code> 選出「在腦區內、而且密度不低於那個值」的格子。<b>一行程式就是 <a href="how-to-draw-lpu.html">PART 2</a> 的第三步。</b>
+    <b>白話，一行拆成三件事：</b>先 <code>v[mask]</code> 把腦區內的密度值挑出來；再 <code>np.percentile(..., 75)</code> 找出排到 75% 那個位置的值；最後 <code>mask &amp; (v &gt;= 那個值)</code> 選出「在腦區內、而且密度不低於那個值」的格子。<b>一行程式就是 <a href="how-to-draw-lpu.html">PART 2</a> 的 STEP 2。</b>
   </div>
 
   <div class="callout">

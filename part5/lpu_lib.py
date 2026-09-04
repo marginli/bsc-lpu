@@ -7,7 +7,7 @@ lpu_lib.py — LPU 管線的設定、資料物件與函式庫
 
   一、Config     整條管線的所有可調參數。全部集中在這裡。
   二、Brain      持有資料（分區標籤、神經元骨架體素），並負責座標換算。
-  三、七個步驟   論文〈Defining an LPU〉那七步，一步一個函式。
+  三、七個步驟   論文〈Defining an LPU〉那七步，編號沿用 PART 2 的 STEP 0–7。
   四、畫圖       出圖的輔助函式。圖內一律不放中文。
 
 配套檔案：run_lpu.py（主程式）、run_lpu.sh（在終端機一鍵跑完）。
@@ -45,12 +45,12 @@ class Config:
     out: Path = Path("out")
 
     # ── 論文明確給定的參數 ──
-    quartile: float = 75.0          # 步驟 3：取上四分位當熱點
-    smooth_size: int = 3            # 步驟 2：3x3x3 移動平均
-    min_cluster_frac: float = 0.01  # 步驟 4：群要大於腦區體積的 1%
-    overlap: float = 0.50           # 步驟 5：重疊超過 50% 才招募
-    core_frac: float = 0.80         # 步驟 7：中心 80% 對周邊 20%
-    c_threshold: float = 2.0        # 步驟 7：c > 2 才算 LPU
+    quartile: float = 75.0          # STEP 2：取上四分位當熱點
+    smooth_size: int = 3            # STEP 1：3x3x3 移動平均
+    min_cluster_frac: float = 0.01  # STEP 3：群要大於腦區體積的 1%
+    overlap: float = 0.50           # STEP 4：重疊超過 50% 才招募
+    core_frac: float = 0.80         # STEP 6：中心 80% 對周邊 20%
+    c_threshold: float = 2.0        # STEP 6：c > 2 才算 LPU
 
     # ── 論文沒給、我們自己決定的（PART 4 結論五）──
     f_ln: float = 0.80              # 指令 2：多少比例的分枝待在同一區才算 LN
@@ -241,7 +241,7 @@ def _load_array(p: Path) -> np.ndarray:
 # 三、七個步驟
 # ══════════════════════════════════════════════════════════════════
 
-# ── 步驟 0：誰是 LN ────────────────────────────────────────────────
+# ── STEP 0：誰是 LN ────────────────────────────────────────────────
 
 def ln_selection(C: np.ndarray, f: float) -> tuple:
     """比例規則：一顆神經元有 f 以上的「區內體素」集中在同一區，就算那一區的 LN。
@@ -266,14 +266,17 @@ def ln_by_region(C: np.ndarray, names: list, f: float) -> tuple:
     return collections.Counter(names[a] for a in arg[sel]), int(sel.sum())
 
 
-# ── 步驟 1、2：密度場 v(r) ─────────────────────────────────────────
+# ── STEP 1：密度場 v(r) 與 3x3x3 平滑 ─────────────────────────────────────────
 
 def density_field(brain: Brain, ln_ids, region: str) -> tuple:
     """在分析格上堆出密度場 v(r)，再做 3×3×3 移動平均。
 
     v(r) 的定義：**有幾顆不同的 LN 佔到這一格**。同一顆神經元在同一格
-    只算一次（那個 np.unique 就是在做這件事）。論文寫的是「穿過該體素的
-    纖維條數」——我們沒有纖維的拓樸，只有體素，所以這是近似，不是同一個量。
+    只算一次（那個 np.unique 就是在做這件事）。
+    論文有兩種說法：補充材料寫 the number of LN fibers passing through the
+    voxel（纖維條數），圖 S5D 的圖說寫 the number of repetitive registrations
+    of every single voxel（重複註冊次數）。從二值化的體素只做得到後者，
+    這個函式算的就是後者。
 
     回傳 (腦區遮罩, 平滑後的 v(r))。
     """
@@ -294,7 +297,7 @@ def estimate_memory(n_hot: int) -> float:
     return n_hot * (n_hot - 1) / 2 * 8 / 2 ** 30
 
 
-# ── 步驟 3：熱點 ──────────────────────────────────────────────────
+# ── STEP 2：熱點 ──────────────────────────────────────────────────
 
 def five_number(values: np.ndarray) -> list:
     return [float(x) for x in np.percentile(values, [0, 25, 50, 75, 100])]
@@ -309,7 +312,7 @@ def hotspots(mask: np.ndarray, v: np.ndarray, q: float) -> np.ndarray:
     return mask & (v >= np.percentile(v[mask], q))
 
 
-# ── 步驟 4：UPGMA 分群 ────────────────────────────────────────────
+# ── STEP 3：UPGMA 分群 ────────────────────────────────────────────
 
 def cluster_hotspots(P: np.ndarray, thr: float, cut: float) -> tuple:
     """對熱點體素做 UPGMA，切在高度 cut，只留大於 thr 個體素的群。
@@ -353,7 +356,7 @@ def cut_sweep(P: np.ndarray, thr: float, cfg: Config, rng, detail: bool = False)
                 plateau=[int(pl.min()), int(pl.max())], **extra)
 
 
-# ── 步驟 5：種子與招募 ────────────────────────────────────────────
+# ── STEP 4：種子與招募 ────────────────────────────────────────────
 
 def neuron_masks(brain: Brain, ids, pad: int = 4) -> tuple:
     """把每顆神經元畫成一塊小立方體裡的二值遮罩（原始 D06 格，不併格）。
@@ -391,7 +394,9 @@ def neuron_voxel_sets(brain: Brain, ids) -> dict:
 def pick_seed(neu: dict, cluster_voxels: np.ndarray, top_n: int = 10) -> dict:
     """挑招募的起始神經元。
 
-    論文的作法是「目視挑一顆纖維侷限在該候選 LPU 內、體積最小的 LN」。
+    論文的原句是 a smallest LN with its fibers restricted within the smallest
+    candidate LPU is visually determined as an initial source——纖維要**完全**
+    侷限在**最小的**那個候選 LPU 之內，而且是目視決定的。
     在我們的資料上沒有任何一顆的比例接近 100%，照字面挑不到，所以改成
     **替代規則：比例最高的前 top_n 顆裡取體積最小的**。這不是論文的條件。
     """
@@ -408,8 +413,11 @@ def recruit(M: dict, sizes: dict, seed: int, grow: int, overlap: float,
     """滾雪球：把目前的 source 撐大 grow 格，凡是有一半以上體積落在裡面的
     LN 就併進來，然後重複，直到沒有新的可收。
 
-    分母用 target 神經元**原本的**體積——只撐大 source，不撐大 target，
-    否則兩邊都撐大會算出超過 1 的比例。
+    論文寫的是 all voxel units enlarged（兩邊都撐大），但沒說
+    over 50% of *its* volume 的分母是 target 撐大前還是撐大後的體積。
+    這裡只撐大 source、分母用 target 原本的體積，是我們的簡化——理由是
+    source 每一輪都在長大，只撐大 source 才不必每輪重算每一顆 target。
+    （兩邊都撐大而分母用撐大前的體積會算出超過 1 的比例，那個讀法不成立。）
     """
     st = ndimage.generate_binary_structure(3, 1)
     ids = np.array(sorted(M))
@@ -446,7 +454,7 @@ def recruit_regime(M: dict, sizes: dict, seed: int, grows, thresholds) -> dict:
     return res
 
 
-# ── 步驟 6：去初級神經突、抽等值面 ────────────────────────────────
+# ── STEP 5、6：去初級神經突、抽等值面、算 c 值 ────────────────────────────────
 
 def depth_profile(dep: np.ndarray, L: np.ndarray, region_idx: int, bands) -> list:
     """依離本體的路徑深度分段，看每一段有多少體素落在該區外。
@@ -481,7 +489,7 @@ def c_value(body: np.ndarray, v: np.ndarray, core_frac: float) -> dict:
                 meanA=float(vals[A].mean()), meanB=float(mB), c=round(c, 3))
 
 
-# ── 步驟 7：連結與合併 ────────────────────────────────────────────
+# ── STEP 7＋步驟以外：神經束驗證（降級）與合併 ────────────────────────────────────────────
 
 def adjacency(lab: np.ndarray) -> set:
     """哪些腦區在空間上相鄰：沿三個軸各比一次相鄰格的標籤。"""
