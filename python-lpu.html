@@ -11,145 +11,568 @@
 <header class="hero">
   <p class="eyebrow">PART 5</p>
   <h1>讀懂 AI 寫出來的程式</h1>
-  <p class="subtitle">把 PART 2 的七個步驟，一一換成可以跑的程式碼</p>
+  <p class="subtitle">十六支散落的程式整合成三個檔案，然後用五個問題把它讀完</p>
 </header>
 
 <div class="wrap">
 
-  <div class="draft"><b>本頁為大綱骨架。</b>模組切法與函式簽名是提案，程式碼區塊目前是<b>骨架（stub）</b>，還沒有實際跑過任何資料。等討論定案後才會真的實作與驗證。</div>
+  <div class="note">
+    <b><a href="agent-run.html">PART 4</a> 交出了十六支程式、733 行。</b>這一頁不是逐行講解那 733 行——<b>沒有人會逐行讀程式</b>，AI 寫的更不會。這一頁做兩件事：先把十六支整理成三個帶得走的檔案，再示範專業的讀法。
+  </div>
 
-  <div class="danger"><b>還沒驗證的事：</b>本頁所有程式碼都<b>尚未在真實資料上跑過</b>，執行時間、記憶體用量、以及能不能重現論文的 41 個 LPU，全都是未知數。討論後要先做一次端到端的實跑，再把真實輸出貼回這一頁。</div>
+  <div class="callout">
+    <b>讀程式不等於看懂每一行。</b>整合後的程式有 1,721 行。真正決定結論的，是其中<b>十個數字</b>；真正需要盯住的，是<b>五個地方</b>。這一頁就是那五個地方。
+  </div>
 
   <nav class="toc">
     <h2>本頁章節</h2>
     <ol>
-      <li><a href="#s0">0. 資料從哪來、環境需要什麼</a></li>
-      <li><a href="#s1">1. 讀神經元、堆成體素密度場</a></li>
-      <li><a href="#s2">2. 27 鄰域平滑與上四分位取熱點</a></li>
-      <li><a href="#s3">3. UPGMA 分群與 1% 篩選</a></li>
-      <li><a href="#s4">4. 招募迴圈</a></li>
-      <li><a href="#s5">5. 等值面抽邊界</a></li>
-      <li><a href="#s6">6. c 值計算</a></li>
-      <li><a href="#s7">7. 畫出來</a></li>
-      <li><a href="#s8">8. 驗證：跟論文的 41 個 LPU 對得上嗎</a></li>
+      <li><a href="#s1">先講三個詞</a></li>
+      <li><a href="#s2">五個問題</a></li>
+      <li><a href="#s3">先看形狀：十六支變成三個檔案</a></li>
+      <li><a href="#s4">問題一：哪些數字決定了結論</a></li>
+      <li><a href="#s5">問題二：資料是怎麼進來的</a></li>
+      <li><a href="#s6">問題三：這一段在做哪一步</a></li>
+      <li><a href="#s7">問題四：它怎麼證明自己沒寫錯</a></li>
+      <li><a href="#s8">問題五：跑不出東西的時候會怎樣</a></li>
+      <li><a href="#s9">帶到另一台機器</a></li>
+      <li><a href="#s10">一張可以帶走的檢查清單</a></li>
     </ol>
   </nav>
 
-  <h2 id="s0"><span class="pt">0</span>資料從哪來、環境需要什麼</h2>
-  <div class="todo">
-    <b>要確認的（討論時要一起決定）</b>
-    <ul>
-      <li><b>神經元影像</b>：本機的 FlyCircuit 全套在 <code>/mnt/sda1/work1/fly_circuit/</code>。要用整套？還是先拿 EP1-1 那 20 顆 <code>.am</code> 當小樣本把管線跑通？</li>
-      <li><b>標準腦與分區</b>：BSC_plan 的 <code>D03</code> 有自製的標準腦模板與分區檔，可以直接當 neuropil 遮罩用。</li>
-      <li><b>LN／PN 的標記</b>：流程的輸入是「已知是 LN 的神經元」。這個標記從哪來？如果沒有現成的，要不要在管線裡先做「纖維是否完全落在某個 neuropil 內」的判定？<b>這是最大的未決問題。</b></li>
-      <li>套件：<code>numpy</code>、<code>scipy</code>（<code>cluster.hierarchy</code>、<code>ndimage</code>）、<code>scikit-image</code>（<code>marching_cubes</code>）、<code>trimesh</code>、<code>matplotlib</code> 或 <code>plotly</code>。</li>
-      <li>規模估算：全腦體素數 × 熱點 25% 的兩兩距離矩陣，記憶體會不會爆？要先算一次再決定用不用抽樣。</li>
-    </ul>
-  </div>
-  <pre><code>lpu/
-├── io_am.py        # 讀 AmiraMesh，沿用 EP1-1 已驗證的判讀
-├── voxelize.py     # STEP 1：神經元 → 密度場 v(r)
-├── hotspot.py      # STEP 2：五數綜合、上四分位
-├── cluster.py      # STEP 3：UPGMA、1% 篩選
-├── recruit.py      # STEP 4：滾雪球招募
-├── surface.py      # STEP 5：等值面 → 邊界網格
-├── cvalue.py       # STEP 6：內縮 80%、算 c
-├── validate.py     # STEP 7：tract 檢查
-└── render.py       # 出圖</code></pre>
+  <h2 id="s1"><span class="pt">開場</span>先講三個詞</h2>
 
-  <h2 id="s1"><span class="pt">STEP 1</span>讀神經元、堆成體素密度場</h2>
-  <pre><code>import numpy as np
+  <p>這一頁會反覆出現三個字眼。先各給一句話，之後不再解釋。</p>
 
-def build_density(neuron_masks, shape, kernel=3):
-    """把一批已對位的 LN 二值遮罩疊成纖維密度場 v(r)。
-
-    neuron_masks : Iterable[np.ndarray(bool)]  每顆 LN 的體素遮罩
-    shape        : tuple  標準腦的體素維度 (I, J, K)
-    回傳          : np.ndarray(float32)  平滑後的 v(r)
-    """
-    raise NotImplementedError  # TODO</code></pre>
-  <div class="todo"><b>待討論</b>：疊加是「條數」還是「有無」？論文寫的是「穿過該體素的纖維條數」，但從二值影像只能得到「有幾顆神經元覆蓋此體素」——這兩者不同，要決定怎麼近似並在課程裡講明。</div>
-
-  <h2 id="s2"><span class="pt">STEP 2</span>27 鄰域平滑與上四分位取熱點</h2>
-  <pre><code>from scipy import ndimage
-
-def smooth27(v):
-    """3x3x3 均值平滑（論文的 27 體素平均）。"""
-    return ndimage.uniform_filter(v, size=3)
-
-def hotspots(v, mask):
-    """在 neuropil 遮罩內取上四分位，回傳熱點體素座標 Z。"""
-    vals = v[mask]
-    qu = np.percentile(vals, 75)          # five-number summary 的 Q3
-    return np.argwhere(mask & (v >= qu))  # Z</code></pre>
-  <div class="todo"><b>待補</b>：印出五數綜合當教學素材；示範改動分位數對結果的影響。</div>
-
-  <h2 id="s3"><span class="pt">STEP 3</span>UPGMA 分群與 1% 篩選</h2>
-  <pre><code>from scipy.cluster.hierarchy import linkage, fcluster
-from scipy.spatial.distance import pdist
-
-def upgma_clusters(Z, n_voxels_in_neuropil, cut, min_frac=0.01):
-    """UPGMA 分群，只保留體素數 > neuropil 總體素 1% 的群。
-
-    cut : 樹的切割高度 —— 論文未給，需自行決定（見 PART 2 的總結）
-    """
-    d = pdist(Z.astype(np.float32))       # 歐氏距離
-    Ldg = linkage(d, method="average")    # UPGMA == average linkage
-    labels = fcluster(Ldg, t=cut, criterion="distance")
-    raise NotImplementedError  # TODO: 依 min_frac 篩選並回傳各群體素</code></pre>
-  <div class="danger"><b>記憶體警告：</b><code>pdist</code> 對 N 個體素會產生 N(N−1)/2 個距離。熱點若有十萬個體素，光距離矩陣就要約 20 GB。實作前必須先估算，並準備替代方案（空間分塊、下採樣、或改用連通元件＋分水嶺）。</div>
-  <div class="todo"><b>待討論</b>：<code>cut</code> 怎麼定？可能的作法：(a) 用已知答案的 VLP 反推一個切割高度，(b) 掃一段 cut 值看群數的穩定平台。這一步是整個重現工作的成敗關鍵。</div>
-
-  <h2 id="s4"><span class="pt">STEP 4</span>招募迴圈</h2>
-  <pre><code>def recruit(seed_mask, candidates, scale=4, overlap=0.5):
-    """滾雪球：體素放大 scale 倍後，與 source 重疊超過 overlap 的神經元就併入。"""
-    source = seed_mask
-    pool = list(candidates)
-    changed = True
-    while changed:
-        changed = False
-        for n in list(pool):
-            # TODO: 放大 scale 倍後計算 n 與 source 的體積重疊比
-            ...
-    return source</code></pre>
-  <div class="todo"><b>待討論</b>：論文的起始 LN 是<b>目視</b>挑的。自動化的候選作法：取該群內體積最小、且纖維完全落在群內的 LN。要不要保留一個手動指定的介面，讓課程可以示範「換一顆 seed 結果會不會變」？</div>
-
-  <h2 id="s5"><span class="pt">STEP 5</span>等值面抽邊界</h2>
-  <pre><code>from skimage.measure import marching_cubes
-
-def lpu_surface(v_recruited, level):
-    """去掉 primary neurite 與 soma 後，抽等值面當作 LPU 邊界。"""
-    verts, faces, normals, _ = marching_cubes(v_recruited, level=level)
-    return verts, faces</code></pre>
-  <div class="todo"><b>待討論</b>：<code>level</code>（等值面門檻）論文未給。另外「去掉 primary neurite 與 soma」在只有體素影像的情況下怎麼做？可能要靠形態學（soma 是大團、primary neurite 是細長管），這本身就是一個小題目。</div>
-
-  <h2 id="s6"><span class="pt">STEP 6</span>c 值計算</h2>
-  <pre><code>def c_value(v, region_mask, core_frac=0.8):
-    """均勻內縮到 core_frac 的體素當中心區 A，其餘為周邊 B，回傳 c。"""
-    # TODO: 用 distance transform 由表面往內排序，取前 core_frac 當 A
-    # c = mean(v[A]) / mean(v[B])
-    raise NotImplementedError</code></pre>
-  <div class="note">實作上「均勻內縮到剩 80% 體素」最直接的作法是對 <code>region_mask</code> 做距離轉換（<code>scipy.ndimage.distance_transform_edt</code>），依離表面的距離排序，取最內側的 80%。這樣不必真的做曲面內縮。</div>
-
-  <h2 id="s7"><span class="pt">STEP 7</span>畫出來</h2>
-  <div class="todo">
-    <b>要決定畫成什麼</b>
-    <ul>
-      <li>三視圖（沿用 EP1-2 已經驗證過的投影作法）？還是可轉動的 3D？</li>
-      <li>每個 LPU 一個顏色——可以接 EP04／EP05 已經做過的 Kaleido 配色演算法。</li>
-      <li>要不要做成能嵌進網頁的互動圖（plotly 或 three.js）？</li>
-    </ul>
+  <div class="terms">
+    <div class="term">
+      <div class="w">函式<span class="en">function</span></div>
+      <p>一段<b>有名字</b>的程式，吃進幾樣東西、吐出一個結果。<code>hotspots(遮罩, 密度場, 75)</code> 就是一個函式：給它三樣東西，它還你一批熱點體素。名字後面的括號就是「吃進什麼」。</p>
+    </div>
+    <div class="term">
+      <div class="w">類別<span class="en">class</span></div>
+      <p>把<b>一批資料</b>和<b>處理那批資料的動作</b>綁在一起的盒子。整條管線只有兩個：<code>Config</code> 裝所有參數，<code>Brain</code> 裝所有資料。</p>
+    </div>
+    <div class="term">
+      <div class="w">模組<span class="en">module</span></div>
+      <p>一個 <code>.py</code> 檔案。<code>import lpu_lib</code> 的意思是「把 <code>lpu_lib.py</code> 這個檔案裡的東西拿過來用」。</p>
+    </div>
+    <div class="term">
+      <div class="w">參數<span class="en">parameter</span></div>
+      <p>程式裡<b>寫死的數字</b>——門檻、比例、跑幾次。這一頁最重要的一個概念：換掉一個參數，結論就可能改變，但程式不會告訴你。</p>
+    </div>
   </div>
 
-  <h2 id="s8"><span class="pt">驗證</span>跟論文的 41 個 LPU 對得上嗎</h2>
-  <div class="todo">
-    <b>這一節是整堂課的重點</b>
-    <ul>
-      <li>逐區比對：我們跑出來的候選 LPU，與論文 Figure 5 的 41 個對得上幾個？</li>
-      <li>三個關鍵檢查點：VLP 有沒有分成兩個？MB 有沒有維持一整個？四對 hub（OPTU／Nod／OG／IDLP）有沒有被正確判成沒有 LN？</li>
-      <li>對不上的地方，是參數的問題還是資料的問題？</li>
-      <li><b>照 BSC 的慣例，AI 在過程中犯的錯與被推翻的結論要一併寫進來，不要修飾成一路順利。</b></li>
-    </ul>
+  <h2 id="s2"><span class="pt">骨架</span>五個問題</h2>
+
+  <p>拿到一份 AI 寫出來的程式，不論它算的是果蠅腦、問卷資料還是影像，都可以問同樣五個問題。每一個問題只需要看程式的一小塊。</p>
+
+  <div class="tblwrap"><table>
+    <tr><th style="width:6%">#</th><th style="width:34%">問題</th><th style="width:26%">要看哪裡</th><th>為什麼是這一個</th></tr>
+    <tr><td>1</td><td><b>哪些數字決定了結論？</b></td><td><code>Config</code></td><td>結論通常靠十幾個數字撐著，不是靠一千行</td></tr>
+    <tr><td>2</td><td><b>資料是怎麼進來的？</b></td><td><code>Brain</code></td><td>讀錯資料的話，後面每一步都會很順利地算出錯的答案</td></tr>
+    <tr><td>3</td><td><b>這一段在做哪一步？</b></td><td>函式名 ↔ 步驟的對照表</td><td>有對照表才能只讀你關心的那一段</td></tr>
+    <tr><td>4</td><td><b>它怎麼證明自己沒寫錯？</b></td><td><code>expected.json</code></td><td>沒有這一塊，「跑完了」只代表沒當掉</td></tr>
+    <tr><td>5</td><td><b>跑不出東西時會怎樣？</b></td><td>會不會停下來</td><td><b>最危險的不是報錯，是不報錯</b></td></tr>
+  </table></div>
+
+  <h2 id="s3"><span class="pt">1</span>先看形狀：十六支變成三個檔案</h2>
+
+  <p><a href="agent-run.html">PART 4</a> 是一條指令一支程式跑出來的，所以留下十六支各自獨立的檔案。這樣的東西可以拿來看，但不能拿來用——它不能搬到別台機器，也很難讀。整合的第一件事不是改演算法，而是<b>把重複的部分收成一份</b>。</p>
+
+  <div class="tblwrap"><table>
+    <tr><th style="width:44%"></th><th style="width:28%">PART 4</th><th style="width:28%">PART 5</th></tr>
+    <tr><td>檔案數</td><td>16 支</td><td><b>3 個</b>（＋一份驗收表）</td></tr>
+    <tr><td>行數</td><td>733</td><td>1,721</td></tr>
+    <tr><td>程式敘述數</td><td>934</td><td>1,066</td></tr>
+    <tr><td>會去載入分區標籤的檔案</td><td>10 支</td><td><b>1 處</b></td></tr>
+    <tr><td>自己寫一次體素編號換算的檔案</td><td>9 支</td><td><b>1 處</b></td></tr>
+    <tr><td>把資料路徑寫死的檔案</td><td>14 支</td><td><b>1 處</b>（而且可以從命令列覆寫）</td></tr>
+  </table></div>
+
+  <div class="plain">
+    <b>行數變多、檔案變少，這是正常的。</b>多出來的不是計算，是原本沒有的東西：一段檢查環境的程式、一段核對結果的程式、一段打包資料的程式。<b>真正在算的那部分反而縮短了</b>——敘述數只多 14%，但那 14% 全是新功能。
+  </div>
+
+  <div class="callout">
+    <b>為什麼「同一件事寫十次」是問題？</b>把體素編號換算成座標這件事，在 PART 4 有九個版本。九個版本代表<b>九個可能寫錯的地方</b>，而且哪一個是對的，讀的人看不出來。收成一份之後，錯了就會全錯——聽起來更糟，其實更好：<b>全錯很容易發現，只錯一個不會。</b>
+  </div>
+
+  <h3>三個檔案的分工</h3>
+
+  <div class="filecard">
+    <div class="f">
+      <div class="nm">run_lpu.sh</div>
+      <span class="role">門</span>
+      <p>在終端機打的那一行。它只做四件事：檢查環境、跑、核對、列出產出。55 行，沒有任何計算。</p>
+    </div>
+    <div class="f">
+      <div class="nm">run_lpu.py</div>
+      <span class="role">順序</span>
+      <p>十四條指令一條一個函式。它只管<b>先做什麼、再做什麼、把什麼印出來</b>，不管怎麼算。1,049 行。</p>
+    </div>
+    <div class="f">
+      <div class="nm">lpu_lib.py</div>
+      <span class="role">做法</span>
+      <p>參數、資料、七個步驟的演算法、畫圖。<b>要改結論就改這裡</b>。552 行。</p>
+    </div>
+  </div>
+
+  <p>這個切法有一個實際的用處：<b>你想改什麼，就知道要打開哪一個檔案。</b>想換一個參數重跑 → <code>lpu_lib.py</code> 最上面；想知道第 7 步在第 6 步之前還是之後 → <code>run_lpu.py</code> 最下面的順序表；想在別台機器跑 → 只碰 <code>run_lpu.sh</code>。</p>
+
+  <figure class="fig">
+    <svg viewBox="0 0 900 400" role="img" aria-label="三個程式檔案與資料、產出的關係圖。左邊是 D03 分區與 D06 骨架兩個資料目錄，中間由上而下是 run_lpu.sh、run_lpu.py、lpu_lib.py 三個檔案，右邊是 out 產出目錄與 expected.json 驗收表，兩者之間是核對。">
+      <style>
+        .bx{fill:#f7f8fa; stroke:#e4e8ee; stroke-width:1.5; rx:10}
+        .bxa{fill:#eff4ff; stroke:#c7dbff; stroke-width:1.5; rx:10}
+        .ti{font-size:15px; font-weight:700; fill:#1b2733}
+        .sb{font-size:13px; fill:#5a6b7b}
+        .hd{font-size:12.5px; font-weight:700; fill:#8b98a5; letter-spacing:.06em}
+        .ar{stroke:#8b98a5; stroke-width:1.8; fill:none}
+      </style>
+      <defs>
+        <marker id="a5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#8b98a5"/>
+        </marker>
+      </defs>
+
+      <text class="hd" x="110" y="228" text-anchor="middle">資料　277 MB</text>
+      <rect class="bx" x="30" y="248" width="160" height="44"/>
+      <text class="ti" x="110" y="276" text-anchor="middle">D03　分區</text>
+      <rect class="bx" x="30" y="304" width="160" height="44"/>
+      <text class="ti" x="110" y="332" text-anchor="middle">D06　骨架</text>
+
+      <text class="hd" x="440" y="26" text-anchor="middle">程式　84 KB</text>
+      <rect class="bxa" x="280" y="40" width="320" height="52"/>
+      <text class="ti" x="300" y="62">run_lpu.sh</text>
+      <text class="sb" x="300" y="81">檢查 → 跑 → 核對 → 列出產出</text>
+
+      <rect class="bx" x="280" y="120" width="320" height="90"/>
+      <text class="ti" x="300" y="146">run_lpu.py　主程式</text>
+      <text class="sb" x="300" y="169">十四條指令，一條一個函式</text>
+      <text class="sb" x="300" y="189">只管先做什麼、再做什麼</text>
+
+      <rect class="bx" x="280" y="240" width="320" height="112"/>
+      <text class="ti" x="300" y="266">lpu_lib.py　函式庫</text>
+      <text class="sb" x="300" y="289">Config　所有參數集中在這裡</text>
+      <text class="sb" x="300" y="309">Brain　　資料與座標換算</text>
+      <text class="sb" x="300" y="329">七個步驟的演算法＋畫圖</text>
+
+      <text class="hd" x="785" y="108" text-anchor="middle">產出　34 MB</text>
+      <rect class="bx" x="700" y="120" width="170" height="90"/>
+      <text class="ti" x="718" y="146">out/</text>
+      <text class="sb" x="718" y="169">16 份 JSON、8 個中間檔</text>
+      <text class="sb" x="718" y="189">7 張圖、2 個 CSV</text>
+
+      <rect class="bxa" x="700" y="250" width="170" height="60"/>
+      <text class="ti" x="718" y="276">expected.json</text>
+      <text class="sb" x="718" y="296">47 項驗收</text>
+
+      <path class="ar" d="M440,92 L440,116" marker-end="url(#a5)"/>
+      <path class="ar" d="M440,210 L440,236" marker-end="url(#a5)"/>
+      <path class="ar" d="M190,270 L274,280" marker-end="url(#a5)"/>
+      <path class="ar" d="M190,326 L274,312" marker-end="url(#a5)"/>
+      <path class="ar" d="M600,165 L696,165" marker-end="url(#a5)"/>
+      <path class="ar" d="M745,246 L745,214" marker-end="url(#a5)"/>
+      <text class="sb" x="757" y="236">核對</text>
+    </svg>
+    <figcaption><b>三個檔案、兩份資料、一個產出目錄。</b>箭頭是「誰用到誰」：<code>run_lpu.sh</code> 叫起 <code>run_lpu.py</code>，主程式用 <code>lpu_lib.py</code> 裡的函式，函式庫去讀 D03 與 D06，結果寫進 <code>out/</code>，最後拿 <code>expected.json</code> 核對一次。<b>程式 84 KB，資料 277 MB——要搬家的重量在左邊，不在中間。</b>
+    <span class="figsrc">示意圖。三個檔案在 <code>part5/</code>。</span></figcaption>
+  </figure>
+
+  <h2 id="s4"><span class="pt">2</span>問題一：哪些數字決定了結論</h2>
+
+  <div class="ask">
+    <p class="q">拿到一份程式，第一件事是找出所有寫死的數字。</p>
+    <p>不是看它怎麼算，是看它<b>用了哪些門檻</b>。散在一千行各處的話，你永遠不會知道結論靠什麼撐著。</p>
+  </div>
+
+  <p>整條管線的所有參數都在 <code>lpu_lib.py</code> 最上面的 <code>Config</code> 裡，而且<b>刻意分成三組</b>：</p>
+
+  <pre><code>@dataclass
+class Config:
+    <span class="cm"># ── 資料在哪。換一台機器時，通常只要改這三行 ──</span>
+    d03: Path = Path("/home/wanjuli/claude_linux/BSC_plan/D03")
+    d06: Path = Path("/home/wanjuli/claude_linux/BSC_plan/D06")
+    out: Path = Path("out")
+
+    <span class="cm"># ── 論文明確給定的參數 ──</span>
+    quartile: float = 75.0          <span class="cm"># 步驟 3：取上四分位當熱點</span>
+    smooth_size: int = 3            <span class="cm"># 步驟 2：3x3x3 移動平均</span>
+    min_cluster_frac: float = 0.01  <span class="cm"># 步驟 4：群要大於腦區體積的 1%</span>
+    overlap: float = 0.50           <span class="cm"># 步驟 5：重疊超過 50% 才招募</span>
+    core_frac: float = 0.80         <span class="cm"># 步驟 7：中心 80% 對周邊 20%</span>
+    c_threshold: float = 2.0        <span class="cm"># 步驟 7：c &gt; 2 才算 LPU</span>
+
+    <span class="cm"># ── 論文沒給、我們自己決定的（PART 4 結論五）──</span>
+    <span class="hl">f_ln: float = 0.80              # 指令 2：多少比例的分枝待在同一區才算 LN</span>
+    <span class="hl">bin_factor: int = 4             # 指令 4：幾格併成一個分析體素</span>
+    <span class="hl">n_shuffle: int = 9              # 指令 7：打亂體素順序重跑幾次</span>
+    <span class="hl">grow: int = 4                   # 指令 9：招募時撐大幾格</span>
+    <span class="hl">depth_cut: int = 10             # 指令 10：離本體幾格以內視為初級神經突</span>
+    <span class="hl">min_ln_to_cluster: int = 10     # 指令 14：LN 少於幾顆就不分群</span>
+    <span class="hl">min_vox_touch: int = 5          # 指令 12：碰到幾個體素才算「碰到」這一區</span>
+
+    <span class="cm"># ── 資料格式常數（跟著 D03／D06 走，不要改）──</span>
+    d06_grid: int = 512             <span class="cm"># D06 體素編號的 X、Y 邊長</span>
+    d06_step: int = 2               <span class="cm"># 一個 D06 體素等於幾個 1 µm 標籤格</span></code></pre>
+
+  <div class="plain">
+    <b>白話：這是一張設定表。</b>每一行是「名字 ＝ 數字 ＋ 一句說明」。程式跑的時候，任何地方要用到「上四分位」，都是回來讀這張表的 <code>quartile</code>，不會自己寫一個 75。<b>所以要改一個門檻，只要改這裡一個地方。</b>
+  </div>
+
+  <div class="callout">
+    <b>藍色標起來的那七行，就是 <a href="agent-run.html">PART 4 結論五</a>那張表。</b>論文沒有給這些數字，是我們自己決定的。它們跟上面那組（論文給的）長得一模一樣、寫在同一個地方、用起來也沒有差別——<b>而這正是最容易出事的地方</b>。把它們分成兩組並註明來源，是為了讓讀的人一眼看出「哪幾個數字是有出處的，哪幾個是我們選的」。
+  </div>
+
+  <h3>它每一次跑都會把這組數字印出來</h3>
+
+  <p><code>Config</code> 裡有一個叫 <code>describe()</code> 的函式，作用只有一個：把「自己決定的」那一組印在螢幕上。每次執行都印，不管你要不要看。</p>
+
+  <pre><code>論文沒有給、由我們自己決定的參數（換掉任何一個，結論就可能改變）
+  f_ln               = 0.8      指令 2  LN 判準的比例門檻
+  bin_factor         = 4        指令 4  幾格併成一個分析體素
+  n_shuffle          = 9        指令 7  打亂順序重跑幾次
+  cut range          = 4–25     指令 7  切割高度掃描範圍
+  plateau            = 14–20    指令 7  取哪一段當平台
+  grow               = 4        指令 9  招募時撐大幾格
+  depth_cut          = 10       指令 10 深度小於此值視為初級神經突
+  min_ln_to_cluster  = 10       指令 14 少於幾顆 LN 就不分群
+  min_vox_touch      = 5        指令 12 碰到幾個體素才算碰到
+  rng_seed           = 0        亂數種子</code></pre>
+
+  <div class="plain">
+    <b>為什麼要強迫自己看？</b>因為半年後回來看 <code>out/</code> 裡的結果，你不會記得當時 <code>f_ln</code> 設的是 0.8 還是 0.9。把它印在紀錄的最前面，等於<b>每一份結果都自帶產生它的條件</b>。
+  </div>
+
+  <h2 id="s5"><span class="pt">3</span>問題二：資料是怎麼進來的</h2>
+
+  <div class="ask">
+    <p class="q">讀錯資料的程式不會當掉，它會很順利地算出錯的答案。</p>
+    <p>所以第二個要看的地方，是「檔案變成數字」的那一段——尤其是<b>座標怎麼對上</b>。</p>
+  </div>
+
+  <p>這條管線要同時用兩套座標：</p>
+
+  <div class="tblwrap"><table>
+    <tr><th style="width:22%"></th><th style="width:39%">D03 的標籤格</th><th style="width:39%">D06 的骨架體素</th></tr>
+    <tr><td>是什麼</td><td>每一格記著「這裡屬於哪個腦區」</td><td>每一筆記著「某顆神經元經過這一格」</td></tr>
+    <tr><td>格子大小</td><td>1 µm</td><td>邊長 2 個標籤格</td></tr>
+    <tr><td>怎麼存</td><td>一個 311 × 611 × 956 的三維陣列</td><td>一個整數 <code>vox</code>，三個軸的位置編在一起</td></tr>
+  </table></div>
+
+  <p>「編在一起」的意思是：一個整數同時記著三個軸的位置，要用的時候得拆開。<code>Brain</code> 在載入的當下就拆一次，之後全程共用：</p>
+
+  <pre><code>G = cfg.d06_grid                          <span class="cm"># 512</span>
+self.ix = (self.vox % G).astype(np.int64)         <span class="cm"># 左右</span>
+self.iy = ((self.vox // G) % G).astype(np.int64)  <span class="cm"># 前後</span>
+self.iz = (self.vox // (G * G)).astype(np.int64)  <span class="cm"># 上下</span></code></pre>
+
+  <div class="plain">
+    <b>白話：這是「除法與餘數」而已。</b>想像門牌號碼寫成 <code>樓層 × 10000 ＋ 排 × 100 ＋ 號</code>，要拆回來就是除一除、取餘數。<code>%</code> 是取餘數、<code>//</code> 是取商。<b>整條管線只有這四行在做這件事</b>，PART 4 有九份各自寫過一次。
+  </div>
+
+  <div class="danger">
+    <b>注意右邊那三個註解。</b><code>ix</code> 是左右、<code>iy</code> 是前後、<code>iz</code> 是上下——<b>這件事不是從檔案的標頭讀來的，是從解剖形狀推出來的</b>（果蠅腦左右最寬，所以最寬的那個軸就是左右）。這種「靠外部知識確定的事」，是讀 AI 寫的程式時最該停下來查的一類：<b>程式把軸接反了也照樣跑得完，只是所有結果都左右顛倒。</b>
+  </div>
+
+  <h3>後面所有步驟共用的那張表</h3>
+
+  <p><code>Brain</code> 算完座標之後，會做一張表 <code>contact</code>，它是後面好幾步的共同輸入：</p>
+
+  <pre><code>@property
+def contact(self) -&gt; np.ndarray:
+    """神經元 × 腦區的體素數矩陣 C。第 0 欄（腦區外）已歸零。"""
+    if self._C is None:                     <span class="cm"># 只算一次，算完存起來</span>
+        N, R = len(self.neurons), len(self.names)
+        L = self.region_of_voxel
+        C = np.bincount(self.nid.astype(np.int64) * R + L,
+                        minlength=N * R).reshape(N, R)
+        C[:, 0] = 0
+        self._C = C
+    return self._C</code></pre>
+
+  <div class="plain">
+    <b>白話：<code>C</code> 是一張 28,573 列 × 76 欄的表。</b>第 <i>i</i> 列第 <i>j</i> 欄的數字是「第 <i>i</i> 顆神經元有幾個體素落在第 <i>j</i> 個腦區裡」。<b>LN 判準、神經束驗證、合併判斷，三步都只是在對這張表做算術。</b>
+  </div>
+
+  <div class="note">
+    <b><code>if self._C is None</code> 那一行是「算一次就好」的寫法。</b>第一次有人要這張表時才算，算完存在 <code>self._C</code> 裡；第二次以後直接拿現成的。這張表要掃過一億四千萬筆紀錄，重算十次就是白白多花十倍時間。<b>讀程式時看到這個形狀，就知道它下面那段是「貴」的。</b>
+  </div>
+
+  <h2 id="s6"><span class="pt">4</span>問題三：這一段在做哪一步</h2>
+
+  <div class="ask">
+    <p class="q">先建立對照表，再讀單一函式。</p>
+    <p>不要從第一行往下讀。先弄清楚「<a href="how-to-draw-lpu.html">PART 2</a> 的第幾步 ＝ 哪一個函式」，然後只讀你關心的那一個。</p>
+  </div>
+
+  <div class="tblwrap"><table>
+    <tr><th style="width:26%">PART 2 的步驟</th><th style="width:8%">指令</th><th style="width:32%">函式</th><th>在哪個檔案</th></tr>
+    <tr><td>（前置）誰是 LN</td><td>2、3</td><td><code>ln_selection</code>／<code>ln_by_region</code></td><td><code>lpu_lib.py</code></td></tr>
+    <tr><td>1、2　密度場 v(r) 與平滑</td><td>4</td><td><code>density_field</code></td><td><code>lpu_lib.py</code></td></tr>
+    <tr><td>3　取上四分位當熱點</td><td>5</td><td><code>five_number</code>／<code>hotspots</code></td><td><code>lpu_lib.py</code></td></tr>
+    <tr><td>4　UPGMA 分群與 1% 過濾</td><td>6、7</td><td><code>cluster_hotspots</code>／<code>cut_sweep</code></td><td><code>lpu_lib.py</code></td></tr>
+    <tr><td>5　挑種子、滾雪球招募</td><td>8、9</td><td><code>pick_seed</code>／<code>recruit</code>／<code>recruit_regime</code></td><td><code>lpu_lib.py</code></td></tr>
+    <tr><td>6　去初級神經突、抽等值面</td><td>10</td><td><code>depth_profile</code></td><td><code>lpu_lib.py</code></td></tr>
+    <tr><td>7　算 c 值</td><td>11</td><td><code>c_value</code></td><td><code>lpu_lib.py</code></td></tr>
+    <tr><td>（收尾）相鄰與合併</td><td>12、13</td><td><code>adjacency</code>／<code>merge_gain</code></td><td><code>lpu_lib.py</code></td></tr>
+    <tr><td>全腦跑一遍</td><td>14</td><td><code>step14</code></td><td><code>run_lpu.py</code></td></tr>
+  </table></div>
+
+  <p>這張表本身也寫在程式裡。<code>run_lpu.py</code> 最下面有一段就是它：</p>
+
+  <pre><code>STEPS = {
+    "1": ("盤點資料、確認座標框與單位", step01),
+    "2": ("把目視判準翻成比例規則", step02),
+    "3": ("全腦 LN 普查與 f 敏感度", step03),
+    "4": (f"{REGION} 的密度場 v(r)", step04),
+    ...
+    "14": ("全腦逐區跑一遍", step14),
+}
+ORDER = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "12", "14"]</code></pre>
+
+  <div class="plain">
+    <b>白話：這是一份目錄。</b>左邊是編號、右邊是「這一步叫什麼、由哪個函式做」。下面那行 <code>ORDER</code> 是執行順序。<b>要知道整支程式做了什麼，看這十幾行就夠了</b>——這是整份程式最值得先讀的地方。
+  </div>
+
+  <h3>細讀之一：最短的那個函式</h3>
+
+  <pre><code>def hotspots(mask, v, q):
+    """取上四分位以上的體素。
+
+    佔比必然接近 25%，因為「上四分位」的定義就是排到 75% 的那個位置。
+    這個 25% 不是資料的性質，是分位數定義的必然結果。
+    """
+    return mask &amp; (v &gt;= np.percentile(v[mask], q))</code></pre>
+
+  <div class="plain">
+    <b>白話，一行拆成三件事：</b>先 <code>v[mask]</code> 把腦區內的密度值挑出來；再 <code>np.percentile(..., 75)</code> 找出排到 75% 那個位置的值；最後 <code>mask &amp; (v &gt;= 那個值)</code> 選出「在腦區內、而且密度不低於那個值」的格子。<b>一行程式就是 <a href="how-to-draw-lpu.html">PART 2</a> 的第三步。</b>
+  </div>
+
+  <div class="callout">
+    <b>真正要讀的是那段說明文字。</b>它講的不是「程式怎麼寫」，而是「<b>不要把結果讀錯</b>」——熱點永遠佔 25%，這不是果蠅腦的性質，是四分位這個定義造成的。<b>看到跑出來的數字是 25.0% 就以為發現了什麼，是最容易犯的錯。</b>
+    <p style="margin-top:8px">讀 AI 寫的註解時，值得先分類：這一句是在<b>解釋程式</b>（可以跳過），還是在<b>解釋結果</b>（一定要讀）。</p>
+  </div>
+
+  <h3>細讀之二：為什麼一個迴圈要跑九次</h3>
+
+  <pre><code>def cut_sweep(P, thr, cfg, rng, detail=False):
+    """掃切割高度，並把體素順序打亂重跑 n_shuffle 次。"""
+    cuts = cfg.cuts
+    runs, root = [], None
+    for t in range(cfg.n_shuffle):                    <span class="cm"># 跑九次</span>
+        <span class="hl">Q = P if t == 0 else P[rng.permutation(len(P))]   # 第一次不打亂，之後都打亂</span>
+        D = pdist(Q)                                  <span class="cm"># 兩兩距離</span>
+        Z = linkage(D, "average")                     <span class="cm"># average linkage 就是 UPGMA</span>
+        runs.append([...每一個切割高度剪出幾群...])
+        del D                                         <span class="cm"># 用完立刻丟掉，這東西很大</span>
+    ...</code></pre>
+
+  <div class="plain">
+    <b>白話：同一份資料，換九種排列順序，各分群一次，看答案一不一樣。</b>如果九次的答案都相同，那個答案就可信；如果九次不一樣，那就不是「答案」，是「其中一種答案」。
+  </div>
+
+  <div class="danger">
+    <b>為什麼順序會影響答案？</b>AL_R 有 3,130 個熱點體素、4,896,885 對距離，但<b>相異的距離值只有 557 種</b>——體素排在整齊的格子上，距離大量重複。UPGMA 每一步要挑「最近的一對」，遇到平手時，選哪一對取決於它們在陣列裡的先後。<b>順序一換，樹就不一樣。</b>
+    <p style="margin-top:8px">實測：切割高度取 6 時，打亂九次得到 13、13、13、14、14、14、15、15、15 群。</p>
+  </div>
+
+  <div class="note">
+    <b><code>if t == 0</code> 這種分支，讀到就要停一下。</b>它的意思永遠是「第一次跟其他次不一樣」。這裡是「第一次用原本的順序，其餘八次打亂」——所以九次裡有一次是原始答案，八次是對照。<b>如果沒注意到這一行，會以為它跑了九次隨機、實際上是一次原始加八次隨機。</b>
+  </div>
+
+  <h2 id="s7"><span class="pt">5</span>問題四：它怎麼證明自己沒寫錯</h2>
+
+  <div class="ask">
+    <p class="q">「跑完了、沒報錯」只證明程式沒當掉，不證明它算對了。</p>
+    <p>要看的是：有沒有一份<b>寫在程式外面</b>的預期答案，跑完會自動核對。</p>
+  </div>
+
+  <p><a href="agent-prompts.html">PART 3</a> 每一條指令後面都附了一張「怎麼確認它做對了」的表。這一版把那些表整份搬進 <code>expected.json</code>——<b>不是文件，是程式會去讀的檔案</b>：</p>
+
+  <pre><code>{"指令": 1,  "說明": "神經元數",           "path": "c01/神經元數",   "want": 28573}
+{"指令": 6,  "說明": "1% 門檻",             "path": "c06/thr",       "want": 125.11, "tol": 0.01}
+{"指令": 9,  "說明": "有操作區間的格子數",   "path": "c09/partial_cells", "want": 0}
+{"指令": 14, "說明": "判定為單一 LPU",       "path": "c14/單一 LPU",   "want": 8}
+{"指令": 14, "說明": "判定為候選 hub",       "path": "c14/候選 hub",   "want": 54}</code></pre>
+
+  <div class="plain">
+    <b>白話：每一行是一項「應該是多少」。</b><code>path</code> 是「去產出的哪一份檔案、找哪一個欄位」，<code>want</code> 是應該得到的值，<code>tol</code> 是允許的誤差（小數才需要）。跑完之後 <code>verify</code> 會把 47 項逐一比對：
+  </div>
+
+  <pre><code>$ python3 run_lpu.py verify
+核對 47 項：通過 47、不符 0、還沒跑 0
+全部通過。</code></pre>
+
+  <div class="callout">
+    <b>最有用的驗收項，是那幾條「預期它失敗」的。</b>上面第三行 <code>partial_cells: 0</code> 記的是「指令 9 應該找不到任何可用的參數組合」。<b>如果哪天這一項變成不是 0，代表資料換了、或是招募那一步被改動過</b>——而那正是最需要被通知的時候。
+    <p style="margin-top:8px">驗收表不只用來確認成功，也用來釘住已知的失敗。</p>
+  </div>
+
+  <div class="note">
+    <b>為什麼要放在程式外面的一個檔案？</b>因為它是「答案」，不是「作法」。放在外面，改答案不必動程式，改程式也不會順手把答案一起改掉。<b>把預期值寫進程式裡自己跟自己比，等於沒有比。</b>
+  </div>
+
+  <h2 id="s8"><span class="pt">6</span>問題五：跑不出東西的時候會怎樣</h2>
+
+  <div class="ask">
+    <p class="q">最危險的不是報錯，是不報錯。</p>
+    <p>一支程式在資料撐不住的時候，可以選擇三件事之一。<b>選哪一件，是寫程式的人的價值判斷，不是技術問題。</b></p>
+  </div>
+
+  <div class="tblwrap"><table>
+    <tr><th style="width:22%">做法</th><th style="width:36%">使用者看到什麼</th><th>後果</th></tr>
+    <tr><td>照樣算下去</td><td>一份完整、漂亮的結果</td><td><b>最糟。</b>看不出有問題，數字會被引用</td></tr>
+    <tr><td>印一行警告再算下去</td><td>幾百行輸出裡的一行小字</td><td>幾乎等於沒印。往下捲就看不到了</td></tr>
+    <tr><td><b>停下來</b></td><td>沒有結果，只有一段說明為什麼停</td><td>使用者必須自己決定要不要繼續</td></tr>
+  </table></div>
+
+  <p><a href="agent-run.html">PART 4 的指令 9</a>（滾雪球招募）在這份資料上跑不出中間結果：掃「撐大 2 到 5 格 × 重疊門檻 0.3 到 0.7」共 20 種組合，每一種的答案不是 1 顆（只有種子）就是 723 顆（整池）。這一版採取第三種做法：</p>
+
+  <pre><code>「收一部分」＝結果落在 2 到 722 之間的格子數：0 ／ 20
+
+┌──────────────────────────────────────────────────────────────────────
+│ 這一步沒有可用的操作區間。
+│ 20 種參數組合，每一種的結果不是 1（只有種子）就是 723（整池）。
+│ 沒有任何一種設定收到「一部分」。
+│
+│ 這不是參數沒調好。論文要求從「最小的」LN 出發，但一顆小的神經元
+│ 撐大之後仍然裝不下一顆大的一半體積，所以要嘛收不到，要嘛一旦撐得
+│ 夠大就整池全收。
+│
+│ 主程式在這裡停下來，不往下產出看起來完整、其實沒有意義的結果。
+│ 要繼續，請加上 --force-recruit：接下來的一切都建立在
+│ 「撐大 4 格」這一種讀法上，而那是唯一跑得動的讀法，不是驗證過的。
+└──────────────────────────────────────────────────────────────────────</code></pre>
+
+  <div class="plain">
+    <b>白話：程式在這裡把選擇權交還給人。</b>它把量到的事實（20 種組合、沒有一種收到一部分）、它的判讀（不是參數沒調好）、以及繼續下去的代價（後面的一切都只是一種讀法）講完，然後停住。<b>要往下跑，得自己打出 <code>--force-recruit</code> 這幾個字。</b>
+  </div>
+
+  <div class="callout">
+    <b>那個旗標的作用不是技術上的，是紀錄上的。</b>它讓「我知道這一步沒有根據，但我還是要往下跑」<b>變成一件必須打出來的事</b>，而且會留在指令紀錄裡。<b>沒有旗標的話，這個決定會消失得無影無蹤。</b>
+  </div>
+
+  <p>在自動化的腳本裡也一樣要看得見。<code>run_lpu.sh</code> 帶著這個旗標，而理由就寫在旗標旁邊，不是寫在另一份文件裡：</p>
+
+  <pre><code><span class="cm"># --force-recruit 的意思：</span>
+<span class="cm">#   指令 9（滾雪球招募）在這份資料上沒有可用的操作區間——20 種參數組合，</span>
+<span class="cm">#   結果不是「只有種子 1 顆」就是「整池 723 顆」，沒有一種收到一部分。</span>
+<span class="cm">#   主程式預設會在那裡停下來，不產出看起來完整、其實沒有意義的結果。</span>
+<span class="cm">#   這裡加上旗標讓它往下走，是為了把後面幾步也跑出來；但要記得，</span>
+<span class="cm">#   之後每一個數字都建立在「撐大 4 格」這一種讀法上。</span>
+"$PY" run_lpu.py all --force-recruit</code></pre>
+
+  <div class="danger">
+    <b>這是拿到 AI 寫的程式時最該檢查的一件事。</b>問它：<b>資料不夠、條件不成立的時候，你這支程式會怎麼做？</b>如果答案是「照樣算完」，那它產出的每一份結果都需要你自己去判斷可不可信——而你多半沒有那個資訊。
+  </div>
+
+  <h2 id="s9"><span class="pt">7</span>帶到另一台機器</h2>
+
+  <p>整合成三個檔案的實際理由：可以搬。但<b>搬家的重量不在程式</b>——程式四個檔案加起來 84 KB，資料 277 MB。</p>
+
+  <h3>第一件事：先問機器夠不夠</h3>
+
+  <p><code>run_lpu.py check</code> 不載入任何資料、不算任何東西，只確認東西都在：</p>
+
+  <pre><code>$ python3 run_lpu.py check
+── 一、Python 與套件 ────────────────────────────────
+   python      3.11.7
+   numpy       1.26.4   （測過的下限 1.24）
+   scipy       1.15.3   （測過的下限 1.10）
+   matplotlib  3.8.0    （測過的下限 3.6）
+── 二、資料檔 ───────────────────────────────────────
+   [有]  labels_fc_1um.npy           173.2 MB   分區標籤體積
+   （中間三個 KB 級的小檔略去）
+   [有]  vox.npy                      45.4 MB   骨架體素編號
+   [有]  nid.npy                      45.4 MB   每個體素屬於哪顆神經元
+   [有]  dep.npy                      11.3 MB   每個體素離細胞本體多遠
+   [有]  neurons.csv                   1.6 MB   28,573 顆神經元的名字
+         合計                          277.0 MB
+── 三、記憶體 ───────────────────────────────────────
+   這條管線實測的峰值是 2.5 GB（指令 14 跑到 ME_L 的兩兩距離時）。
+   目前可用約 16.3 GB → 夠
+
+結果：全部通過，可以跑 `python3 run_lpu.py all`</code></pre>
+
+  <div class="plain">
+    <b>白話：這一步的價值在於「還沒開始算就知道會不會失敗」。</b>不然的話，你會等三分鐘、載完 277 MB，然後在畫第一張圖的時候才發現 <code>matplotlib</code> 沒裝。
+  </div>
+
+  <h3>只有三個套件</h3>
+
+  <div class="tblwrap"><table>
+    <tr><th style="width:20%">套件</th><th style="width:20%">測過的版本</th><th>用在哪</th></tr>
+    <tr><td><code>numpy</code></td><td>1.26.4</td><td>全部。所有陣列運算</td></tr>
+    <tr><td><code>scipy</code></td><td>1.15.3</td><td>平滑、膨脹、距離轉換、兩兩距離、UPGMA</td></tr>
+    <tr><td><code>matplotlib</code></td><td>3.8.0</td><td>七張圖</td></tr>
+  </table></div>
+
+  <p><b>沒有用到</b>：<code>pandas</code>、<code>scikit-learn</code>、<code>scikit-image</code>、<code>trimesh</code>、<code>PIL</code>。整條管線是用 <code>numpy</code> 加 <code>scipy</code> 的基本功能做出來的。</p>
+
+  <div class="callout">
+    <b>套件少本身就是一種可讀性。</b>每多一個套件，讀的人就多一份「這一段到底在做什麼」要查。而且套件愈多，兩年後裝不起來的機率愈高。
+  </div>
+
+  <h3>三件會咬人的事</h3>
+
+  <div class="tblwrap"><table>
+    <tr><th style="width:26%">要注意的</th><th>為什麼</th></tr>
+    <tr><td><b>畫圖前要先設 Agg</b></td><td>沒有螢幕的機器（伺服器、容器、<code>ssh</code> 連進去的工作站）直接畫圖會找不到顯示裝置而中斷。整條管線只有 <code>setup_matplotlib()</code> 一個地方在做這件事，所以只有一個地方需要對</td></tr>
+    <tr><td><b>圖裡不要放中文</b></td><td>新機器不一定裝了中文字型。<b>字型不在的時候 <code>matplotlib</code> 不會停</b>，它照樣把圖存起來，只是每個中文字都變成空白方塊。七張圖的文字全部是英文，說明一律寫在網頁上</td></tr>
+    <tr><td><b>版本要鎖</b></td><td>理由跟一般專案不同：這條管線的答案<b>會被平手的處理方式影響</b>（上面〈為什麼一個迴圈要跑九次〉那一節）。換一個 <code>scipy</code> 版本，如果分群的內部實作動過，同一份資料可能給出不同的群數</td></tr>
+  </table></div>
+
+  <h3>資料打包：277 MB 變 39 MB</h3>
+
+  <pre><code>$ python3 run_lpu.py pack --pack-to ~/lpu_data
+   labels_fc_1um.npy           173.2 MB →     1.1 MB   分區標籤體積
+   （中間三個 KB 級的小檔略去）
+   vox.npy                      45.4 MB →     5.9 MB   骨架體素編號
+   nid.npy                      45.4 MB →    21.0 MB   每個體素屬於哪顆神經元
+   dep.npy                      11.3 MB →     9.1 MB   每個體素離細胞本體多遠
+   合計                        277.0 MB →    38.6 MB   （14%）</code></pre>
+
+  <div class="plain">
+    <b>白話：分區標籤壓到原本的 0.6%。</b>那個檔案是 1.7 億個格子，絕大多數是「腦區外」的零，剩下的也是一大片一大片同樣的號碼——這種東西壓縮率極高。<b>程式讀得懂壓縮檔，所以另一台機器不必先解開</b>，代價是載入多花 0.4 秒。
+  </div>
+
+  <div class="note">
+    <b>可攜性是驗過的，不是宣稱的。</b>把四個檔案（84 KB）複製到一個空目錄，只給它打包後的 39 MB，重跑一遍：<b>16 份 JSON 與 7 張圖全部與原本逐位元組相同</b>，47 項驗收全部通過。
+  </div>
+
+  <div class="statgrid">
+    <div class="stat"><div class="v">84 KB</div><div class="k">程式（四個檔案）</div></div>
+    <div class="stat"><div class="v">39 MB</div><div class="k">打包後的資料</div></div>
+    <div class="stat"><div class="v">166 秒</div><div class="k">整條跑完</div></div>
+    <div class="stat"><div class="v">2.5 GB</div><div class="k">實測峰值記憶體</div></div>
+  </div>
+
+  <div class="callout">
+    <b>整條管線的瓶頸不是算力，是資料。</b>全腦 75 區跑完只要 94 秒，而<b>其中 54 區的 LN 候選少於十顆</b>，根本沒有東西可以分群。換一台更快的機器，不會讓那 54 區變得可以分析。<b>看到一份程式跑得很慢時值得先問：慢的是計算，還是根本在等一份不存在的資料？</b>
+  </div>
+
+  <h2 id="s10"><span class="pt">收尾</span>一張可以帶走的檢查清單</h2>
+
+  <p>這五個問題跟果蠅腦沒有關係。任何一份 AI 寫給你的分析程式，都可以照這個順序問一遍。</p>
+
+  <div class="tblwrap"><table>
+    <tr><th style="width:6%">#</th><th style="width:30%">問題</th><th style="width:30%">怎麼問</th><th>答不出來代表什麼</th></tr>
+    <tr><td>1</td><td><b>參數在哪裡</b></td><td>「把所有寫死的門檻、比例、次數列給我，並標出哪些有出處、哪些是你自己決定的」</td><td>你不知道結論靠什麼撐著</td></tr>
+    <tr><td>2</td><td><b>資料怎麼進來</b></td><td>「單位是什麼、座標軸誰是誰、這個判斷是從檔案讀來的還是你推的」</td><td>可能整份結果左右顛倒，而且不會報錯</td></tr>
+    <tr><td>3</td><td><b>哪一段做哪一步</b></td><td>「給我一張表：我的第幾步 ＝ 你的哪個函式」</td><td>你只能整份接受或整份不信，無法逐段檢查</td></tr>
+    <tr><td>4</td><td><b>怎麼證明沒寫錯</b></td><td>「把預期值寫成一個獨立的檔案，跑完自動核對」</td><td>「跑完了」只等於「沒當掉」</td></tr>
+    <tr><td>5</td><td><b>撐不住時會怎樣</b></td><td>「資料不夠、條件不成立的時候，你會停下來還是照樣算完」</td><td><b>最危險的一項。</b>你會拿到一份看不出有問題的結果</td></tr>
+  </table></div>
+
+  <div class="note">
+    <b>五個問題裡只有第四個在問「算得對不對」。</b>其餘四個問的是<b>參數的來源、資料的意義、能不能逐段對照、撐不住時怎麼處理</b>——全部是「這份結果能不能拿去用」的問題。<b>算法對不對，AI 通常比你會判斷；但這四件事只有你能判斷，因為只有你知道這份資料是怎麼來的、要拿去回答什麼問題。</b>
+  </div>
+
+  <div class="callout">
+    <b>回到這堂課的起點。</b><a href="what-is-lpu.html">PART 1</a> 問「一個腦區的邊界該畫在哪裡」，<a href="how-to-draw-lpu.html">PART 2</a> 把它變成七個步驟，<a href="agent-prompts.html">PART 3</a> 把七個步驟變成十四條指令，<a href="agent-run.html">PART 4</a> 讓 AI 真的跑了一遍，這一頁把跑出來的東西整理成看得懂、帶得走的三個檔案。
+    <p style="margin-top:8px"><b>五個部分裡，只有 PART 4 那一步是 AI 做的。</b>其餘四步——決定要問什麼、把問題寫成步驟、把含糊的地方指定清楚、判斷跑出來的東西能不能用——都還在人這一邊。</p>
   </div>
 
   <div class="pager">
@@ -157,6 +580,6 @@ def lpu_surface(v_recruited, level):
     <a href="index.html">回首頁 →</a>
   </div>
 </div>
-<div class="foot">BSC 腦空間體研究中心 · 專題課程 LPU · PART 5</div>
+<div class="foot">BSC 腦空間體研究中心 · 專題課程 LPU · PART 5　｜　程式在 <code>part5/</code>，三個檔案 ＋ 一份驗收表；所有數字由 <code>part5/run_lpu.py</code> 實跑產生</div>
 </body>
 </html>

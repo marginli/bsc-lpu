@@ -170,3 +170,19 @@ svg text{font-family:-apple-system,"Segoe UI","Noto Sans TC","Microsoft JhengHei
 .cmd h3{margin:0 0 4px}
 .cmd .meta{font-size:13px; color:var(--faint); margin:0 0 14px}
 .cmd h4{font-size:15px; margin:18px 0 6px; color:var(--ink)}
+
+/* ── PART 5：讀程式 ── */
+pre .cm{color:#7f93a8}                                    /* 註解 */
+pre .hl{background:rgba(96,165,250,.24); border-radius:3px}
+pre b{color:#fff}
+.filecard{display:grid; gap:12px; margin:22px 0}
+@media(min-width:760px){.filecard{grid-template-columns:repeat(3,1fr)}}
+.filecard .f{border:1px solid var(--border); border-radius:10px; padding:13px 16px; background:var(--panel)}
+.filecard .f .nm{font-family:"Cascadia Code",Consolas,Menlo,monospace; font-size:14.5px; font-weight:700}
+.filecard .f .role{display:block; font-size:12px; letter-spacing:.06em; color:var(--accent); font-weight:700; margin:7px 0 3px}
+.filecard .f p{margin:0; font-size:14px; color:var(--soft); line-height:1.7}
+.ask{border:1px solid var(--border); border-left:4px solid var(--accent); background:#fff;
+  border-radius:0 10px 10px 0; padding:11px 18px; margin:20px 0}
+.ask .q{font-weight:700; font-size:16px; margin:0 0 3px}
+.ask p{margin:3px 0; font-size:14.5px; color:var(--soft)}
+.lineno{font-family:"Cascadia Code",Consolas,Menlo,monospace; font-size:13px; color:var(--faint); white-space:nowrap}
