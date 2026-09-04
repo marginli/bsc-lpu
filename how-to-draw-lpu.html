@@ -724,7 +724,7 @@
     <p style="margin-top:8px"><b>所以膨脹要解決的不是「完全沒有交集」，而是「交集太小」。</b>兩顆神經元各自的分枝鋪得很開，真正重疊的只是其中一小塊——不膨脹時任意兩顆的重疊率中位只有 <b>1.5%</b>、最大 <b>10%</b>，離 50% 的門檻很遠。把神經元佔的每個體素撐大，等於把「算是重疊」的範圍放寬，那一小塊才長得到過門檻的大小。</p>
 
     <p style="margin-top:8px" class="figsrc">以上都在我們的資料上量的（D06 骨架體素），程式在 <code>scripts/dilation_check.py</code>。論文用的是原始共軛焦影像，體素更細、絕對數字會不同。</p>
-    <p><b>四、論文沒說「被撐大的是誰」。</b>是要撐大 source（已經收進來的那一群）、target（正在被考慮的那一顆）、還是兩邊都撐？<code>enlarged 4 folds</code> 這句話對此完全沒有交代，而差別不小：</p>
+    <p><b>四、「所有體素」已經回答了撐大誰——但沒回答 50% 的分母是哪一個。</b>論文的原句是 <i>With <b>all</b> voxel units enlarged 4 folds, a target neuron is recruited if over 50% of <b>its</b> volume overlaps with the source.</i>「所有」表示 <b>source 與 target 兩邊都撐大</b>。<b>沒有交代的是後半句那個 <i>its volume</i></b>：50% 的分母，是 target <b>撐大前</b>的體積，還是<b>撐大後</b>的？這個差別大到會讓其中一種讀法直接不成立：</p>
     <div class="tblwrap"><table>
       <tr><th>撐大誰</th><th>重疊率中位數</th><th>超過 50% 的配對</th></tr>
       <tr><td>只撐大 source</td><td>0.238</td><td>5.9%</td></tr>
@@ -737,7 +737,7 @@
       <p style="margin-top:6px"><b>為什麼會跑出這種數字：分子分母不是同一個東西。</b>分子數的是「<b>撐大後</b>的 A 與<b>撐大後</b>的 B 共同佔到的格子」，分母卻用「<b>撐大前</b>的 B 有幾格」。B 撐大兩格之後體積變成原本的 16.9 倍，所以共同的部分輕易就比原本的 B 大好幾倍。<b>要嘛分子分母都用撐大後的（那就是第四列，0.232），要嘛都用撐大前的（那就是不膨脹，0.015）——不能一邊撐大一邊不撐。</b></p>
     </div>
 
-    <p style="margin-top:8px"><b>剩下三列都是合理的讀法，但答案差很多：「只撐大 target」的通過率是「只撐大 source」的三倍多。</b>（本頁上面那張<b>膨脹敏感度表</b>用的是「只撐大 source」，因為論文的句子是「target 有多少比例落在 source 內」。）</p>
+    <p style="margin-top:8px"><b>照字面讀，成立的只有第四列</b>：兩邊都撐大、分母也用撐大後的體積——重疊率中位 0.232、4.0% 的配對過門檻。前兩列（只撐大其中一邊）不是論文的字面讀法，但算得出來，而且答案差很多：<b>「只撐大 target」的通過率是「只撐大 source」的三倍多。</b>（本頁上面那張<b>膨脹敏感度表</b>、以及 <a href="agent-run.html">PART 4</a> 的實跑，用的都是「只撐大 source、分母用 target 撐大前的體積」。<b>那是我們的簡化，不是論文的字面讀法</b>——選它是因為滾雪球時 source 一直在長大，只撐大 source 才不必每一輪重算每一顆 target。）</p>
 
     <p><b>五、「4 倍」是每個方向 4 倍，還是體積 4 倍？</b>兩種讀法差 16 倍。而在體素格點上還有第三個問題：<b>撐大是一格一格來的，跨不出小數</b>。</p>
     <div class="tblwrap"><table>
@@ -1010,7 +1010,7 @@
   <div class="tblwrap"><table>
     <tr><th style="width:20%">在哪一步</th><th style="width:30%">含糊在哪</th><th>影響</th></tr>
     <tr><td>STEP 1</td><td><b>v(r) 是數纖維條數，還是數重疊的神經元數</b></td><td>補充材料與圖 S5D 的說法不同。從二值化影像只做得到後者</td></tr>
-    <tr><td>STEP 4</td><td><b>膨脹的細節：撐大誰、撐大多少</b></td><td>論文沒說撐大的是 source 還是 target（通過率差三倍多）；「4 倍」是每方向還是體積也沒說（差 16 倍），而格點上撐大 1 格體積就已經是 6.2 倍</td></tr>
+    <tr><td>STEP 4</td><td><b>膨脹的細節：50% 的分母、撐大多少</b></td><td>論文寫 <i>all voxel units enlarged</i>（兩邊都撐大），但沒說 <i>50% of its volume</i> 的分母是 target 撐大前還是撐大後——差別大到其中一種讀法會算出超過 1 的比例；「4 倍」是每方向還是體積也沒說（差 16 倍），而格點上撐大 1 格體積就已經是 6.2 倍</td></tr>
     <tr><td>STEP 3</td><td><b>UPGMA 平手時挑哪一對</b></td><td>體素在規則格點上，距離大量重複（489 萬對只有 573 種值）。演算法沒有規定，實作按輸入順序挑；打亂順序，同一個高度的答案可差 7 個</td></tr>
     <tr><td>STEP 7</td><td><b>神經束的節點是 LPU 還是 neuropil</b></td><td>正文寫 LPU（會造成循環），補充材料的演算法寫 neuropil（不會）。兩處不一致，論文沒有裁決</td></tr>
   </table></div>

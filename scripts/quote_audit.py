@@ -29,7 +29,9 @@ def main(paper,pages):
     for pg in pages:
         s=io.open(pg,encoding='utf-8').read()
         # 區塊標籤換成換行（免得相鄰儲存格的字黏成同一句），行內標籤直接拿掉（引文常被 <b> 切開）
-        t=re.sub(r'<(script|style|svg)\b.*?</\1>',' ',s,flags=re.S)
+        # 程式碼不是引文：<pre> 與行內 <code> 一律先剝掉，否則 Python 會被當成英文句子
+        t=re.sub(r'<(script|style|svg|pre)\b.*?</\1>',' ',s,flags=re.S)
+        t=re.sub(r'<code\b[^>]*>.*?</code>',' ',t,flags=re.S)
         t=re.sub(r'</?(td|th|tr|table|p|div|li|ol|ul|h[1-6]|figcaption|figure|br|blockquote|nav)\b[^>]*>','\n',t)
         txt=re.sub(r'<[^>]+>','',t)
         print(pg); seen=set()
