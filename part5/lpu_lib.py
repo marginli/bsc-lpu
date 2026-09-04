@@ -399,7 +399,9 @@ def pick_seed(neu: dict, cluster_voxels: np.ndarray, top_n: int = 10) -> dict:
     論文的原句是 a smallest LN with its fibers restricted within the smallest
     candidate LPU is visually determined as an initial source——纖維要**完全**
     侷限在**最小的**那個候選 LPU 之內，而且是目視決定的。
-    在我們的資料上沒有任何一顆的比例接近 100%，照字面挑不到，所以改成
+    這個條件成不成立要看腦區：在 AL_R 上沒有任何一顆的比例接近 100%，
+    照字面挑不到；換到 AVLP_R、切割高度取平台上的值時，最大的那一群裡
+    有五顆超過 97%（最高 99.1%），照字面就挑得到。挑不到時改用
     **替代規則：比例最高的前 top_n 顆裡取體積最小的**。這不是論文的條件。
     """
     target = set(map(tuple, cluster_voxels.tolist()))
@@ -414,6 +416,13 @@ def recruit(M: dict, sizes: dict, seed: int, grow: int, overlap: float,
             max_rounds: int = 40, verbose: bool = True) -> tuple:
     """滾雪球：把目前的 source 撐大 grow 格，凡是有一半以上體積落在裡面的
     LN 就併進來，然後重複，直到沒有新的可收。
+
+    **論文對這一步寫了兩種不一樣的作法。**補充材料寫的是這裡實作的滾雪球
+    （Once recruited, two partners are combined as a new source），圖 S5D(e)
+    的圖說寫的卻是固定靶（recruited based on the coverage of the two clusters
+    ——靶就是 STEP 3 分出來的群，不會愈滾愈大）。兩者在真實資料上差很多：
+    滾雪球每收一顆就把靶放大一次，所以只有「收不到」與「全收」兩個終點；
+    固定靶的結果則隨門檻連續變化。
 
     論文寫的是 all voxel units enlarged（兩邊都撐大），但沒說
     over 50% of *its* volume 的分母是 target 撐大前還是撐大後的體積。

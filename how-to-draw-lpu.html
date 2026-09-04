@@ -593,6 +593,10 @@
     <div class="note" style="margin-top:8px">
       <b>AVLP 那個 2 要小心解讀。</b>它在平台上穩定給 2，而 Chiang 的 VLP 恰好也被切成 2——但<b>這兩個「2」不是同一件事</b>。Ito 把 Chiang 的 VLP 重新劃成 AVLP、PVLP、PLP 三塊，我們算的是其中一塊；論文切的是整個 VLP 的背側與腹側。<b>看起來吻合，但分的不是同一個東西，不能拿來當佐證。</b>
     </div>
+    <div class="note" style="margin-top:8px">
+      <b>還有一件事：「群數穩定」不等於「分群穩定」。</b>前腦橋在這個平台上九次都給 2 群，但<b>九次分出來的不是同一批體素</b>——兩群的大小在 189／268 與 213／244 之間游移。再往下走一步（拿這兩群各自去收 LN），九次收到的名單兩兩重疊度<b>最低只有 0.154</b>（完全一樣是 1、毫無交集是 0），<b>九次都收到的只有 8 顆</b>。<b>穩的是「有兩群」這個數字，不是那兩群本身。</b>AVLP_R 則相反：九次的群大小完全相同（313／3,010），收到的名單也九次一模一樣。
+    </div>
+
     <p style="margin-top:8px"><b>而右邊那段「全部收斂到 1」根本不是結論。</b>每一棵樹都有一個最高點——根，也就是最後一次合併的高度。剪在根以上，當然只剩一群：</p>
     <div class="tblwrap"><table>
       <tr><th>腦區</th><th>AL_R</th><th>AL_L</th><th>AVLP_R</th><th>AVLP_L</th><th>FB</th><th>PB</th></tr>
@@ -626,6 +630,11 @@
   </div>
 
   <div class="plain"><b>白話。</b>這是一個「跟我夠像的就算我這一群」的滾雪球。雪球越滾越大，能吸附的對象也越來越多，直到沒有東西可以再吸為止。</div>
+
+  <div class="callout">
+    <b>這一步論文寫了兩次，寫在兩個地方，兩次不一樣。</b>先給一個名字：招募的時候，每一顆 LN 都要跟某個東西比對「我有多少體積落在它裡面」，<b>那個被比對的對象，本專題一律叫「靶」</b>。上面那句「收進來的併成新的種子，再去招募下一顆」是<b>補充材料</b>的寫法，它的<b>靶會愈滾愈大</b>。但<b>圖 S5D(e) 的圖說</b>寫的是另一回事：<i>Visualization of two populations of candidate LNs recruited <b>based on the coverage of the two clusters</b>, respectively</i>——兩批候選 LN 是依<b>兩個群各自的覆蓋範圍</b>招募出來的，也就是說<b>靶就是 STEP 3 分出來的群，固定不動</b>。
+    <p style="margin-top:8px">選哪一種不是文字之爭，它決定這一步跑不跑得動：<b>滾雪球那一種在三個腦區、368 組參數下，結果不是「只有種子」就是「幾乎整池全收」，沒有一組落在中間</b>；固定靶那一種則隨門檻連續變化。<a href="agent-run.html#two-readings">PART 4〈發現一〉</a>把兩種讀法都跑了一遍。</p>
+  </div>
 
   <figure class="fig">
     <svg viewBox="0 0 720 232" role="img" aria-label="示意圖：招募的三個階段，種子神經元放大後吸附重疊超過一半的鄰居，雪球逐步變大。">
@@ -670,7 +679,7 @@
         <text class="cap" x="0" y="194">這個候選 LPU 的組成單位</text>
       </g>
     </svg>
-    <figcaption>示意圖，非論文原圖。</figcaption>
+    <figcaption><b>畫的是補充材料那一種讀法（滾雪球）</b>——靶每收一顆就變大一次。圖說那一種讀法的靶是 STEP 3 分出來的群，固定不動，只會發生第 ② 格那一次判定。示意圖，非論文原圖。</figcaption>
   </figure>
 
   <div class="gap">
@@ -763,7 +772,7 @@
     </div>
     <p style="margin-top:8px">論文沒有給這個 4 的推導——<code>enlarged 4 folds</code> 全文只出現這一次。<b>論文有說整個招募在做什麼</b>（見上面的引文），<b>沒說的是這個 4 從哪裡來、以及它對應到格點上的哪一步</b>。</p>
 
-    <p><b>六、種子的條件按字面根本挑不出人。</b>論文寫「<i>a smallest LN with its fibers <b>restricted within</b> the smallest candidate LPU</i>」——纖維要<b>完全侷限在</b>那個候選 LPU 之內。但別忘了 STEP 2 只留下密度最高的 25% 體素，所以一個「候選 LPU」在這個時間點只是<b>一堆高密度的格子</b>；而一顆 LN 的分枝必然同時鋪在密的地方和疏的地方。</p>
+    <p><b>六、種子的條件挑不挑得出人，要看腦區。</b>論文寫「<i>a smallest LN with its fibers <b>restricted within</b> the smallest candidate LPU</i>」——纖維要<b>完全侷限在</b>那個候選 LPU 之內。在右觸角葉、切割高度 8 分出來的那幾群上，照字面一顆都挑不到：</p>
     <div class="tblwrap"><table>
       <tr><th>右觸角葉 723 顆 LN 候選，各有多少比例的體素落在……</th><th>中位數</th><th>最大值</th><th>達到 100% 的</th></tr>
       <tr><td>最小的那一群（切割高度 8，397 個體素）</td><td>4.8%</td><td>35.8%</td><td><b>0 顆</b></td></tr>
@@ -771,6 +780,7 @@
       <tr><td>整個右觸角葉</td><td>92.1%</td><td>99.5%</td><td><b>0 顆</b></td></tr>
     </table></div>
     <p style="margin-top:8px"><b>照字面找，一顆都找不到</b>——最接近的那顆也只有 35.8% 的體素落在最小那一群裡。把該群膨脹兩格再填洞放寬，最好的一顆升到 50.9%，達到 100% 的<b>還是 0 顆</b>（<code>scripts/seed_check.py</code>）。<b>要讓這一步跑起來，只能改成「有一部分落在裡面就算」，而「一部分」是多少，論文沒有給。</b></p>
+    <p style="margin-top:8px"><b>但換一個腦區，這個條件就成立了。</b>在 AVLP_R、切割高度取平台上的 17 時，最大的那一群裡有五顆 LN 的體素<b>有 97% 以上</b>落在群內，最高的一顆是 <b>99.1%</b>（該顆共 112 個分析體素，不是小到失真的個案）。<b>所以「挑不到合格的種子」是右觸角葉這個腦區的性質，不是這個條件本身的性質。</b>真正沒有給的是另一件事：<b>當一個腦區挑不出人時該怎麼辦。</b></p>
     <p style="margin-top:8px">再加上論文明寫這一顆是<b>目視</b>決定的——這是整條流程唯一寫明要人介入的一步，而<b>換一顆種子，招募出來的結果可能不同</b>。</p>
   </div>
 
@@ -1003,14 +1013,15 @@
     <tr><th style="width:20%">在哪一步</th><th style="width:30%">缺什麼</th><th>影響</th></tr>
     <tr><td>STEP 3</td><td><b>UPGMA 樹的切割高度</b></td><td>直接決定找到幾個候選 LPU。同一個右觸角葉可以是 1 個，也可以是 16 個</td></tr>
     <tr><td>STEP 5</td><td><b>等值面的門檻</b></td><td>決定候選 LPU 的體積，連帶影響 c 值</td></tr>
-    <tr><td>STEP 4</td><td><b>起始種子怎麼挑</b></td><td>論文的條件「纖維完全侷限在該候選 LPU 內」按字面挑不出任何一顆（最接近的只有 35.8% 落在裡面）；放寬成「有一部分在裡面」則沒給比例。而且論文明寫是目視決定的——換一顆種子，招募結果可能不同</td></tr>
+    <tr><td>STEP 4</td><td><b>起始種子怎麼挑</b></td><td>論文的條件「纖維完全侷限在該候選 LPU 內」<b>在右觸角葉上</b>按字面挑不出任何一顆（最接近的只有 35.8% 落在裡面），<b>在 AVLP_R 上卻挑得到</b>（最高 99.1%）——論文沒有寫「挑不出人的時候該怎麼辦」。放寬成「有一部分在裡面」則沒給比例。而且它明寫是目視決定的——換一顆種子，招募結果可能不同</td></tr>
   </table></div>
 
-  <h3>四個定義上的含糊</h3>
+  <h3>五個定義上的含糊</h3>
 
   <div class="tblwrap"><table>
     <tr><th style="width:20%">在哪一步</th><th style="width:30%">含糊在哪</th><th>影響</th></tr>
     <tr><td>STEP 1</td><td><b>v(r) 是數纖維條數，還是數重疊的神經元數</b></td><td>補充材料與圖 S5D 的說法不同。從二值化影像只做得到後者</td></tr>
+    <tr><td><b>STEP 4</b></td><td><b>招募的靶是滾雪球的種子，還是分群本身</b></td><td>補充材料寫「收進來的併成新的種子」（靶愈滾愈大），圖 S5D(e) 的圖說寫 <i>recruited based on the coverage of the two clusters</i>（靶就是分群，固定不動）。兩處不一致，而<b>選哪一種決定這一步跑不跑得動</b>——滾雪球那一種在三個腦區、368 組參數下沒有一組收到中間結果</td></tr>
     <tr><td>STEP 4</td><td><b>膨脹的細節：50% 的分母、撐大多少</b></td><td>論文寫 <i>all voxel units enlarged</i>（兩邊都撐大），但沒說 <i>50% of its volume</i> 的分母是 target 撐大前還是撐大後——差別大到其中一種讀法會算出超過 1 的比例；「4 倍」是每方向還是體積也沒說（差 16 倍），而格點上撐大 1 格體積就已經是 6.2 倍</td></tr>
     <tr><td>STEP 3</td><td><b>UPGMA 平手時挑哪一對</b></td><td>體素在規則格點上，距離大量重複（489 萬對只有 573 種值）。演算法沒有規定，實作按輸入順序挑；打亂順序，同一個高度的答案可差 7 個</td></tr>
     <tr><td>STEP 7</td><td><b>神經束的節點是 LPU 還是 neuropil</b></td><td>正文寫 LPU（會造成循環），補充材料的演算法寫 neuropil（不會）。兩處不一致，論文沒有裁決</td></tr>
@@ -1024,14 +1035,14 @@
     <tr><td>步驟以外</td><td><b>合併</b></td><td>照七個步驟跑，永遠跑不出蕈狀體與中央複合體那兩個 LPU</td></tr>
   </table></div>
 
-  <p>七個缺口加上這兩件，總共<b>九件事</b>需要重跑的人自己決定。</p>
+  <p>八個缺口加上這兩件，總共<b>十件事</b>需要重跑的人自己決定。</p>
 
   <div class="callout">
     <b>這不是要否定這篇論文。</b>2011 年能把一套腦區劃分寫成七個具體的步驟、還附上數學定義，本身就是一件不常見的事——多數同期的分區工作連步驟都沒有。真正的問題是<b>那個年代的論文格式不要求附程式碼與參數檔</b>，所以再明確的文字描述，隔了十幾年還是留下了這些洞。
   </div>
 
   <div class="note">
-    看完了怎麼算，下一步是自己動手算一次。<b>上面那六張真實資料的圖，其實就是 STEP 0 到 STEP 3 的產出</b>——程式在 <code>scripts/make_part2_figures.py</code>。<a href="agent-prompts.html">PART 3</a> 會把這條流程拆成一串交給 AI Agent 的指令，<a href="agent-run.html">PART 4</a> 真的讓它跑一遍，<a href="python-lpu.html">PART 5</a> 則是不靠 AI、自己寫程式做一次。<b>那九個要自己決定的地方，三者都躲不掉。</b>
+    看完了怎麼算，下一步是自己動手算一次。<b>上面那六張真實資料的圖，其實就是 STEP 0 到 STEP 3 的產出</b>——程式在 <code>scripts/make_part2_figures.py</code>。<a href="agent-prompts.html">PART 3</a> 會把這條流程拆成一串交給 AI Agent 的指令，<a href="agent-run.html">PART 4</a> 真的讓它跑一遍，<a href="python-lpu.html">PART 5</a> 則是不靠 AI、自己寫程式做一次。<b>那十個要自己決定的地方，三者都躲不掉。</b>
   </div>
 
   <div class="pager">
