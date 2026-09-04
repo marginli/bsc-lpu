@@ -273,10 +273,12 @@ def density_field(brain: Brain, ln_ids, region: str) -> tuple:
 
     v(r) 的定義：**有幾顆不同的 LN 佔到這一格**。同一顆神經元在同一格
     只算一次（那個 np.unique 就是在做這件事）。
-    論文有兩種說法：補充材料寫 the number of LN fibers passing through the
+    論文在三個地方寫這一步：正文的七步驟條列第 (1) 步是 calculating the
+    number of counts passing through a voxel by populations of LNs（沒指明數
+    纖維還是神經元），補充材料寫 the number of LN fibers passing through the
     voxel（纖維條數），圖 S5D 的圖說寫 the number of repetitive registrations
-    of every single voxel（重複註冊次數）。從二值化的體素只做得到後者，
-    這個函式算的就是後者。
+    of every single voxel（重複註冊次數）。後兩者互相衝突；從二值化的體素
+    只做得到「重複註冊次數」，這個函式算的就是它。
 
     回傳 (腦區遮罩, 平滑後的 v(r))。
     """
