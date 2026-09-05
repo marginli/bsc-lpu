@@ -26,11 +26,13 @@ import time
 from pathlib import Path
 
 import numpy as np
+from scipy import ndimage
 
 import lpu_lib as L
 from lpu_lib import Brain, Config
 
 REGION = "AL_R"              # 逐步示範用的腦區
+SUB_REGION = "AVLP_R"        # 指令 12 第三部分：唯一在切割高度平台上穩定分成兩群的腦區
 SWEEP_REGIONS = ["AL_R", "AL_L", "AVLP_R", "AVLP_L", "FB", "PB"]
 
 
@@ -681,24 +683,125 @@ NAMED_GROUPS = {"MB_R": ["MB_CA_R", "MB_PED_R", "MB_VL_R", "MB_ML_R"],
                 "EBLT": ["EB", "BU_R", "BU_L"]}
 
 
+def _tract_subdivision(brain: Brain, paths: list, lab: np.ndarray, big: set) -> dict:
+    """次分區層次的 STEP 7：一個腦區切出來的兩個候選，各有沒有自己的長程神經束。
+
+    論文：a sub-division with c>2 is an LPU **if the region has its own long-range
+    tracts**。所以「自己的」是關鍵——兩個候選如果共用同一批神經束，就沒有理由
+    說它們是兩個 LPU。
+
+    但兩塊空間上分開的邊界本來就會收到不同的束，所以**一定要有隨機對照**：
+    從同一個 LN 池子隨機抽同樣顆數、走同樣流程，看隨機的兩塊會不會也不共用。
+    """
+    cfg = brain.cfg
+    cut = float(np.mean(cfg.plateau))          # 平台正中間的切割高度
+    S = _ln_ids(brain, SUB_REGION)
+    mask, sm = L.density_field(brain, S, SUB_REGION)
+    P = np.argwhere(L.hotspots(mask, sm, cfg.quartile)).astype(np.float32)
+    cl, sizes, keep, _ = L.cluster_hotspots(P, cfg.min_cluster_frac * mask.sum(), cut)
+    keep = sorted(keep, key=lambda k: sizes[k - 1])
+    print(f"   切割高度取平台正中的 {cut:g}：{len(keep)} 群，"
+          f"大小 {[int(sizes[k - 1]) for k in keep]}")
+    if len(keep) < 2:
+        print("   只有一群，沒有次分區可以驗。")
+        return dict(region=SUB_REGION, cut=cut, n_clusters=len(keep))
+
+    def body_of(pop):
+        sel = np.isin(brain.nid, pop) & (brain.dep >= cfg.depth_cut)
+        kz, ky, kx = brain.binned_coords(sel)
+        key = np.unique(np.stack([kz, ky, kx, brain.nid[sel]]), axis=1)
+        f = np.zeros(brain.binned_shape(), np.float32)
+        np.add.at(f, (key[0], key[1], key[2]), 1.0)
+        v = ndimage.uniform_filter(f, cfg.smooth_size)
+        nz = v[v > 0]
+        return None if not len(nz) else ndimage.binary_fill_holes(v >= np.percentile(nz, 75))
+
+    pops, sets = [], []
+    for k in keep:
+        pop = L.recruit_coverage(brain, S, P[cl == k], cfg.cover_grow, cfg.cover_thr)
+        pops.append(pop)
+        sets.append(L.tracts_in_body(paths, lab, big, SUB_REGION, body_of(pop), brain))
+        print(f"   群{k}（{int(sizes[k - 1])} 熱點體素）→ 固定靶讀法招募 {len(pop)} 顆 LN，"
+              f"端點落在它邊界內的神經束 {len(sets[-1])} 條")
+    shared = len(sets[0] & sets[1])
+    print(f"   兩個候選共用的神經束：{shared} 條")
+
+    # 隨機對照：同樣顆數，從同一個 LN 池子裡抽
+    rng = np.random.default_rng(cfg.rng_seed)
+    ctrl = []
+    for _ in range(cfg.n_shuffle):
+        perm = rng.permutation(np.array(sorted(set(S))))
+        a = perm[:len(pops[0])].tolist()
+        b = perm[len(pops[0]):len(pops[0]) + len(pops[1])].tolist()
+        ta = L.tracts_in_body(paths, lab, big, SUB_REGION, body_of(a), brain)
+        tb = L.tracts_in_body(paths, lab, big, SUB_REGION, body_of(b), brain)
+        ctrl.append(len(ta & tb))
+    lo, hi = int(min(ctrl)), int(max(ctrl))
+    print(f"   隨機對照（同樣顆數，抽 {cfg.n_shuffle} 次）共用 {lo}–{hi} 條（中位 {int(np.median(ctrl))}）")
+    good = shared < lo
+    print("   → " + ("有鑑別力：隨機切兩塊會共用神經束，真實的兩個候選不共用"
+                     if good else
+                     "沒有鑑別力：隨機切兩塊也一樣不共用，這個判準分辨不出東西"))
+    return dict(region=SUB_REGION, cut=cut, n_clusters=len(keep),
+                sizes=[int(sizes[k - 1]) for k in keep],
+                n_ln=[len(p) for p in pops], n_tracts=[len(t) for t in sets],
+                shared=shared, control=ctrl, control_min=lo, control_max=hi,
+                discriminates=bool(good))
+
+
 def step12_13(brain: Brain) -> dict:
     cfg = brain.cfg
     C, names = brain.contact, brain.names
-    print("═══ 指令 12：長程神經束驗證（降級版） ═══")
-    print("完整的綁束演算法需要每顆神經元在兩區的終點平均位置與最短路徑，")
-    print("D06 沒有存路徑，只有體素與離本體的深度 → 無法照補充材料實作。")
-    print(f"降級為：『有幾顆神經元同時碰到 {REGION} 和另一個腦區』（每區至少 {cfg.min_vox_touch} 個體素）。")
-    print("與原版的差別：沒有做軌跡分群，所以算出來的是「連結對象」不是「神經束」。\n")
-    touch = C >= cfg.min_vox_touch
-    al = brain.n2i[REGION]
-    par = touch[:, al]
-    cnt = collections.Counter()
-    for j in np.flatnonzero(touch[par].sum(0)):
-        if j and j != al:
-            cnt[names[j]] = int(touch[par][:, j].sum())
-    print(f"碰到 {REGION} 的神經元 {int(par.sum()):,} 顆，其中同時碰到別區的：")
-    for k, v in cnt.most_common(8):
-        print(f"   {REGION} ↔ {k:10s} {v:5d} 顆")
+    out = cfg.ensure_out()
+    print("═══ 指令 12：長程神經束驗證（STEP 7） ═══")
+    print("這一步需要每顆神經元的樹狀拓樸——終端在哪、兩點之間怎麼走。")
+    print("D06 柵格化之後只剩體素集合，所以做不到；原始 SWC 的 idpar 欄有拓樸，拿回來就做得到。")
+    print(f"資料：{cfg.swc}")
+    print("『<30 voxels』的體素邊長論文沒寫；FC12_warp 的 AmiraMesh 標頭顯示")
+    print("bbox 跨距 ÷（格數−1）三軸都正好 1.0000 → 1 voxel = 1 µm，門檻 = "
+          f"{cfg.tract_dist_um:g} µm。\n")
+
+    # ── 一、掃路徑（貴，會快取）──
+    cache = out / "c12_paths.csv"
+    cols = ["name", "A", "B", "nA", "nB", "Ax", "Ay", "Az", "Bx", "By", "Bz",
+            "L_total", "L_trim", "n_trim"]
+    if cache.exists():
+        with open(cache, newline="", encoding="utf-8") as fh:
+            paths = [{k: (v if k in ("name", "A", "B") else float(v)) for k, v in r.items()}
+                     for r in csv.DictReader(fh)]
+        print(f"一、路徑：沿用 {cache.name}（{len(paths):,} 條）。刪掉它會重掃，約 100 秒。")
+    else:
+        t0 = time.time()
+        paths = L.scan_paths(brain)
+        with open(cache, "w", newline="", encoding="utf-8") as fh:
+            wr = csv.DictWriter(fh, cols); wr.writeheader()
+            wr.writerows({k: r[k] for k in cols} for r in paths)
+        print(f"一、掃出跨兩區的路徑 {len(paths):,} 條（{time.time() - t0:.0f} 秒）")
+    Lt = np.array([p["L_total"] for p in paths])
+    print(f"   路徑總長：中位 {np.median(Lt):.0f} µm、最長 {Lt.max():.0f} µm")
+
+    # ── 二、綁成神經束 ──
+    t0 = time.time()
+    lab = L.bundle_tracts(paths, cfg)
+    per, big = L.tracts_by_region(paths, lab, cfg.tract_min_neurons)
+    pairs = {tuple(sorted((p["A"], p["B"]))) for p, t in zip(paths, lab) if int(t) in big}
+    print(f"\n二、綁束（同腦區配對＋完全連結，{cfg.tract_dist_um:g} µm／相似度 {cfg.tract_sim}）："
+          f"{len(big):,} 條神經束（≥{cfg.tract_min_neurons} 顆），{time.time() - t0:.0f} 秒")
+    print(f"   被神經束連起來的腦區配對 {len(pairs)} 組")
+    print("   注意：論文交付的 58 條是圖 7 命名過的交連束 14 ＋交叉束 10 對＋聯絡束 12 對，")
+    print("   不是原始的分束數，兩個數不能直接比。")
+    no_tract = [n for n in brain.region_names if not per.get(n)]
+    print(f"   75 區裡 {75 - len(no_tract)} 區有自己的神經束、{len(no_tract)} 區沒有："
+          + ("、".join(no_tract) if no_tract else "無"))
+
+    # ── 三、次分區層次：AVLP_R 的兩個候選各有沒有自己的神經束 ──
+    print(f"\n三、次分區層次：{SUB_REGION}")
+    sub = _tract_subdivision(brain, paths, lab, big)
+
+    r12 = dict(n_paths=len(paths), n_tracts=len(big), n_region_pairs=len(pairs),
+               regions_without_tracts=no_tract,
+               tracts_per_region={k: len(v) for k, v in per.items()}, sub=sub)
+    np.save(out / "c12_tract_labels.npy", lab)
 
     print("\n═══ 指令 13：合併判斷 ═══")
     c0, n0 = L.ln_by_region(C, names, cfg.f_ln)
@@ -728,7 +831,7 @@ def step12_13(brain: Brain) -> dict:
         before = c0.get(a, 0) + c0.get(b, 0)
         print(f"   {g:5d}   {a:10s}+ {b:12s} {after:6d} {before:11d}")
         top10.append(dict(gain=int(g), a=a, b=b, after=int(after), before=int(before)))
-    r = dict(tract_relaxed=dict(cnt.most_common(10)),
+    r = dict(tract=r12,
              merge_named={g: int(c1.get(g, 0)) for g in NAMED_GROUPS},
              n0=n0, n1=n1, top10=top10)
     cfg.save("c12_13", r)
@@ -780,7 +883,8 @@ def step14_estimate(brain: Brain) -> dict:
     print("處理方式：")
     print(f"  · 體素太多的區：再併一次格，距離矩陣降到 1/64")
     print(f"  · LN 少於 {cfg.min_ln_to_cluster} 顆的區：不分群，直接判定"
-          f"「沒有自己的 LN 族群」→ 候選 hub")
+          f"「沒有自己的 LN 族群」；再看指令 12 有沒有找到它自己的長程神經束"
+          f"——有的話是 hub，沒有的話兩者皆非")
     return r
 
 
@@ -792,12 +896,21 @@ def step14_run(brain: Brain) -> list:
         for r in csv.DictReader(fh):
             LN[r["region"]].append(brain.n2x[r["neuron"]])
     rng = np.random.default_rng(cfg.rng_seed)
+    # 指令 12 算出每個腦區有幾條自己的長程神經束。論文對 hub 的定義是
+    # 「有長程神經束、但沒有 LN 族群」——所以沒有 LN 族群**也沒有束**的腦區
+    # 兩者皆非，不能叫 hub。沒有指令 12 的結果時退回原本的「候選 hub」。
+    tpr = {}
+    f12 = cfg.ensure_out() / "c12_13.json"
+    if f12.exists():
+        tpr = json.loads(f12.read_text(encoding="utf-8")).get("tract", {}).get("tracts_per_region", {})
     res, t0 = [], time.time()
     for nm in brain.region_names:
         n_ln = len(LN.get(nm, []))
         if n_ln < cfg.min_ln_to_cluster:
-            res.append(dict(region=nm, n_ln=n_ln,
-                            status=f"LN 太少（<{cfg.min_ln_to_cluster}）", verdict="候選 hub"))
+            v = ("候選 hub" if not tpr else
+                 ("hub" if tpr.get(nm, 0) > 0 else "兩者皆非"))
+            res.append(dict(region=nm, n_ln=n_ln, n_tracts=int(tpr.get(nm, 0)),
+                            status=f"LN 太少（<{cfg.min_ln_to_cluster}）", verdict=v))
             continue
         mask, sm = L.density_field(brain, LN[nm], nm)
         P = np.argwhere(L.hotspots(mask, sm, cfg.quartile)).astype(np.float32)
@@ -805,7 +918,7 @@ def step14_run(brain: Brain) -> list:
         A = d.pop("runs")
         pl = d["plateau"]
         res.append(dict(region=nm, n_ln=n_ln, n_vox=int(mask.sum()), n_hot=int(len(P)),
-                        status="跑完",
+                        n_tracts=int(tpr.get(nm, 0)), status="跑完",
                         verdict="單一 LPU" if pl[1] == 1 else f"候選 {pl[0]}–{pl[1]} 個 LPU",
                         **d))
         print(f"  {nm:10s} LN {n_ln:5d} 熱點 {len(P):5d} 全範圍 {d['lo']}–{d['hi']:<3d} "
@@ -813,8 +926,17 @@ def step14_run(brain: Brain) -> list:
     cfg.save("c14_table", res)
     ran = [r for r in res if r["status"] == "跑完"]
     kinds = collections.Counter(
-        "候選 hub" if r["status"] != "跑完" else
+        r["verdict"] if r["status"] != "跑完" else
         ("單一 LPU" if r["verdict"] == "單一 LPU" else "多個候選") for r in res)
+    if tpr:
+        no_ln_no_tract = [r["region"] for r in res if r["verdict"] == "兩者皆非"]
+        withln = [r for r in res if r["status"] == "跑完"]
+        print(f"有 LN 族群的 {len(withln)} 區裡，{sum(1 for r in withln if r['n_tracts'] > 0)} 區"
+              f"有自己的長程神經束")
+        print(f"沒有 LN 族群的 {len(res) - len(withln)} 區裡，"
+              f"{len(res) - len(withln) - len(no_ln_no_tract)} 區有束（＝hub）、"
+              f"{len(no_ln_no_tract)} 區連束也沒有（兩者皆非）："
+              + ("、".join(no_ln_no_tract) if no_ln_no_tract else "無"))
     print(f"\n跑完 {len(ran)} 區、略過 {len(res) - len(ran)} 區，用時 {time.time() - t0:.0f} 秒")
     print("判定分布：", collections.Counter(r["verdict"] for r in res).most_common())
     cfg.save("c14", dict(n_ran=len(ran), n_skipped=len(res) - len(ran), **kinds))
@@ -827,16 +949,24 @@ def step14_figure(brain: Brain):
     from matplotlib.patches import Patch
     tab = {r["region"]: r for r in json.loads(
         (cfg.ensure_out() / "c14_table.json").read_text(encoding="utf-8"))}
+    # 四類，不是三類：指令 12 做出真正的 STEP 7 之後，原本一律叫「候選 hub」的
+    # 那 54 區可以分開了——論文對 hub 的定義是「有長程神經束、但沒有 LN 族群」，
+    # 所以連神經束也沒有的腦區兩者皆非。
     EN = {"單一 LPU": "one LPU", "多個候選": "more than one candidate",
-          "候選 hub": "no LN population (candidate hub)"}
+          "hub": "hub: tracts but no LN population",
+          "兩者皆非": "neither: no LN population, no tracts",
+          "候選 hub": "no LN population (tracts not checked)"}
     rgb = {"單一 LPU": (0.15, 0.39, 0.92), "多個候選": (0.85, 0.47, 0.02),
+           "hub": (0.58, 0.64, 0.70), "兩者皆非": (0.85, 0.20, 0.24),
            "候選 hub": (0.58, 0.64, 0.70)}
 
     def cls(r):
         if r["status"] != "跑完":
-            return "候選 hub"
+            return r["verdict"]              # hub／兩者皆非／候選 hub
         return "單一 LPU" if r["verdict"] == "單一 LPU" else "多個候選"
     kind = {n: cls(tab[n]) for n in brain.region_names}
+    order = [k for k in ("單一 LPU", "多個候選", "hub", "兩者皆非", "候選 hub")
+             if any(v == k for v in kind.values())]
 
     # axis0=前後、axis1=背腹、axis2=左右，是指令 1 驗出來的，不是猜的
     fig, axes = plt.subplots(1, 2, figsize=(11.5, 5.4), dpi=170)
@@ -856,9 +986,8 @@ def step14_figure(brain: Brain):
         for sp in ax.spines.values():
             sp.set_color("#c3cbd6")
     n_of = lambda k: sum(1 for n in brain.region_names if kind[n] == k)
-    fig.legend(handles=[Patch(color=rgb[k], label=f"{EN[k]}  ({n_of(k)})")
-                        for k in ("單一 LPU", "多個候選", "候選 hub")],
-               loc="lower center", ncol=3, frameon=False, fontsize=10)
+    fig.legend(handles=[Patch(color=rgb[k], label=f"{EN[k]}  ({n_of(k)})") for k in order],
+               loc="lower center", ncol=min(len(order), 4), frameon=False, fontsize=9.5)
     n_ran = sum(1 for n in brain.region_names if tab[n]["status"] == "跑完")
     fig.suptitle(f"Our own whole-brain pass  ·  {len(brain.region_names)} Ito regions  ·  "
                  f"{n_ran} clustered, {len(brain.region_names) - n_ran} had "
@@ -866,7 +995,7 @@ def step14_figure(brain: Brain):
                  fontsize=10.5, color="#5a6b7b")
     fig.tight_layout(rect=[0, .06, 1, .96])
     L.save_fig(fig, cfg, "c14_brain")
-    print("判定分布：", {k: n_of(k) for k in ("單一 LPU", "多個候選", "候選 hub")})
+    print("判定分布：", {k: n_of(k) for k in order})
 
 
 def step14(brain: Brain):

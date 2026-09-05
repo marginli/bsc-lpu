@@ -25,7 +25,7 @@
   </div>
 
   <div class="callout">
-    <b>讀程式不等於看懂每一行。</b>整合後的四個檔案合計 1,744 行。真正決定結論的，是其中<b>十個數字</b>；真正需要盯住的，是<b>五個地方</b>。這一頁就是那五個地方。
+    <b>讀程式不等於看懂每一行。</b>整合後的四個檔案合計 2,102 行。真正決定結論的，是其中<b>十個數字</b>；真正需要盯住的，是<b>五個地方</b>。這一頁就是那五個地方。
   </div>
 
   <nav class="toc">
@@ -113,12 +113,12 @@
     <div class="f">
       <div class="nm">run_lpu.py</div>
       <span class="role">順序</span>
-      <p>十四條指令收成十二個函式（指令 10＋11、12＋13 各併成一個）。它只管<b>先做什麼、再做什麼、把什麼印出來</b>，不管怎麼算。1,051 行。</p>
+      <p>十四條指令收成十二個函式（指令 10＋11、12＋13 各併成一個）。它只管<b>先做什麼、再做什麼、把什麼印出來</b>，不管怎麼算。1,180 行。</p>
     </div>
     <div class="f">
       <div class="nm">lpu_lib.py</div>
       <span class="role">做法</span>
-      <p>參數、資料、七個步驟的演算法、畫圖。<b>要改結論就改這裡</b>。572 行。</p>
+      <p>參數、資料、七個步驟的演算法、畫圖。<b>要改結論就改這裡</b>。791 行。</p>
     </div>
   </div>
 
@@ -146,7 +146,7 @@
       <rect class="bx" x="30" y="304" width="160" height="44"/>
       <text class="ti" x="110" y="332" text-anchor="middle">D06　骨架</text>
 
-      <text class="hd" x="440" y="26" text-anchor="middle">程式　86 KB</text>
+      <text class="hd" x="440" y="26" text-anchor="middle">程式　105 KB</text>
       <rect class="bxa" x="280" y="40" width="320" height="52"/>
       <text class="ti" x="300" y="62">run_lpu.sh</text>
       <text class="sb" x="300" y="81">檢查 → 跑 → 核對 → 列出產出</text>
@@ -170,7 +170,7 @@
 
       <rect class="bxa" x="700" y="250" width="170" height="60"/>
       <text class="ti" x="718" y="276">expected.json</text>
-      <text class="sb" x="718" y="296">47 項驗收</text>
+      <text class="sb" x="718" y="296">56 項驗收</text>
 
       <path class="ar" d="M440,92 L440,116" marker-end="url(#a5)"/>
       <path class="ar" d="M440,210 L440,236" marker-end="url(#a5)"/>
@@ -180,7 +180,7 @@
       <path class="ar" d="M745,246 L745,214" marker-end="url(#a5)"/>
       <text class="sb" x="757" y="236">核對</text>
     </svg>
-    <figcaption><b>三個檔案、兩份資料、一個產出目錄。</b>箭頭是「誰用到誰」：<code>run_lpu.sh</code> 叫起 <code>run_lpu.py</code>，主程式用 <code>lpu_lib.py</code> 裡的函式，函式庫去讀 D03 與 D06，結果寫進 <code>out/</code>，最後拿 <code>expected.json</code> 核對一次。<b>程式 86 KB，資料 277 MB——要搬家的重量在左邊，不在中間。</b>
+    <figcaption><b>三個檔案、兩份資料、一個產出目錄。</b>箭頭是「誰用到誰」：<code>run_lpu.sh</code> 叫起 <code>run_lpu.py</code>，主程式用 <code>lpu_lib.py</code> 裡的函式，函式庫去讀 D03 與 D06，結果寫進 <code>out/</code>，最後拿 <code>expected.json</code> 核對一次。<b>程式 105 KB，資料 277 MB——要搬家的重量在左邊，不在中間。</b>
     <span class="figsrc">示意圖。三個檔案在 <code>part5/</code>。</span></figcaption>
   </figure>
 
@@ -316,7 +316,7 @@ def contact(self) -&gt; np.ndarray:
     <tr><td>STEP 4　挑種子、滾雪球招募</td><td>8、9</td><td><code>pick_seed</code>／<code>recruit</code>／<code>recruit_regime</code></td><td><code>lpu_lib.py</code></td></tr>
     <tr><td>STEP 5　去初級神經突、抽等值面</td><td>10</td><td><code>depth_profile</code></td><td><code>lpu_lib.py</code></td></tr>
     <tr><td>STEP 6　算 c 值</td><td>11</td><td><code>c_value</code></td><td><code>lpu_lib.py</code></td></tr>
-    <tr><td>STEP 7　長程神經束驗證</td><td>12</td><td><code>adjacency</code>（論文的演算法在 D06 上做不到，這是降級版）</td><td><code>lpu_lib.py</code></td></tr>
+    <tr><td>STEP 7　長程神經束驗證</td><td>12</td><td><code>read_swc</code>／<code>tree_path</code>／<code>scan_paths</code>／<code>bundle_tracts</code>／<code>tracts_in_body</code></td><td><code>lpu_lib.py</code></td></tr>
     <tr><td>步驟以外　合併判斷</td><td>13</td><td><code>merge_gain</code></td><td><code>lpu_lib.py</code></td></tr>
     <tr><td>全腦跑一遍</td><td>14</td><td><code>step14</code></td><td><code>run_lpu.py</code></td></tr>
   </table></div>
@@ -396,14 +396,15 @@ ORDER = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "12", "14"]</code></
 {"指令": 6,  "說明": "1% 門檻（分母是整個腦區）", "path": "c06/thr", "want": 125.11, "tol": 0.01}
 {"指令": 9,  "說明": "20 種參數組合裡「只收一部分」的有幾個", "path": "c09/partial_cells", "want": 0}
 {"指令": 14, "說明": "判定為單一 LPU",       "path": "c14/單一 LPU",   "want": 8}
-{"指令": 14, "說明": "判定為候選 hub",       "path": "c14/候選 hub",   "want": 54}</code></pre>
+{"指令": 12, "說明": "兩個候選共用的神經束",  "path": "c12_13/tract/sub/shared", "want": 0}
+{"指令": 14, "說明": "判定為 hub",           "path": "c14/hub",        "want": 48}</code></pre>
 
   <div class="plain">
-    <b>白話：每一行是一項「應該是多少」。</b><code>path</code> 是「去產出的哪一份檔案、找哪一個欄位」，<code>want</code> 是應該得到的值，<code>tol</code> 是允許的誤差（小數才需要）。跑完之後 <code>verify</code> 會把 47 項逐一比對：
+    <b>白話：每一行是一項「應該是多少」。</b><code>path</code> 是「去產出的哪一份檔案、找哪一個欄位」，<code>want</code> 是應該得到的值，<code>tol</code> 是允許的誤差（小數才需要）。跑完之後 <code>verify</code> 會把 56 項逐一比對：
   </div>
 
   <pre><code>$ python3 run_lpu.py verify
-核對 47 項：通過 47、不符 0、還沒跑 0
+核對 56 項：通過 56、不符 0、還沒跑 0
 全部通過。</code></pre>
 
   <div class="callout">
@@ -473,7 +474,7 @@ ORDER = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "12", "14"]</code></
 
   <h2 id="s9"><span class="pt">7</span>帶到另一台機器</h2>
 
-  <p>整合成三個檔案的實際理由：可以搬。但<b>搬家的重量不在程式</b>——程式四個檔案加起來 86 KB，資料 277 MB。</p>
+  <p>整合成三個檔案的實際理由：可以搬。但<b>搬家的重量不在程式</b>——程式四個檔案加起來 105 KB，資料 277 MB。</p>
 
   <h3>第一件事：先問機器夠不夠</h3>
 
@@ -542,13 +543,14 @@ ORDER = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "12", "14"]</code></
   </div>
 
   <div class="note">
-    <b>可攜性是驗過的，不是宣稱的。</b>把四個檔案（86 KB）複製到一個空目錄，只給它打包後的 39 MB，重跑一遍：<b>16 份 JSON 與 7 張圖全部與原本逐位元組相同</b>，47 項驗收全部通過。
+    <b>可攜性是驗過的，不是宣稱的。</b>把四個檔案（105 KB）複製到一個空目錄，只給它打包後的 39 MB<b>再加一份 3.1 MB 的路徑快取</b>，重跑一遍：<b>16 份 JSON 與 7 張圖全部與原本逐位元組相同</b>，56 項驗收全部通過。
+    <p style="margin-top:8px"><b>那份 3.1 MB 是 STEP 7 的中間產物。</b>神經束要從 FlyCircuit 的 SWC 原始檔算（28,573 個檔、<b>842 MB</b>），但掃完的結果會存成 <code>out/c12_paths.csv</code>——17,690 條跨兩區的路徑。<b>下次跑到指令 12 時那個檔在，就不必再讀 SWC。</b>所以搬家要搬的還是 39 MB ＋ 3 MB，不是 39 MB ＋ 842 MB。</p>
   </div>
 
   <div class="statgrid">
-    <div class="stat"><div class="v">86 KB</div><div class="k">程式（四個檔案）</div></div>
+    <div class="stat"><div class="v">105 KB</div><div class="k">程式（四個檔案）</div></div>
     <div class="stat"><div class="v">39 MB</div><div class="k">打包後的資料</div></div>
-    <div class="stat"><div class="v">166 秒</div><div class="k">整條跑完</div></div>
+    <div class="stat"><div class="v">170 秒</div><div class="k">整條跑完</div></div>
     <div class="stat"><div class="v">2.5 GB</div><div class="k">實測峰值記憶體</div></div>
   </div>
 

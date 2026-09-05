@@ -42,6 +42,7 @@ class Config:
     # ── 資料在哪。換一台機器時，通常只要改這三行（或用命令列參數覆寫）──
     d03: Path = Path("/home/wanjuli/claude_linux/BSC_plan/D03")
     d06: Path = Path("/home/wanjuli/claude_linux/BSC_plan/D06")
+    swc: Path = Path("/mnt/sda1/work1/fly_circuit/FC12_swc")   # STEP 7 才用得到
     out: Path = Path("out")
 
     # ── 論文明確給定的參數 ──
@@ -51,6 +52,8 @@ class Config:
     overlap: float = 0.50           # STEP 4：重疊超過 50% 才招募
     core_frac: float = 0.80         # STEP 6：中心 80% 對周邊 20%
     c_threshold: float = 2.0        # STEP 6：c > 2 才算 LPU
+    tract_dist_um: float = 30.0     # STEP 7：兩端平均終端位置要多近才算同一束
+    tract_sim: float = 0.60         # STEP 7：總路徑長度的相似度門檻
 
     # ── 論文沒給、我們自己決定的（PART 4 結論五）──
     f_ln: float = 0.80              # 指令 2：多少比例的分枝待在同一區才算 LN
@@ -60,6 +63,10 @@ class Config:
     depth_cut: int = 10             # 指令 10：離本體幾格以內視為初級神經突
     min_ln_to_cluster: int = 10     # 指令 14：LN 少於幾顆就不分群
     min_vox_touch: int = 5          # 指令 12：碰到幾個體素才算「碰到」這一區
+    term_min: int = 5               # STEP 7：一個腦區至少幾個終端，才算這顆神經元連到它
+    tract_min_neurons: int = 3      # STEP 7：一條神經束至少幾顆神經元
+    cover_grow: int = 1             # STEP 4（固定靶讀法）：把分群撐大幾個分析體素
+    cover_thr: float = 0.30         # STEP 4（固定靶讀法）：覆蓋率門檻
     rng_seed: int = 0               # 打亂順序用的亂數種子
 
     # 切割高度：論文沒給。掃 4 到 25，平台取 14–20。
@@ -94,6 +101,10 @@ class Config:
             ("depth_cut", self.depth_cut, "指令 10 深度小於此值視為初級神經突"),
             ("min_ln_to_cluster", self.min_ln_to_cluster, "指令 14 少於幾顆 LN 就不分群"),
             ("min_vox_touch", self.min_vox_touch, "指令 12 碰到幾個體素才算碰到"),
+            ("term_min", self.term_min, "指令 12 幾個終端才算連到一個腦區"),
+            ("tract_min_neurons", self.tract_min_neurons, "指令 12 一條神經束至少幾顆"),
+            ("cover_grow", self.cover_grow, "指令 9  固定靶讀法：分群撐大幾格"),
+            ("cover_thr", self.cover_thr, "指令 9  固定靶讀法：覆蓋率門檻"),
             ("rng_seed", self.rng_seed, "亂數種子"),
         ]
         w = max(len(r[0]) for r in rows)
@@ -465,6 +476,33 @@ def recruit_regime(M: dict, sizes: dict, seed: int, grows, thresholds) -> dict:
     return res
 
 
+def recruit_coverage(brain: "Brain", pop_ids, cluster_pts: np.ndarray,
+                     grow: int, thr: float) -> list:
+    """固定靶讀法的招募（圖 S5D(e)）：靶是 STEP 3 分出來的群，不會愈滾愈大。
+
+    論文對 STEP 4 寫了兩次，兩次不一樣。補充材料寫滾雪球（見 recruit），
+    圖 S5D(e) 的圖說寫的是 recruited **based on the coverage of the two clusters**
+    ——每顆 LN 各自量一次「我有多少比例的體素落在這一群裡」，超過門檻就收。
+
+    因為靶固定不動，沒有回饋，所以結果隨門檻連續變化；滾雪球則只有
+    「收不到」與「全收」兩個終點。
+    """
+    shape = brain.binned_shape()
+    m = np.zeros(shape, bool)
+    pts = cluster_pts.astype(int)
+    m[pts[:, 0], pts[:, 1], pts[:, 2]] = True
+    if grow:
+        m = ndimage.binary_dilation(m, ndimage.generate_binary_structure(3, 1), grow)
+    mf = m.ravel()
+    neu = neuron_voxel_sets(brain, pop_ids)
+    out = []
+    for i in sorted(neu):
+        idx = np.ravel_multi_index(np.array(sorted(neu[i])).T, shape)
+        if mf[idx].sum() / len(neu[i]) > thr:
+            out.append(i)
+    return out
+
+
 # ── STEP 5、6：去初級神經突、抽等值面、算 c 值 ────────────────────────────────
 
 def depth_profile(dep: np.ndarray, L: np.ndarray, region_idx: int, bands) -> list:
@@ -500,7 +538,188 @@ def c_value(body: np.ndarray, v: np.ndarray, core_frac: float) -> dict:
                 meanA=float(vals[A].mean()), meanB=float(mB), c=round(c, 3))
 
 
-# ── STEP 7＋步驟以外：神經束驗證（降級）與合併 ────────────────────────────────────────────
+# ── STEP 7：長程神經束 ────────────────────────────────────────────
+#
+# 論文〈Searching Neural Tracts〉：For a selected neuron linking two neuropils, an
+# average position of all terminals within each of the two regions was first
+# determined. The algorithm then automatically traced the shortest path connecting
+# the two average terminal positions. Next, neural paths derived from different
+# neurons with similar average terminal positions (<30 voxels distance) and total
+# path length (>60% similarity) were bundled into a single tract.
+#
+# 這一步需要**樹狀拓樸**（哪個節點是哪個節點的親代），D06 柵格化之後只剩體素
+# 集合，所以做不到。原始的 SWC 有 idpar 欄，拿回來就做得到。
+# 「<30 voxels」的體素邊長論文沒寫；FlyCircuit FC12_warp 的 AmiraMesh 標頭顯示
+# bbox 跨距 ÷（格數−1）在三軸都正好 1.0000，所以 1 voxel = 1 µm、門檻 = 30 µm。
+
+
+def read_swc(path) -> tuple:
+    """讀 TREES toolbox 的 SWC。欄位是 inode R X Y Z D/2 idpar。
+
+    回傳 (XYZ, pi, step)：座標、**父節點的列號**、以及到親代的邊長。
+    D06 的 swcread.py 讀了 idpar、算完到 soma 的距離就把它丟掉了，
+    所以 D06 的體素檔沒有拓樸——STEP 7 缺的就是這個。
+    """
+    a = np.loadtxt(path, comments="#", dtype=np.float64)
+    if a.ndim == 1:
+        a = a[None, :]
+    idx = a[:, 0].astype(np.int64)
+    XYZ = a[:, 2:5].astype(np.float32)
+    par = a[:, 6].astype(np.int64)
+    pos = {v: i for i, v in enumerate(idx)}
+    pi = np.array([pos.get(q, -1) for q in par], dtype=np.int64)
+    stp = np.zeros(len(a), np.float32)
+    ok = pi >= 0
+    stp[ok] = np.linalg.norm(XYZ[ok] - XYZ[pi[ok]], axis=1)
+    return XYZ, pi, stp
+
+
+def tree_path(pi: np.ndarray, i: int, j: int):
+    """樹上 i 到 j 的節點序列。樹上兩點之間的路徑唯一，所以「最短」是自動的。"""
+    up, seen, x = [], {}, i
+    while x >= 0:
+        seen[x] = len(up)
+        up.append(x)
+        x = pi[x]
+    dn, y = [], j
+    while y >= 0 and y not in seen:
+        dn.append(y)
+        y = pi[y]
+    return None if y < 0 else up[:seen[y] + 1] + dn[::-1]
+
+
+def scan_paths(brain: "Brain", verbose: bool = True) -> list:
+    """掃所有 SWC，抽出每顆神經元的「跨兩區路徑」。
+
+    回傳每顆一筆：兩個腦區、兩端的平均終端位置、路徑總長、以及去掉細胞本體
+    與兩區內部之後的長度（論文說 cell body and paths within the two selected
+    neuropils were removed）。
+    """
+    import os
+    cfg = brain.cfg
+    orig = np.array(brain.meta["origin"], np.float32) if "origin" in brain.meta \
+        else np.array([-480.0, -410.0, -175.0], np.float32)
+    lab, names = brain.lab, brain.names
+    files = sorted(f for f in os.listdir(cfg.swc) if f.endswith(".swc"))
+    if verbose:
+        print(f"SWC {len(files)} 個，終端門檻 {cfg.term_min} 個")
+    rows = []
+    for k, f in enumerate(files):
+        try:
+            XYZ, pi, stp = read_swc(os.path.join(cfg.swc, f))
+        except Exception:
+            continue
+        if len(XYZ) < 20:
+            continue
+        has_child = np.zeros(len(XYZ), bool)
+        has_child[pi[pi >= 0]] = True
+        leaf = ~has_child
+        ijk = np.rint(XYZ - orig).astype(np.int32)
+        z, y, x = ijk[:, 2], ijk[:, 1], ijk[:, 0]
+        good = ((z >= 0) & (z < lab.shape[0]) & (y >= 0) & (y < lab.shape[1])
+                & (x >= 0) & (x < lab.shape[2]))
+        reg = np.zeros(len(XYZ), np.int16)
+        reg[good] = lab[z[good], y[good], x[good]]
+        cnt = collections.Counter(int(r) for r in reg[leaf] if r)
+        top = [(r, c) for r, c in cnt.most_common() if c >= cfg.term_min][:2]
+        if len(top) < 2:
+            continue
+        (rA, nA), (rB, nB) = top
+        cA = XYZ[leaf & (reg == rA)].mean(0)
+        cB = XYZ[leaf & (reg == rB)].mean(0)
+        iA = int(np.argmin(np.linalg.norm(XYZ - cA, axis=1)))
+        iB = int(np.argmin(np.linalg.norm(XYZ - cB, axis=1)))
+        P = tree_path(pi, iA, iB)
+        if P is None or len(P) < 2:
+            continue
+        pr = reg[np.array(P)]
+        keep = (pr != rA) & (pr != rB)
+        rows.append(dict(name=f[:-len("_swc.swc")], A=names[rA], B=names[rB],
+                         nA=nA, nB=nB,
+                         Ax=float(cA[0]), Ay=float(cA[1]), Az=float(cA[2]),
+                         Bx=float(cB[0]), By=float(cB[1]), Bz=float(cB[2]),
+                         L_total=float(sum(stp[n] for n in P[1:])),
+                         L_trim=float(sum(stp[n] for n, q in zip(P[1:], keep[1:]) if q)),
+                         n_trim=int(keep.sum())))
+        if verbose and (k + 1) % 6000 == 0:
+            print(f"   {k + 1}/{len(files)}　路徑 {len(rows)}", flush=True)
+    return rows
+
+
+def bundle_tracts(paths: list, cfg: Config) -> np.ndarray:
+    """把路徑綁成神經束。回傳每條路徑的束編號。
+
+    論文只說 similar 的路徑 were bundled into a single tract，**沒說相容關係
+    不遞移的時候怎麼辦**。純連通分量在 30 µm 附近會滲流（最大一束吞掉六成以上
+    的路徑），所以這裡用**同一組腦區＋完全連結**：一束之內兩兩都要相容。
+    這是我們的選擇，不是論文的規定。
+    """
+    from scipy.spatial.distance import pdist, squareform
+    A = np.array([[p["Ax"], p["Ay"], p["Az"]] for p in paths], np.float64)
+    B = np.array([[p["Bx"], p["By"], p["Bz"]] for p in paths], np.float64)
+    Ln = np.array([p["L_total"] for p in paths])
+    na = np.array([p["A"] for p in paths])
+    nb = np.array([p["B"] for p in paths])
+    sw = na > nb                                   # 兩端依腦區名正規化，方向相反才對得起來
+    P = np.where(sw[:, None], B, A)
+    Q = np.where(sw[:, None], A, B)
+    pair = np.array([f"{a}|{b}" for a, b in zip(np.where(sw, nb, na), np.where(sw, na, nb))])
+    lab = np.full(len(paths), -1, np.int64)
+    nxt = 0
+    for pr in collections.Counter(pair):
+        sel = np.flatnonzero(pair == pr)
+        if len(sel) == 1:
+            lab[sel] = nxt
+            nxt += 1
+            continue
+        g = np.maximum(squareform(pdist(P[sel])), squareform(pdist(Q[sel])))
+        lo = np.minimum.outer(Ln[sel], Ln[sel])
+        hi = np.maximum.outer(Ln[sel], Ln[sel])
+        ratio = np.divide(lo, hi, out=np.zeros_like(lo), where=hi > 0)
+        g = np.where(ratio > cfg.tract_sim, g, 1e6)   # 長度不像 → 視為無限遠
+        np.fill_diagonal(g, 0.0)
+        Z = linkage(squareform(g, checks=False), method="complete")
+        cl = fcluster(Z, cfg.tract_dist_um, "distance")
+        for c in np.unique(cl):
+            lab[sel[cl == c]] = nxt
+            nxt += 1
+    return lab
+
+
+def tracts_by_region(paths: list, lab: np.ndarray, min_n: int) -> tuple:
+    """每個腦區有哪些神經束在它身上結束。回傳 (區→束集合, 有效的束集合)。"""
+    cnt = collections.Counter(lab.tolist())
+    big = {t for t, c in cnt.items() if c >= min_n}
+    per = collections.defaultdict(set)
+    for p, t in zip(paths, lab):
+        if int(t) in big:
+            per[p["A"]].add(int(t))
+            per[p["B"]].add(int(t))
+    return per, big
+
+
+def tracts_in_body(paths: list, lab: np.ndarray, big: set, region: str,
+                   body: np.ndarray, brain: "Brain") -> set:
+    """哪些神經束的端點落在某個候選 LPU 的邊界內。"""
+    cfg = brain.cfg
+    orig = np.array([-480.0, -410.0, -175.0], np.float32)
+    B = cfg.bin_factor
+    sh = body.shape
+    out = set()
+    for p, t in zip(paths, lab):
+        if int(t) not in big:
+            continue
+        for side in ("A", "B"):
+            if p[side] != region:
+                continue
+            c = np.array([p[f"{side}x"], p[f"{side}y"], p[f"{side}z"]], np.float32)
+            z, y, x = (np.rint(c - orig).astype(int) // B)[::-1]
+            if 0 <= z < sh[0] and 0 <= y < sh[1] and 0 <= x < sh[2] and body[z, y, x]:
+                out.add(int(t))
+    return out
+
+
+# ── 步驟以外：合併 ────────────────────────────────────────────
 
 def adjacency(lab: np.ndarray) -> set:
     """哪些腦區在空間上相鄰：沿三個軸各比一次相鄰格的標籤。"""
