@@ -968,19 +968,32 @@ def step14_figure(brain: Brain):
     order = [k for k in ("單一 LPU", "多個候選", "hub", "兩者皆非", "候選 hub")
              if any(v == k for v in kind.values())]
 
-    # axis0=前後、axis1=背腹、axis2=左右，是指令 1 驗出來的，不是猜的
+    # axis0=前後、axis1=背腹、axis2=左右（指令 1 驗出來的），而且三個軸都是
+    # 「數值越大越前／越背／越左」。一張投影圖要對，三件事都得指定：
+    #   ① 攝影機站在軸的哪一端 —— 決定哪一面擋住哪一面（project 的 from_high）
+    #   ② 上下 —— axis1 越大越背側，而 imshow 的第 0 列畫在最上面
+    #   ③ 左右 —— 由攝影機的位置決定，不是隨便挑一邊
+    # 三件事任何一件漏掉都不會報錯，只會畫出一張看起來很正常的錯圖。
+    #
+    #   前視圖：站在前側往後看。近的是前側（from_high=True），
+    #           剩下 (背腹, 左右)，上下翻一次；果蠅的右邊在畫面左邊（正面對看）。
+    #   側視圖：站在右側往左看。近的是右側（from_high=False，右側 axis2 小），
+    #           剩下 (前後, 背腹)，rot90 轉正後前側在畫面右邊，再左右翻成
+    #           「前側在左」——與 PART 1 那張矢狀圖同一個慣例。
     fig, axes = plt.subplots(1, 2, figsize=(11.5, 5.4), dpi=170)
-    views = [(0, "front view  (looking along the anterior-posterior axis)"),
-             (2, "side view  (looking along the left-right axis)")]
-    for ax, (axis, ttl) in zip(axes, views):
-        P = L.project(brain.lab, axis)
+    views = [(0, True, np.flipud,
+              "front view  (from the front; the fly's right is on the left)"),
+             (2, False, lambda a: np.fliplr(np.rot90(a, 1)),
+              "side view  (from the right; anterior to the left)")]
+    for ax, (axis, from_high, upright, ttl) in zip(axes, views):
+        P = L.project(brain.lab, axis, from_high=from_high)
         img = np.ones(P.shape + (3,))
         for n in brain.region_names:
             m = (P == brain.n2i[n])
             if m.any():
                 img[m] = rgb[kind[n]]
         img[P == 0] = 1.0
-        ax.imshow(img if axis == 0 else np.rot90(img, 1))
+        ax.imshow(upright(img))
         ax.set_xticks([]); ax.set_yticks([])
         ax.set_title(ttl, fontsize=10, color=L.INK)
         for sp in ax.spines.values():

@@ -780,9 +780,17 @@ def save_fig(fig, cfg: Config, name: str):
     print(f"   圖已存：{p.name}")
 
 
-def project(lab: np.ndarray, axis: int) -> np.ndarray:
-    """沿一個軸做「第一個非零」的投影，得到一張腦區圖。"""
+def project(lab: np.ndarray, axis: int, from_high: bool = False) -> np.ndarray:
+    """沿一個軸做「第一個非零」的投影，得到一張腦區圖。
+
+    `from_high` 決定攝影機站在軸的哪一端——也就是**哪一面會擋住哪一面**。
+    預設從索引小的那端走進去；`from_high=True` 改從索引大的那端。
+    這不是美觀問題：從錯的一端走，前側的腦區會整個被後側蓋掉
+    （AL_R 的正視投影面積 13,519 格，從後側走只剩 100 格看得到，EB 是 0 格）。
+    """
     a = np.moveaxis(lab, axis, 0)
+    if from_high:
+        a = a[::-1]
     out = np.zeros(a.shape[1:], np.int16)
     for i in range(a.shape[0]):
         s = a[i]
