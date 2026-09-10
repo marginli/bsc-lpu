@@ -854,7 +854,17 @@
 
   <div class="gap">
     <h4>又一個沒給的參數</h4>
-    <p>等值面的門檻要設多少，論文沒有寫。而它直接決定候選 LPU 的<b>體積</b>——也就直接影響下一步的 c 值。</p>
+    <p>等值面的門檻要設多少，論文沒有寫（<i>isointensity surface</i> 只有名字，沒有數值）。而它直接決定候選 LPU 的<b>體積</b>——也就直接影響下一步的 c 值。</p>
+    <p style="margin-top:8px"><b>差多少？量給你看。</b>同一批神經元（右觸角葉招募到的 723 顆，去掉初級神經突之後），<b>只換這一個門檻</b>：</p>
+    <div class="tblwrap"><table>
+      <tr><th>門檻取密度的第幾百分位</th><th>抽出來的區域佔腦區</th><th>下一步的 c 值</th><th>過得了 c &gt; 2 嗎</th></tr>
+      <tr><td>10</td><td>373.7%</td><td>248.9</td><td>過</td></tr>
+      <tr><td>25</td><td>283.0%</td><td>99.2</td><td>過</td></tr>
+      <tr><td>50</td><td>187.2%</td><td>24.9</td><td>過</td></tr>
+      <tr><td><b>75</b></td><td><b>93.4%</b></td><td><b>2.67</b></td><td>過</td></tr>
+      <tr><td>90</td><td>37.4%</td><td>1.22</td><td><b style="color:var(--red)">不過</b></td></tr>
+    </table></div>
+    <p style="margin-top:8px"><b>c 值從 248.9 掉到 1.22——205 倍，而且中途跨過了 c &gt; 2 這條判準。</b>前三個門檻抽出來的「候選 LPU」甚至比腦區本身還大（密度場會溢出到區外，因為被招募的神經元有一部分伸出去了）。<b>第 75 百分位是這幾個裡唯一讓區域小於腦區的</b>，本專題後面一律用它——那是我們挑的，不是論文給的。<span class="figsrc">由 <code>part5/lpu_lib.py</code> 的 <code>c_value()</code> 算出。</span></p>
   </div>
 
   <h2 id="s6"><span class="pt">STEP 6</span>算 c 值：中心要比周邊密</h2>
@@ -1012,7 +1022,7 @@
   <div class="tblwrap"><table>
     <tr><th style="width:20%">在哪一步</th><th style="width:30%">缺什麼</th><th>影響</th></tr>
     <tr><td>STEP 3</td><td><b>UPGMA 樹的切割高度</b></td><td>直接決定找到幾個候選 LPU。同一個右觸角葉可以是 1 個，也可以是 15 個</td></tr>
-    <tr><td>STEP 5</td><td><b>等值面的門檻</b></td><td>決定候選 LPU 的體積，連帶影響 c 值</td></tr>
+    <tr><td>STEP 5</td><td><b>等值面的門檻</b></td><td>決定候選 LPU 的體積，連帶影響 c 值。<b>同一批神經元只換這個門檻，區域從腦區的 373.7% 縮到 37.4%、c 值從 248.9 掉到 1.22（205 倍），中途跨過 c &gt; 2</b>——見 <a href="#s5">STEP 5</a> 那張掃描表</td></tr>
     <tr><td>STEP 4</td><td><b>起始種子怎麼挑</b></td><td>論文的條件「纖維完全侷限在該候選 LPU 內」<b>在右觸角葉上</b>按字面挑不出任何一顆（最接近的只有 23.6% 落在裡面），<b>在 AVLP_R 上卻挑得到</b>（最高 99.1%）——論文沒有寫「挑不出人的時候該怎麼辦」。放寬成「有一部分在裡面」則沒給比例。而且它明寫是目視決定的——換一顆種子，招募結果可能不同</td></tr>
   </table></div>
 
