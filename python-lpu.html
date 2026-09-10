@@ -25,7 +25,7 @@
   </div>
 
   <div class="callout">
-    <b>讀程式不等於看懂每一行。</b>整合後的四個檔案合計 2,102 行。真正決定結論的，是其中<b>十個數字</b>；真正需要盯住的，是<b>五個地方</b>。這一頁就是那五個地方。
+    <b>讀程式不等於看懂每一行。</b>整合後的四個檔案合計 2,123 行。真正決定結論的，是其中<b>十四個數字</b>；真正需要盯住的，是<b>五個地方</b>。這一頁就是那五個地方。
   </div>
 
   <nav class="toc">
@@ -209,7 +209,7 @@ class Config:
     c_threshold: float = 2.0        <span class="cm"># STEP 6：c &gt; 2 才算 LPU</span>
 
     <span class="cm"># ── 論文沒給、我們自己決定的（PART 4 結論五）──</span>
-<span class="hl">    f_ln: float = 0.80              # 指令 2：多少比例的分枝待在同一區才算 LN</span><span class="hl">    bin_factor: int = 4             # 指令 4：幾格併成一個分析體素</span><span class="hl">    n_shuffle: int = 9              # 指令 7：打亂體素順序重跑幾次</span><span class="hl">    grow: int = 4                   # 指令 9：招募時撐大幾格（2 格招不到任何一顆）</span><span class="hl">    depth_cut: int = 10             # 指令 10：離本體幾格以內視為初級神經突</span><span class="hl">    min_ln_to_cluster: int = 10     # 指令 14：LN 少於幾顆就不分群</span><span class="hl">    min_vox_touch: int = 5          # 指令 12：碰到幾個體素才算「碰到」這一區</span><span class="hl">    rng_seed: int = 0               # 打亂順序用的亂數種子</span>
+<span class="hl">    f_ln: float = 0.80              # 指令 2：多少比例的分枝待在同一區才算 LN</span><span class="hl">    bin_factor: int = 4             # 指令 4：幾格併成一個分析體素</span><span class="hl">    n_shuffle: int = 9              # 指令 7：打亂體素順序重跑幾次</span><span class="hl">    grow: int = 4                   # 指令 9：招募時撐大幾格（2 格招不到任何一顆）</span><span class="hl">    depth_cut: int = 10             # 指令 10：離本體幾格以內視為初級神經突</span><span class="hl">    min_ln_to_cluster: int = 10     # 指令 14：LN 少於幾顆就不分群</span><span class="hl">    min_vox_touch: int = 5          # 指令 12：碰到幾個體素才算「碰到」這一區</span><span class="hl">    term_min: int = 5               # STEP 7：一個腦區至少幾個終端，才算這顆神經元連到它</span><span class="hl">    tract_min_neurons: int = 3      # STEP 7：一條神經束至少幾顆神經元</span><span class="hl">    cover_grow: int = 1             # STEP 4（固定靶讀法）：把分群撐大幾個分析體素</span><span class="hl">    cover_thr: float = 0.30         # STEP 4（固定靶讀法）：覆蓋率門檻</span><span class="hl">    rng_seed: int = 0               # 打亂順序用的亂數種子</span>
 <span class="hl">    # 切割高度：論文沒給。掃 4 到 25，平台取 14–20。</span><span class="hl">    cut_lo: float = 4.0</span><span class="hl">    cut_hi: float = 26.0</span><span class="hl">    cut_step: float = 1.0</span><span class="hl">    plateau: tuple = (14.0, 20.0)</span>
 
     <span class="cm"># ── 資料格式常數（跟著 D03／D06 走，不要改）──</span>
@@ -221,7 +221,7 @@ class Config:
   </div>
 
   <div class="callout">
-    <b>藍底標起來的那兩段，就是 <a href="agent-run.html">PART 4 結論五</a>那張表——十三行程式碼、十項決定。</b>論文沒有給這些數字，是我們自己決定的。它們跟上面那組（論文給的）長得一模一樣、寫在同一個地方、用起來也沒有差別——<b>而這正是最容易出事的地方</b>。把它們分成兩組並註明來源，是為了讓讀的人一眼看出「哪幾個數字是有出處的，哪幾個是我們選的」。
+    <b>藍底標起來的那兩段，是論文沒給、由我們自己決定的參數：十七行程式碼、十四項決定。</b>它跟 <a href="agent-run.html">PART 4〈結論五〉</a>那張表講的是同一件事——<b>哪些數字是我們自己選的</b>——只是那張表按「這一遍做了哪些決定」列（十項），這裡按程式裡的欄位列（十四項），兩邊不是逐項對應：<code>term_min</code>、<code>tract_min_neurons</code>、<code>cover_grow</code>、<code>cover_thr</code> 是後來補做 STEP 7 與固定靶讀法時才加上的。論文沒有給這些數字，是我們自己決定的。它們跟上面那組（論文給的）長得一模一樣、寫在同一個地方、用起來也沒有差別——<b>而這正是最容易出事的地方</b>。把它們分成兩組並註明來源，是為了讓讀的人一眼看出「哪幾個數字是有出處的，哪幾個是我們選的」。
   </div>
 
   <h3>它每一次跑都會把這組數字印出來</h3>
@@ -238,6 +238,10 @@ class Config:
   depth_cut          = 10       指令 10 深度小於此值視為初級神經突
   min_ln_to_cluster  = 10       指令 14 少於幾顆 LN 就不分群
   min_vox_touch      = 5        指令 12 碰到幾個體素才算碰到
+  term_min           = 5        指令 12 幾個終端才算連到一個腦區
+  tract_min_neurons  = 3        指令 12 一條神經束至少幾顆
+  cover_grow         = 1        指令 9  固定靶讀法：分群撐大幾格
+  cover_thr          = 0.3      指令 9  固定靶讀法：覆蓋率門檻
   rng_seed           = 0        亂數種子</code></pre>
 
   <div class="plain">
@@ -313,7 +317,7 @@ def contact(self) -&gt; np.ndarray:
     <tr><td>STEP 1　密度場 v(r) 與 3×3×3 平滑</td><td>4</td><td><code>density_field</code></td><td><code>lpu_lib.py</code></td></tr>
     <tr><td>STEP 2　取上四分位當熱點</td><td>5</td><td><code>five_number</code>／<code>hotspots</code></td><td><code>lpu_lib.py</code></td></tr>
     <tr><td>STEP 3　UPGMA 分群與 1% 過濾</td><td>6、7</td><td><code>cluster_hotspots</code>／<code>cut_sweep</code></td><td><code>lpu_lib.py</code></td></tr>
-    <tr><td>STEP 4　挑種子、滾雪球招募</td><td>8、9</td><td><code>pick_seed</code>／<code>recruit</code>／<code>recruit_regime</code></td><td><code>lpu_lib.py</code></td></tr>
+    <tr><td>STEP 4　挑種子、招募<br><span style="color:var(--faint);font-weight:400">（論文的兩種讀法各一支）</span></td><td>8、9</td><td><code>pick_seed</code>／<code>recruit</code>（滾雪球）／<code>recruit_regime</code>／<code>recruit_coverage</code>（固定靶）</td><td><code>lpu_lib.py</code></td></tr>
     <tr><td>STEP 5　去初級神經突、抽等值面</td><td>10</td><td><code>depth_profile</code></td><td><code>lpu_lib.py</code></td></tr>
     <tr><td>STEP 6　算 c 值</td><td>11</td><td><code>c_value</code></td><td><code>lpu_lib.py</code></td></tr>
     <tr><td>STEP 7　長程神經束驗證</td><td>12</td><td><code>read_swc</code>／<code>tree_path</code>／<code>scan_paths</code>／<code>bundle_tracts</code>／<code>tracts_in_body</code></td><td><code>lpu_lib.py</code></td></tr>
@@ -457,8 +461,11 @@ ORDER = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "12", "14"]</code></
     <b>那個旗標的作用不是技術上的，是紀錄上的。</b>它讓「我知道這一步沒有根據，但我還是要往下跑」<b>變成一件必須打出來的事</b>，而且會留在指令紀錄裡。<b>沒有旗標的話，這個決定會消失得無影無蹤。</b>
   </div>
 
+  <p><b>那另一種讀法呢？也在同一個函式庫裡。</b><code>recruit_coverage()</code> 實作的是圖 S5D(e) 的固定靶讀法，指令 12、13 用的就是它——AVLP_R 那兩個候選族群（11 顆與 138 顆）都是它招募出來的。<b>論文對同一步的兩種寫法，程式裡是兩支函式；跑不動的那一支會停下來，跑得動的那一支繼續往下。</b></p>
+
   <p>在自動化的腳本裡也一樣要看得見。<code>run_lpu.sh</code> 帶著這個旗標，而理由就寫在旗標旁邊，不是寫在另一份文件裡：</p>
 
+  
   <pre><code><span class="cm"># --force-recruit 的意思：</span>
 <span class="cm">#   指令 9 實作的是補充材料的滾雪球讀法，而它在這份資料上沒有可用的</span>
 <span class="cm">#   操作區間——20 種參數組合，結果不是「只有種子 1 顆」就是「整池 723 顆」。</span>
