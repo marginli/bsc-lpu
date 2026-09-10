@@ -63,7 +63,14 @@ def ln_of(region, *_):
 
 
 def field_of(region, lab, name2id, rows, vox, nid, n2l):
-    """回傳 (遮罩, 平滑後的 v(r), LN 候選數)。"""
+    """回傳 (遮罩, 平滑後的 v(r), LN 候選數)。
+
+    v(r) 的定義是「有幾顆不同的 LN 佔到這一格」——同一顆神經元在同一個分析
+    體素裡不論留下幾筆 2 µm 紀錄都只算一次（那個 np.unique 就是在做這件事）。
+    對應圖 S5D 圖說的 the number of repetitive registrations of every single
+    voxel；從二值化的體素影像也只做得到這一種。`part5/lpu_lib.py` 的
+    density_field() 算的是同一個量，所以本頁與 PART 4、PART 5 的數字可以直接對。
+    """
     sh = tuple(s // B + 1 for s in lab.shape)
     mask = np.zeros(sh, bool)
     zz, yy, xx = np.nonzero(lab == name2id[region])
@@ -71,9 +78,10 @@ def field_of(region, lab, name2id, rows, vox, nid, n2l):
     S = ln_of(region, rows, n2l)
     f = np.zeros(sh, np.float32)
     if S:
-        sel = np.isin(nid, S); v = vox[sel]
+        sel = np.isin(nid, S); v = vox[sel]; n = nid[sel]
         iz = (v // (GX * GY)) * 2 // B; iy = ((v // GX) % GY) * 2 // B; ix = (v % GX) * 2 // B
-        np.add.at(f, (iz, iy, ix), 1.0)
+        key = np.unique(np.stack([iz, iy, ix, n]).astype(np.int64), axis=1)
+        np.add.at(f, (key[0], key[1], key[2]), 1.0)
     return mask, ndimage.uniform_filter(f, size=3), len(S)
 
 
