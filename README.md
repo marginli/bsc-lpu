@@ -10,7 +10,7 @@ doi:10.1016/j.cub.2010.11.056。
 
 | 頁面 | 內容 |
 |---|---|
-| `index.html` | 首頁，五個按鈕 |
+| `index.html` | 首頁：**6 分鐘的說明影片** ＋ 五個按鈕 |
 | `what-is-lpu.html` | PART 1　什麼是 LPU——定義、與 neuropil／hub 的差別、全腦 41 個 LPU |
 | `how-to-draw-lpu.html` | PART 2　如何畫出 LPU——論文的七步驟流程，以及照著跑會發現的**十件必須自己決定的事** |
 | `agent-prompts.html` | PART 3　要怎麼交代 AI Agent——把流程寫成 14 條指令，重點在那十個空缺各寫在哪一句 |
@@ -18,6 +18,8 @@ doi:10.1016/j.cub.2010.11.056。
 | `python-lpu.html` | PART 5　讀懂 AI 寫出來的程式——十六支整合成三個檔案，用五個問題讀完 |
 
 `assets/lpu.css` 為六頁共用樣式，沿用 BSC 線上課程的視覺慣例。
+
+首頁的說明影片 `assets/lpu-overview.mp4`（6 分 3 秒、1080p、6.4 MB）與字幕 `assets/lpu-overview.vtt` 由 `scripts/make_video.py` 產生：投影片以 headless Chrome 截圖、旁白用 `edge-tts` 合成、再用 `ffmpeg`（`libopenh264`）合成。改內容就重跑那支程式。
 
 ## 目錄
 
