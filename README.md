@@ -23,6 +23,7 @@ doi:10.1016/j.cub.2010.11.056。
 
 | 目錄 | 內容 |
 |---|---|
+| `downloads/` | 學員下載用的程式包 `lpu-part5-code.zip`（44 KB）。**資料包不在這裡**——38 MB 的 `lpu-part5-data.zip` 放在 GitHub Release `data-v1`，不進版本控制的歷史 |
 | `scripts/` | PART 1、2 的產圖程式，以及兩支可沿用的稽核程式（`quote_audit.py` 引文對回論文全文、`svg_audit.py` 檢查 SVG 有沒有超出 viewBox） |
 | `part4/` | PART 4 實跑用的十六支程式與其產出（`scripts/`、`out/`） |
 | `part5/` | 整合後的三個檔案＋驗收表（`run_lpu.sh`／`run_lpu.py`／`lpu_lib.py`／`expected.json`），另見 `part5/README.md` |
@@ -52,6 +53,24 @@ D06 柵格化之後只剩體素集合，所以一度是降級版；原始的 Fly
 
 **還沒解掉的**：STEP 7 的綁束方式論文沒交代（相容關係不遞移時怎麼辦），
 換一種綁法束數會差一個數量級。
+
+## 學員要下載的東西
+
+PART 5 的〈下載：把這兩包拿走〉一節（`python-lpu.html#download`）給兩個連結：
+
+| 包 | 大小 | 放在哪 | 內容 |
+|---|---|---|---|
+| `lpu-part5-code.zip` | 44 KB | `downloads/`，由 Pages 提供 | `run_lpu.sh`／`run_lpu.py`／`lpu_lib.py`／`expected.json`／`README.md` ＋ `SHA256SUMS.txt` |
+| `lpu-part5-data.zip` | 38 MB | GitHub Release **`data-v1`** | 八個資料檔壓成 `.npz`（D03 的分區標籤、D06 的骨架體素）＋ `out/c12_paths.csv` ＋ `來源與出處.md` ＋ `SHA256SUMS.txt` |
+
+**資料包用 Release 不用 repo**：38 MB 進了 git 歷史就拿不掉，而資料是會換版的。
+換版時重打一包、`gh release create data-v2`，再改頁面上那一個連結即可。
+
+兩包合起來在一台空目錄的機器上實跑過：**170 秒、56 項驗收全過，
+16 份 JSON 與 7 張圖與 `part5/out/` 逐位元組相同**。
+
+重打資料包：`python3 part5/run_lpu.py pack --pack-to <某個目錄>`，
+再把 `part5/out/c12_paths.csv` 放進 `<某個目錄>/out/`，連同 `來源與出處.md` 一起壓。
 
 `robots.txt` 擋搜尋引擎收錄。
 

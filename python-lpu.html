@@ -481,7 +481,7 @@ ORDER = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "12", "14"]</code></
 
   <h2 id="s9"><span class="pt">7</span>帶到另一台機器</h2>
 
-  <p>整合成三個檔案的實際理由：可以搬。但<b>搬家的重量不在程式</b>——程式四個檔案加起來 106 KB，資料 277 MB。</p>
+  <p>整合成三個檔案的實際理由：可以搬。但<b>搬家的重量不在程式</b>——程式四個檔案加起來 106 KB，資料 277 MB。兩包都可以直接下載，連結在本節的<a href="#download">〈下載：把這兩包拿走〉</a>。</p>
 
   <h3>第一件事：先問機器夠不夠</h3>
 
@@ -552,6 +552,48 @@ ORDER = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "12", "14"]</code></
   <div class="note">
     <b>可攜性是驗過的，不是宣稱的。</b>把四個檔案（106 KB）複製到一個空目錄，只給它打包後的 39 MB<b>再加一份 3.1 MB 的路徑快取</b>，重跑一遍：<b>16 份 JSON 與 7 張圖全部與原本逐位元組相同</b>，56 項驗收全部通過。
     <p style="margin-top:8px"><b>那份 3.1 MB 是 STEP 7 的中間產物。</b>神經束要從 FlyCircuit 的 SWC 原始檔算（28,573 個檔、<b>842 MB</b>），但掃完的結果會存成 <code>out/c12_paths.csv</code>——17,690 條跨兩區的路徑。<b>下次跑到指令 12 時那個檔在，就不必再讀 SWC。</b>所以搬家要搬的還是 39 MB ＋ 3 MB，不是 39 MB ＋ 842 MB。</p>
+  </div>
+
+  <h3 id="download">下載：把這兩包拿走</h3>
+
+  <p>上面講的東西都可以直接下載。<b>分成兩包，因為它們的性質不一樣</b>——程式 44 KB，跟著課程網站走；資料 38 MB，放在 GitHub 的發布頁，不進版本控制的歷史。</p>
+
+  <p>資料包的 38 MB 是<b>八個資料檔（上面那張表的 38.6 MB）＋ 那份 3.1 MB 的路徑檔</b>，再一起壓成 zip；加了東西反而小一點，是因為 <code>neurons.csv</code> 與路徑檔都是純文字，zip 還能再壓掉約六成。</p>
+
+  <div class="btns">
+    <a class="btn c3" href="downloads/lpu-part5-code.zip">
+      <span class="no">程式包 · 44 KB</span>
+      <span class="t">lpu-part5-code.zip</span>
+      <p class="s">三個檔案 ＋ 驗收表 ＋ 說明：<code>run_lpu.sh</code>、<code>run_lpu.py</code>、<code>lpu_lib.py</code>、<code>expected.json</code>、<code>README.md</code>。</p>
+      <p class="m">解開後是 <code>lpu-part5/</code> · 內附 SHA256SUMS.txt</p>
+    </a>
+    <a class="btn c2" href="https://github.com/marginli/bsc-lpu/releases/download/data-v1/lpu-part5-data.zip">
+      <span class="no">資料包 · 38 MB</span>
+      <span class="t">lpu-part5-data.zip</span>
+      <p class="s">八個資料檔（D03 的分區標籤、D06 的骨架體素）壓成 <code>.npz</code>，外加 STEP 7 的路徑檔 <code>out/c12_paths.csv</code>。</p>
+      <p class="m">解開後是 <code>lpu-part5-data/</code> · 內含上面那八個檔 ＋ 那份路徑檔</p>
+    </a>
+  </div>
+
+  <p><b>兩包都解開，把資料包裡的 <code>out/</code> 複製到程式旁邊，然後跑：</b></p>
+
+  <pre><code>$ unzip lpu-part5-code.zip &amp;&amp; unzip lpu-part5-data.zip
+$ cp -r lpu-part5-data/out lpu-part5/
+$ cd lpu-part5 &amp;&amp; ./run_lpu.sh ../lpu-part5-data/D03 ../lpu-part5-data/D06</code></pre>
+
+  <div class="plain">
+    <b>白話：第二行是在省 842 MB。</b><code>out/c12_paths.csv</code> 是 STEP 7 掃 SWC 掃出來的結果。把它先放進 <code>out/</code>，指令 12 就會直接沿用，不必去讀那 28,573 個原始檔——那才是搬不動的部分。少了這一行程式也跑得完，只是跑到指令 12 會找不到 SWC 而停在那裡。
+  </div>
+
+  <p>這兩包<b>就是上面那張驗收表跑出 56 項全過的那份東西</b>，不是另外整理的版本。在一台空目錄的機器上照上面三行跑完：<b>170 秒、56 項全過，16 份 JSON 與 7 張圖與 <code>part5/out/</code> 裡的成品逐位元組相同</b>。</p>
+
+  <div class="note">
+    <b>資料的出處要跟著走。</b>資料包裡有一份 <code>來源與出處.md</code>，逐檔寫明來自哪裡：
+    <ul>
+      <li><b>D03</b>（分區標籤）——FCWB 模板出自 Zenodo record 10568（Ostrovsky &amp; Jefferis, 2014，<b>CC0</b>）；分區 surface 來自 <code>nat.flybrains</code>（natverse，<b>GPL-3</b>），分區的定義出自 Ito et al. (2014) <i>Neuron</i> 81(4):755–765。</li>
+      <li><b>D06</b>（骨架體素）與那份路徑檔——由 FlyCircuit 的 28,573 個 SWC 算出來的，出自這堂課讀的<b>同一篇論文</b>（Chiang et al., 2011）。學術與教學用途；用到它請引用該論文並註明 FlyCircuit。</li>
+    </ul>
+    兩包內各有一份 <code>SHA256SUMS.txt</code>，用 <code>sha256sum -c SHA256SUMS.txt</code> 核對。
   </div>
 
   <div class="statgrid">
