@@ -774,18 +774,24 @@
     <p style="margin-top:8px" class="figsrc">以上都在我們的資料上量的（D06 骨架體素），程式在 <code>scripts/dilation_check.py</code>。論文用的是原始共軛焦影像，體素更細、絕對數字會不同。</p>
     <p><b>四、「所有體素」已經回答了撐大誰——但沒回答 50% 的分母是哪一個。</b>論文的原句是 <i>With <b>all</b> voxel units enlarged 4 folds, a target neuron is recruited if over 50% of <b>its</b> volume overlaps with the source.</i>「所有」表示 <b>source 與 target 兩邊都撐大</b>。<b>沒有交代的是後半句那個 <i>its volume</i></b>：50% 的分母，是 target <b>撐大前</b>的體積，還是<b>撐大後</b>的？這個差別大到會讓其中一種讀法直接不成立：</p>
     <div class="tblwrap"><table>
-      <tr><th>撐大誰</th><th>重疊率中位數</th><th>超過 50% 的配對</th></tr>
-      <tr><td>只撐大 source</td><td>0.238</td><td>5.9%</td></tr>
-      <tr><td>只撐大 target</td><td>0.227</td><td><b>19.8%</b></td></tr>
-      <tr><td>兩邊都撐大，分母用 target 原本的體積</td><td><b style="color:var(--red)">3.26</b>　<span style="color:var(--red)">← 超過 1</span></td><td>93.6%</td></tr>
-      <tr><td>兩邊都撐大，分母用 target 撐大後的體積</td><td>0.232</td><td>4.0%</td></tr>
+      <tr><th style="width:10%">讀法</th><th style="width:20%">撐大誰</th><th style="width:22%">50% 的分母</th><th>重疊率中位數</th><th>超過 50% 的配對</th></tr>
+      <tr style="background:rgba(34,197,94,.07)"><td><b>①</b></td><td><b>只撐大 source</b></td><td><b>target 撐大前的體積</b><br><span style="color:var(--faint);font-size:13px">（target 根本沒撐大）</span></td><td>0.238</td><td><b>5.9%</b>　<b style="color:#15803d">← 本專題採用</b></td></tr>
+      <tr><td>②</td><td>只撐大 target</td><td>target 撐大後的體積</td><td>0.227</td><td><b>19.8%</b></td></tr>
+      <tr><td>③</td><td>兩邊都撐大</td><td>target <b>撐大前</b>的體積</td><td><b style="color:var(--red)">3.26</b>　<span style="color:var(--red)">← 超過 1</span></td><td>93.6%</td></tr>
+      <tr style="background:var(--accent-soft)"><td><b>④</b></td><td>兩邊都撐大</td><td>target <b>撐大後</b>的體積</td><td>0.232</td><td><b>4.0%</b>　<b style="color:var(--accent)">← 論文的字面讀法</b></td></tr>
     </table></div>
     <div class="plain">
-      <b>第三列的 3.26 就是那個讀法不成立的證據。</b>「重疊率」是一個比例，最大只能是 <b>1</b>（＝B 的體素<b>全部</b>都落在 A 裡面）。而這一列算出 3.26，等於說「B 有 326% 的體素落在 A 裡」——不可能。
-      <p style="margin-top:6px"><b>為什麼會跑出這種數字：分子分母不是同一個東西。</b>分子數的是「<b>撐大後</b>的 A 與<b>撐大後</b>的 B 共同佔到的格子」，分母卻用「<b>撐大前</b>的 B 有幾格」。B 撐大兩格之後體積變成原本的 16.9 倍，所以共同的部分輕易就比原本的 B 大好幾倍。<b>要嘛分子分母都用撐大後的（那就是第四列，0.232），要嘛都用撐大前的（那就是不膨脹，0.015）——不能一邊撐大一邊不撐。</b></p>
+      <b>第 ③ 列的 3.26 就是那個讀法不成立的證據。</b>「重疊率」是一個比例，最大只能是 <b>1</b>（＝B 的體素<b>全部</b>都落在 A 裡面）。而這一列算出 3.26，等於說「B 有 326% 的體素落在 A 裡」——不可能。
+      <p style="margin-top:6px"><b>為什麼會跑出這種數字：分子分母不是同一個東西。</b>分子數的是「<b>撐大後</b>的 A 與<b>撐大後</b>的 B 共同佔到的格子」，分母卻用「<b>撐大前</b>的 B 有幾格」。B 撐大兩格之後體積變成原本的 16.9 倍，所以共同的部分輕易就比原本的 B 大好幾倍。<b>要嘛分子分母都用撐大後的（那就是第 ④ 列，0.232），要嘛都用撐大前的（那就是不膨脹，0.015）——不能一邊撐大一邊不撐。</b></p>
     </div>
 
-    <p style="margin-top:8px"><b>照字面讀，成立的只有第四列</b>：兩邊都撐大、分母也用撐大後的體積——重疊率中位 0.232、4.0% 的配對過門檻。前兩列（只撐大其中一邊）不是論文的字面讀法，但算得出來，而且答案差很多：<b>「只撐大 target」的通過率是「只撐大 source」的三倍多。</b>（本頁上面那張<b>膨脹敏感度表</b>、以及 <a href="agent-run.html">PART 4</a> 的實跑，用的都是「只撐大 source、分母用 target 撐大前的體積」。<b>那是我們的簡化，不是論文的字面讀法</b>——選它是因為滾雪球時 source 一直在長大，只撐大 source 才不必每一輪重算每一顆 target。）</p>
+    <p style="margin-top:8px"><b>照字面讀，成立的是第 ④ 列</b>：兩邊都撐大、分母也用撐大後的體積。<b>第 ③ 列不成立</b>（比例大於 1），第 ② 列不是論文的讀法。</p>
+
+    <div class="fixed">
+      <b>本專題採用的是第 ① 列，不是字面的第 ④ 列。</b>本頁上面那張膨脹敏感度表、<a href="agent-prompts.html">PART 3</a> 的指令 9、<a href="agent-run.html">PART 4</a> 的實跑、<a href="python-lpu.html">PART 5</a> 的 <code>recruit()</code>，用的都是第 ① 列。
+      <p style="margin-top:8px"><b>為什麼不用第 ④ 列：</b>滾雪球時 source 每一輪都在長大，若 target 也要撐大，<b>每一輪都得把每一顆候選神經元重新撐大一次</b>；只撐大 source 則每輪只撐一次。</p>
+      <p style="margin-top:8px"><b>代價量過了：</b>第 ① 列與第 ④ 列的通過率是 <b>5.9% 對 4.0%</b>，中位數 0.238 對 0.232——<b>兩者很接近</b>。真正會翻盤的是第 ③ 列（93.6%），而那個讀法本身不成立。<b>換句話說，這個簡化沒有把門檻放鬆到改變結論的程度</b>，但它仍然是我們的選擇，不是論文的規定。</p>
+    </div>
 
     <p><b>五、「4 倍」是每個方向 4 倍，還是體積 4 倍？</b>兩種讀法差 16 倍。而在體素格點上還有第三個問題：<b>撐大是一格一格來的，跨不出小數</b>。</p>
     <div class="tblwrap"><table>
