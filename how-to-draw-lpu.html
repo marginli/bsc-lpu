@@ -654,8 +654,24 @@
   <div class="plain"><b>白話。</b>這是一個「跟我夠像的就算我這一群」的滾雪球。雪球越滾越大，能吸附的對象也越來越多，直到沒有東西可以再吸為止。</div>
 
   <div class="callout">
-    <b>這一步論文寫了兩次，寫在兩個地方，兩次不一樣。</b>先給一個名字：招募的時候，每一顆 LN 都要跟某個東西比對「我有多少體積落在它裡面」，<b>那個被比對的對象，本專題一律叫「靶」（論文的原字是 <i>target</i>；被撐大的那一邊論文叫 <i>source</i>，本專題叫「種子」）</b>。上面那句「收進來的併成新的種子，再去招募下一顆」是<b>補充材料</b>的寫法，它的<b>靶會愈滾愈大</b>。但<b><a href="#figS5D">圖 S5D(e)</a> 的圖說</b>寫的是另一回事：<i>Visualization of two populations of candidate LNs recruited <b>based on the coverage of the two clusters</b>, respectively</i>——兩批候選 LN 是依<b>兩個群各自的覆蓋範圍</b>招募出來的，也就是說<b>靶就是 STEP 3 分出來的群，固定不動</b>。
-    <p style="margin-top:8px">選哪一種不是文字之爭，它決定這一步跑不跑得動：<b>滾雪球那一種在三個腦區、388 組參數下（右觸角葉 20 組，前腦橋與 AVLP_R 的四個群各 92 組），結果不是「只有種子」就是「幾乎整池全收」，沒有一組落在中間</b>；固定靶那一種則隨門檻連續變化。<a href="agent-run.html#two-readings">PART 4〈發現一〉</a>把兩種讀法都跑了一遍。</p>
+    <b>先把「誰跟誰比」講清楚，這一步才讀得下去。</b>招募的判準是一句話：<b>某一顆候選 LN，有超過 50% 的體積落在某一團裡面，就把它收進來。</b>所以場上永遠是兩個角色：
+    <ul>
+      <li><b>被檢查的那一顆 LN</b>——論文叫它 <i>target</i>（<i>a <b>target</b> neuron is recruited if over 50% of <b>its</b> volume overlaps with the source</i>）。<b>50% 的分母就是它的體積。</b></li>
+      <li><b>被拿來比對的那一團</b>——論文叫它 <i>source</i>。<b>本專題把這一團叫「靶」</b>，因為它才是「落在誰裡面」的那個「誰」。（<b>注意：本專題的「靶」＝論文的 <i>source</i>，不是論文的 <i>target</i></b>。論文的 target 是上面那顆被檢查的 LN。）</li>
+    </ul>
+    <p style="margin-top:8px"><b>被撐大的只有那一團（source）</b>，被檢查的那顆 LN 不撐大——這是我們的實作選擇，理由與論文原文（<i>all voxel units enlarged</i>，兩邊都撐大）的差別，見下面〈<a href="#dilate">六個要注意的地方</a>〉的第二、三點。</p>
+  </div>
+
+  <div class="callout">
+    <b>這一步論文寫了兩次，寫在兩個地方，兩次不一樣——差別就在那一團會不會變。</b>
+    <div class="tblwrap"><table>
+      <tr><th style="width:22%"></th><th style="width:39%">補充材料的寫法（滾雪球）</th><th>圖 <a href="#figS5D">S5D(e)</a> 圖說的寫法（固定靶）</th></tr>
+      <tr><td><b>那一團是什麼</b></td><td>起始的那顆種子，<b>加上已經收進來的每一顆 LN</b></td><td><b><a href="#s3">STEP 3</a> 分出來的那一群熱點體素</b></td></tr>
+      <tr><td><b>它會不會變</b></td><td><b>會。</b>每收一顆就把它併進來，下一輪再撐大一次——<b>愈滾愈大</b><br><span style="color:var(--soft)">原文：<i>Once recruited, two partners are combined as a <b>new source</b> for recruiting next target</i></span></td><td><b>不會，從頭到尾就是那一群。</b>每顆 LN 各量一次「我有多少比例落在這一群裡」，超過門檻就收<br><span style="color:var(--soft)">原文：<i>candidate LNs recruited <b>based on the coverage of the two clusters</b></i></span></td></tr>
+      <tr><td><b>有沒有回饋</b></td><td><b>有。</b>先收到誰，會改變接下來收得到誰</td><td><b>沒有。</b>每顆各算各的，互不影響</td></tr>
+    </table></div>
+    <p style="margin-top:8px"><b>「種子」與「靶」在滾雪球這一種讀法裡會合流</b>：一開始那一團就只有種子，收了第一顆之後，那一團＝種子＋第一顆，再往下就愈滾愈大。<b>固定靶那一種沒有種子這個角色</b>——不必挑起點，因為那一群本來就在。</p>
+    <p style="margin-top:8px">選哪一種不是文字之爭，<b>它決定這一步跑不跑得動</b>：滾雪球那一種在三個腦區、388 組參數下（右觸角葉 20 組，前腦橋與 AVLP_R 的四個群各 92 組），結果不是「只有種子」就是「幾乎整池全收」，<b>沒有一組落在中間</b>——因為每收一顆就把靶放大一次，只有「收不到」與「全收」兩個終點；固定靶那一種則<b>隨門檻連續變化</b>。<a href="agent-run.html#two-readings">PART 4〈發現一〉</a>把兩種讀法都跑了一遍。</p>
   </div>
 
   <figure class="fig">
@@ -705,7 +721,7 @@
   </figure>
 
   <div class="gap">
-    <h4>六個要注意的地方</h4>
+    <h4 id="dilate">六個要注意的地方</h4>
     <p><b>一、「放大」不能照字面理解成「把整個座標放大」。</b>如果是整體等比放大，<b>這一步不會有任何作用</b>——判準是「重疊超過體積的 50%」，是一個<b>比例</b>；把所有東西一起放大 4 倍，分子分母同時變大，比例一模一樣。<br>唯一說得通的讀法是<b>把神經元佔用的那些體素各自向外撐大</b>（影像處理裡叫<b>形態學膨脹</b>）。<br>
     <b>換句話說，被撐大的是神經元的形狀，不是格子。</b>格點位置、格子大小都沒有動；動的是「這顆神經元佔了哪些格」——原本只佔一條細線，撐大之後佔了一條粗一點的管。原文寫 <i>all voxel units enlarged</i>，字面是「所有體素單位」——但<b>有作用的只有被神經元佔用的那些</b>。</p>
     <p><b>二、先講清楚這裡的「重疊」是什麼。</b>比的是<b>兩顆神經元</b>，但度量單位是體素：</p>
