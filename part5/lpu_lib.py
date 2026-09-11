@@ -650,8 +650,9 @@ def bundle_tracts(paths: list, cfg: Config) -> np.ndarray:
     """把路徑綁成神經束。回傳每條路徑的束編號。
 
     論文只說 similar 的路徑 were bundled into a single tract，**沒說相容關係
-    不遞移的時候怎麼辦**。純連通分量在 30 µm 附近會滲流（最大一束吞掉六成以上
-    的路徑），所以這裡用**同一組腦區＋完全連結**：一束之內兩兩都要相容。
+    不遞移的時候怎麼辦**。純連通分量在 30 µm 就已經把 2,057 條路徑串成一束，
+    而且離滲流只差幾微米（35 µm 時最大一束 9,761 條、40 µm 時 12,891 條），
+    所以這裡用**同一組腦區＋完全連結**：一束之內兩兩都要相容（最大一束 85 條）。
     這是我們的選擇，不是論文的規定。
     """
     from scipy.spatial.distance import pdist, squareform
