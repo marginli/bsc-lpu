@@ -70,12 +70,12 @@
       <path class="ln" d="M330 76 L330 100"/>
       <rect class="bx" x="120" y="102" width="420" height="42"/>
       <text class="n" x="136" y="122">1</text><text class="t" x="156" y="122">數每個體素被幾條 LN 纖維穿過，得到 v(r)</text>
-      <text class="s" x="156" y="138">再取 3×3×3 共 27 個體素的平均</text>
+      <text class="s" x="156" y="138">在單一個 neuropil 內數，再取 3×3×3 共 27 個體素的平均</text>
 
       <path class="ln" d="M330 144 L330 168"/>
       <rect class="bx" x="120" y="170" width="420" height="42"/>
       <text class="n" x="136" y="190">2</text><text class="t" x="156" y="190">取上四分位 Q<tspan font-size="10" dy="3">U</tspan><tspan dy="-3">，留下最密的 25%</tspan></text>
-      <text class="s" x="156" y="206">這些體素構成熱點集合 Z</text>
+      <text class="s" x="156" y="206">同樣只在這個 neuropil 內取，這些體素構成熱點集合 Z</text>
 
       <path class="ln" d="M330 212 L330 236"/>
       <rect class="bx" x="120" y="238" width="420" height="42"/>
@@ -134,7 +134,7 @@
 
       <text class="lab" x="10" y="770">灰底＝論文列出的七個步驟　·　藍框＝判定結果　·　黃色虛線＝論文做了、但沒有寫成步驟的事</text>
       <text class="lab" x="10" y="792">流程改繪自 Chiang et al. (2011) 正文第 5 頁的七步驟條列與補充材料〈Defining an LPU〉，非原圖重製。</text>
-    </svg>    <figcaption><b>七個步驟，加上兩件不在步驟裡的事。</b>左邊黃色虛線框的「合併」是論文實際做了、但沒有寫成判準的操作——照著七個步驟跑，永遠跑不出蕈狀體與中央複合體那兩個 LPU。上方的 STEP 0 也一樣：它是七個步驟的前提，論文沒有把它算成一步。
+    </svg>    <figcaption><b>整條流程一次只處理一個 neuropil。</b>v(r)、四分位、分群全都在<b>同一個 neuropil 內部</b>做，全腦就是把這條流程對每一個 neuropil 各跑一次（我們的資料是 75 個）。<p style="margin-top:8px"><b>七個步驟，加上兩件不在步驟裡的事。</b>左邊黃色虛線框的「合併」是論文實際做了、但沒有寫成判準的操作——照著七個步驟跑，永遠跑不出蕈狀體與中央複合體那兩個 LPU。上方的 STEP 0 也一樣：它是七個步驟的前提，論文沒有把它算成一步。</p>
     <span class="figsrc">本圖依 Chiang et al. (2011) 正文的七步驟條列與補充材料〈Defining an LPU〉自行繪製，非原圖重製。</span></figcaption>
   </figure>
 
@@ -363,7 +363,7 @@
 
   <h2 id="s2"><span class="pt">STEP 2</span>取上四分位，留下熱點</h2>
 
-  <p>對某個 neuropil 內所有的 <code>v(r)</code> 做<b>五數綜合</b>（five-number summary：最小值、<b>下四分位</b>、中位數、<b>上四分位</b>、最大值）。取上四分位 <code>Q<sub>U</sub></code>，定義熱點集合：</p>
+  <p><b>這一步是對單一個 neuropil 做的</b>：把<b>那個 neuropil 內</b>所有的 <code>v(r)</code> 拿來做<b>五數綜合</b>（five-number summary：最小值、<b>下四分位</b>、中位數、<b>上四分位</b>、最大值）。取上四分位 <code>Q<sub>U</sub></code>，定義熱點集合：</p>
 
   <div class="formula">
     Z ＝ { r : v(r) ≥ Q<sub>U</sub> }
