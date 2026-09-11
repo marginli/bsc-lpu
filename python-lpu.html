@@ -226,6 +226,22 @@ class Config:
     <b>藍底標起來的那兩段，是論文沒給、由我們自己決定的參數：十七行程式碼、十四項決定。</b>它跟 <a href="agent-run.html">PART 4〈結論五〉</a>那張表講的是同一件事——<b>哪些數字是我們自己選的</b>——只是那張表按「這一遍做了哪些決定」列（十項），這裡按程式裡的欄位列（十四項），兩邊不是逐項對應：<code>term_min</code>、<code>tract_min_neurons</code>、<code>cover_grow</code>、<code>cover_thr</code> 是後來補做 STEP 7 與固定靶讀法時才加上的。論文沒有給這些數字，是我們自己決定的。它們跟上面那組（論文給的）長得一模一樣、寫在同一個地方、用起來也沒有差別——<b>而這正是最容易出事的地方</b>。把它們分成兩組並註明來源，是為了讓讀的人一眼看出「哪幾個數字是有出處的，哪幾個是我們選的」。
   </div>
 
+  <h3 id="vs-part3">跟 <a href="agent-prompts.html">PART 3</a> 的指令對得起來嗎</h3>
+
+  <p>這份程式是照 <a href="agent-prompts.html">PART 3</a> 那 14 條指令跑出來的，所以值得逐項對一次。<b>指令裡寫死的數值有十三個，其中十一個程式照做</b>——LN 判準 80%、4×4×4 併格、打亂九次、上四分位、深度小於 10 丟掉、神經束 30 個體素與 60% 相似度、一條束至少三顆、c &gt; 2、中心區 80%。</p>
+
+  <p><b>只有兩個不一樣，而且都是 <a href="agent-run.html">PART 4</a> 實跑之後改的：</b></p>
+
+  <div class="tblwrap"><table>
+    <tr><th style="width:22%">參數</th><th style="width:24%">PART 3 的指令說</th><th style="width:20%">程式實際用</th><th>為什麼改</th></tr>
+    <tr><td><code>grow</code><br>招募時撐大幾格</td><td><b>2 格</b></td><td><b>4 格</b></td><td>撐大 2 格時<b>一顆都招募不到</b>——重疊率過門檻的配對只有 5.9%。改成 4 格才啟動（53.4%），但啟動之後三輪吞下整池。<a href="agent-run.html#two-readings">PART 4〈發現一〉</a></td></tr>
+    <tr><td><code>plateau</code><br>切割高度</td><td><b>先用 8</b>（指令自己註明「這是我隨便挑的，指令 7 會處理」）</td><td><b>平台 14–20</b></td><td>指令 7 本來就要求掃 4–25 並找出穩定區間，<b>8 只是暫用值</b>；掃完之後改用帶寬為 0 的那一段</td></tr>
+  </table></div>
+
+  <div class="note">
+    <b>這兩個改動沒有被藏起來，是這份程式最該學的地方。</b><code>Config</code> 的註解就寫著「<code># 指令 9：招募時撐大幾格（2 格招不到任何一顆）</code>」與「<code># 切割高度：論文沒給。掃 4 到 25，平台取 14–20。</code>」——<b>把「為什麼是這個值」寫在值的旁邊，而不是寫在另一份文件裡</b>。
+  </div>
+
   <h3>它每一次跑都會把這組數字印出來</h3>
 
   <p><code>Config</code> 裡有一個叫 <code>describe()</code> 的函式，作用只有一個：把「自己決定的」那一組印在螢幕上。每次執行都印，不管你要不要看。</p>
@@ -315,6 +331,7 @@ def contact(self) -&gt; np.ndarray:
 
   <div class="tblwrap"><table>
     <tr><th style="width:30%">PART 2 的步驟</th><th style="width:8%">指令</th><th style="width:32%">函式</th><th>在哪個檔案</th></tr>
+    <tr style="color:var(--soft)"><td>（不對應任何 STEP）</td><td>1</td><td>盤點資料、確認座標框與單位——收在 <code>Brain</code> 載入時的檢查</td><td><code>lpu_lib.py</code></td></tr>
     <tr><td>STEP 0　誰是 LN（前置）</td><td>2、3</td><td><code>ln_selection</code>／<code>ln_by_region</code></td><td><code>lpu_lib.py</code></td></tr>
     <tr><td>STEP 1　密度場 v(r) 與 3×3×3 平滑</td><td>4</td><td><code>density_field</code></td><td><code>lpu_lib.py</code></td></tr>
     <tr><td>STEP 2　取上四分位當熱點</td><td>5</td><td><code>five_number</code>／<code>hotspots</code></td><td><code>lpu_lib.py</code></td></tr>

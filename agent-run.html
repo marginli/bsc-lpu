@@ -47,20 +47,20 @@
 
   <div class="tblwrap"><table>
     <tr><th style="width:6%">#</th><th style="width:26%">指令</th><th style="width:14%">結果</th><th>發生什麼</th></tr>
-    <tr><td>1</td><td>盤點資料、確認單位</td><td><b style="color:var(--amber)">抓到問題（已修正）</b></td><td>八項數字全對。但軸向檢查發現<b>兩個座標框的軸序不一樣</b>——指令 14 那張全腦圖已依此校正</td></tr>
-    <tr><td>2</td><td>定 LN 判準</td><td><b style="color:var(--green)">全對</b></td><td>9,688／6,922／4,545／1,761 四個門檻全部吻合，曲線單調</td></tr>
-    <tr><td>3</td><td>全腦 LN 普查</td><td><b style="color:var(--green)">全對</b></td><td>35／40 區、83.5% 體積、蕈狀體與結節全程 0、EB 會變——全部吻合</td></tr>
-    <tr><td>4</td><td>密度場 v(r)</td><td><b style="color:var(--amber)">抓到問題（已修正）</b></td><td><b>兩處對不上，錯的是當時 PART 2 與 PART 3 的數字</b>，不是這次的執行；<b>兩頁都已改用同一個定義重算</b></td></tr>
-    <tr><td>5</td><td>五數綜合、熱點</td><td><b style="color:var(--green)">照做</b></td><td>熱點 25.0%、3,130 個體素——與 PART 2 現在的數字相同</td></tr>
-    <tr><td>6</td><td>分群、1% 過濾</td><td><b style="color:var(--green)">照做</b></td><td>門檻 125.1 吻合。群數 5（346／455／520／798／1,011），與 PART 2 相同</td></tr>
-    <tr><td>7</td><td>切割高度掃描</td><td><b style="color:var(--green)">照做</b></td><td>高度 4 剪出 50 群但一群都沒過。<b>六個腦區的平台值與 PART 2 完全相同</b></td></tr>
-    <tr><td>8</td><td>挑種子</td><td><b style="color:var(--green)">照設計失敗</b></td><td>照字面 0 顆符合，替代規則生效——與指令設計的預期一致</td></tr>
+    <tr><td>1</td><td>盤點資料、確認座標框與單位</td><td><b style="color:var(--amber)">抓到問題（已修正）</b></td><td>八項數字全對。但軸向檢查發現<b>兩個座標框的軸序不一樣</b>——指令 14 那張全腦圖已依此校正</td></tr>
+    <tr><td>2</td><td>定出「誰算 LN」的規則</td><td><b style="color:var(--green)">全對</b></td><td>9,688／6,922／4,545／1,761 四個門檻全部吻合，曲線單調</td></tr>
+    <tr><td>3</td><td>全腦 LN 普查與敏感度掃描</td><td><b style="color:var(--green)">全對</b></td><td>35／40 區、83.5% 體積、蕈狀體與結節全程 0、EB 會變——全部吻合</td></tr>
+    <tr><td>4</td><td>建單一腦區的密度場 v(r)</td><td><b style="color:var(--amber)">抓到問題（已修正）</b></td><td><b>兩處對不上，錯的是當時 PART 2 與 PART 3 的數字</b>，不是這次的執行；<b>兩頁都已改用同一個定義重算</b></td></tr>
+    <tr><td>5</td><td>五數綜合、取上四分位、得熱點</td><td><b style="color:var(--green)">照做</b></td><td>熱點 25.0%、3,130 個體素——與 PART 2 現在的數字相同</td></tr>
+    <tr><td>6</td><td>距離矩陣、UPGMA、1% 過濾</td><td><b style="color:var(--green)">照做</b></td><td>門檻 125.1 吻合。群數 5（346／455／520／798／1,011），與 PART 2 相同</td></tr>
+    <tr><td>7</td><td>切割高度掃描與打亂順序重跑</td><td><b style="color:var(--green)">照做</b></td><td>高度 4 剪出 50 群但一群都沒過。<b>六個腦區的平台值與 PART 2 完全相同</b></td></tr>
+    <tr><td>8</td><td>挑起始種子</td><td><b style="color:var(--green)">照設計失敗</b></td><td>照字面 0 顆符合，替代規則生效——與指令設計的預期一致</td></tr>
     <tr><td><b>9</b></td><td><b>膨脹與滾雪球招募</b></td><td><b style="color:var(--amber)">補充材料的讀法失敗<br>圖說的讀法做得出來</b></td><td><b>三個腦區、388 組參數全部是「只有種子」或「幾乎整池」，沒有中間值</b>；<b>換成圖說的固定靶讀法就跑得動</b>，後面每一個候選族群（包括最後站得住的 AVLP_R 那 138 顆）都是這樣招募出來的</td></tr>
-    <tr><td>10</td><td>去本體、抽等值面</td><td><b style="color:var(--amber)">跑得動，門檻是論文的空缺</b></td><td>最鬆的門檻抽出的區域是腦區本身的 <b>283%</b>；門檻論文沒給，本專題取第 75 百分位（唯一小於腦區的一個）</td></tr>
+    <tr><td>10</td><td>去掉本體與初級神經突、抽等值面</td><td><b style="color:var(--amber)">跑得動，門檻是論文的空缺</b></td><td>最鬆的門檻抽出的區域是腦區本身的 <b>283%</b>；門檻論文沒給，本專題取第 75 百分位（唯一小於腦區的一個）</td></tr>
     <tr><td>11</td><td>算 c 值</td><td><b style="color:var(--amber)">單看沒有鑑別力<br>加隨機對照後有（已解決）</b></td><td>三個門檻算出 99.2／24.9／2.67，<b>都通過 c &gt; 2</b>——隨機抽同樣顆數也照樣通過；<b>改成跟隨機對照比，只有 AVLP_R 那 138 顆跳得出來</b></td></tr>
-    <tr><td>12</td><td>神經束驗證</td><td><b style="color:var(--green)">做出來了（回頭補的）</b></td><td>D06 沒有存路徑，但原始 SWC 有樹狀拓樸；<b>2,420 條神經束</b></td></tr>
+    <tr><td>12</td><td>長程神經束驗證</td><td><b style="color:var(--green)">做出來了（回頭補的）</b></td><td>D06 沒有存路徑，但原始 SWC 有樹狀拓樸；<b>2,420 條神經束</b></td></tr>
     <tr><td>13</td><td>合併判斷</td><td><b style="color:var(--green)">全對＋新發現</b></td><td>596／619／18／8,143 全部吻合。全腦掃描冒出<b>論文沒提的合併候選</b></td></tr>
-    <tr><td>14</td><td>全腦跑一遍</td><td><b style="color:var(--amber)">21 區跑完<br>另 54 區卡在自訂門檻</b></td><td>計算不是瓶頸（95 秒）。<b>54 區的 LN 少於十顆——那個 10 是自己補的門檻</b>，換成 5 顆就有 24 區可跑；這 54 區後來靠補做的 STEP 7 分成 <b>48 區 hub 與 6 區兩者皆非</b></td></tr>
+    <tr><td>14</td><td>全腦跑一遍、出圖、出報告</td><td><b style="color:var(--amber)">21 區跑完<br>另 54 區卡在自訂門檻</b></td><td>計算不是瓶頸（95 秒）。<b>54 區的 LN 少於十顆——那個 10 是自己補的門檻</b>，換成 5 顆就有 24 區可跑；這 54 區後來靠補做的 STEP 7 分成 <b>48 區 hub 與 6 區兩者皆非</b></td></tr>
   </table></div>
 
   <h2><span class="pt">結論三</span>三個實質發現</h2>
