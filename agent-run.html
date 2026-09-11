@@ -30,6 +30,17 @@
     <p style="margin-top:8px"><b>真正有價值的是對不上的地方</b>——那些是知道答案也擋不住的問題，下面會逐一列出。</p>
   </div>
 
+  <div class="callout">
+    <b>這一頁的數字是哪一次跑出來的？</b>值得先講清楚，因為這一頁同時放了兩批結果。
+    <div class="tblwrap"><table>
+      <tr><th style="width:26%">來源</th><th style="width:22%">產出放在</th><th>包含什麼</th></tr>
+      <tr><td><b>第一次實跑</b><br>把 <a href="agent-prompts.html">PART 3</a> 的 14 條指令一口氣交出去</td><td><code>part4/out/</code><br><span style="color:var(--faint)">十六支程式</span></td><td>本頁下半〈逐條實跑紀錄〉的每一個數字，<b>包括失敗的那幾步</b>（指令 9 收到 1 顆、指令 12 的降級版）</td></tr>
+      <tr><td><b>後來補做的兩件事</b><br>真正的 STEP 7、圖說的固定靶讀法</td><td><code>part5/out/</code><br><span style="color:var(--faint)">整合後的管線，見 <a href="python-lpu.html">PART 5</a></span></td><td><a href="#step7">〈後來補做的：真正的 STEP 7〉</a>、結論一那張全腦判定圖、以及 48 區 hub／6 區兩者皆非的分別</td></tr>
+    </table></div>
+    <p style="margin-top:8px"><b>兩套產出比對過</b>：共同的 13 份結果檔裡<b>有 8 份內容完全相同</b>（指令 1、4、5、6、7、8 與參數掃描、全腦估算），中間檔 <code>.npy</code> 也逐項相同；<b>不同的 5 份，差異全部來自上面那兩件補做的事</b>，沒有一處是同一段程式跑出不同答案。</p>
+    <p style="margin-top:8px"><b>所以「本頁 ≠ 拿現在的指令重跑一遍」</b>：指令 9 那一步在這一頁仍然是<b>照原指令（撐大 2 格）失敗的樣子</b>，因為那正是這一頁要記錄的事；<a href="python-lpu.html#vs-part3">PART 5 有一張表</a>列出最後程式改掉了哪兩個參數。而 <a href="python-lpu.html">PART 5</a> 那條管線是<b>可以重跑的</b>——實測 170 秒、56 項驗收全過、產出與 <code>part5/out/</code> 逐位元組相同。</p>
+  </div>
+
   <h2><span class="pt">結論一</span>做出來的東西</h2>
 
   <figure class="fig">
