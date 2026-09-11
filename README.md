@@ -26,7 +26,7 @@ doi:10.1016/j.cub.2010.11.056。
 | 目錄 | 內容 |
 |---|---|
 | `downloads/` | 學員下載用的程式包 `lpu-part5-code.zip`（44 KB）。**資料包不在這裡**——38 MB 的 `lpu-part5-data.zip` 放在 GitHub Release `data-v1`，不進版本控制的歷史 |
-| `scripts/` | PART 1、2 的產圖程式，以及兩支可沿用的稽核程式（`quote_audit.py` 引文對回論文全文、`svg_audit.py` 檢查 SVG 有沒有超出 viewBox） |
+| `scripts/` | PART 1、2 的產圖程式、說明影片的產生器（`make_video.py` ＋ `video_slides.py`），以及**四支可以直接沿用到下一個專題的稽核程式**：`page_audit.py`（標籤平衡／連結錨點／中英夾雜／SVG 內的 `<b>`）、`content_audit.py`（術語第一次出現／表格有沒有標我們用哪一個／口語擬人／抽所有數字）、`quote_audit.py`（引文對回論文全文）、`svg_audit.py`（SVG 有沒有超出 viewBox）|
 | `part4/` | PART 4 實跑用的十六支程式與其產出（`scripts/`、`out/`） |
 | `part5/` | 整合後的三個檔案＋驗收表（`run_lpu.sh`／`run_lpu.py`／`lpu_lib.py`／`expected.json`），另見 `part5/README.md` |
 | `_notes/` | 製作過程的修正紀錄。**進 repo，但由 workflow 的 `rm -rf _notes` 擋在網站之外** |
