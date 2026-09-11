@@ -193,6 +193,8 @@
 
   <p>整條管線的所有參數都在 <code>lpu_lib.py</code> 最上面的 <code>Config</code> 裡，而且<b>刻意分成三組</b>：</p>
 
+  <p style="color:var(--soft);font-size:14.5px"><b>本頁的程式片段省略了型別標註</b>（原始碼是 <code>def hotspots(mask: np.ndarray, v: np.ndarray, q: float) -&gt; np.ndarray:</code>，這裡寫成 <code>def hotspots(mask, v, q):</code>），<b>其餘一律逐字照抄</b>；終端輸出若有略去的段落，會在該處註明。</p>
+
   <pre><code>@dataclass
 class Config:
     <span class="cm"># ── 資料在哪。換一台機器時，通常只要改這三行 ──</span>
@@ -503,7 +505,9 @@ ORDER = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "12", "14"]</code></
          合計                          277.0 MB
 ── 三、記憶體 ───────────────────────────────────────
    這條管線實測的峰值是 2.5 GB（指令 14 跑到 ME_L 的兩兩距離時）。
+   其他每一步都在 1.1 GB 以下。
    目前可用約 16.3 GB → 夠
+   （第四段「輸出目錄」與最後印出的參數表略去；參數表見上面〈它每一次跑都會把這組數字印出來〉）
 
 結果：全部通過，可以跑 `python3 run_lpu.py all`</code></pre>
 

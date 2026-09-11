@@ -79,7 +79,7 @@
 
       <path class="ln" d="M330 212 L330 236"/>
       <rect class="bx" x="120" y="238" width="420" height="42"/>
-      <text class="n" x="136" y="258">3</text><text class="t" x="156" y="258">對 Z 做 UPGMA 分群</text>
+      <text class="n" x="136" y="258">3</text><text class="t" x="156" y="258">對熱點集合 Z 做 UPGMA 分群</text>
       <text class="s" x="156" y="274">① 樹剪在某個高度　② 只留超過該區 1% 的群</text>
 
       <path class="ln" d="M330 280 L330 304"/>
@@ -137,6 +137,14 @@
     </svg>    <figcaption><b>整條流程一次只處理一個 neuropil。</b>v(r)、四分位、分群全都在<b>同一個 neuropil 內部</b>做，全腦就是把這條流程對每一個 neuropil 各跑一次（我們的資料是 75 個）。<p style="margin-top:8px"><b>七個步驟，加上兩件不在步驟裡的事。</b>左邊黃色虛線框的「合併」是論文實際做了、但沒有寫成判準的操作——照著七個步驟跑，永遠跑不出蕈狀體與中央複合體那兩個 LPU。上方的 STEP 0 也一樣：它是七個步驟的前提，論文沒有把它算成一步。</p>
     <span class="figsrc">本圖依 Chiang et al. (2011) 正文的七步驟條列與補充材料〈Defining an LPU〉自行繪製，非原圖重製。</span></figcaption>
   </figure>
+
+  <div class="note">
+    <b>圖裡有兩個現在還沒解釋的詞，先各給一句：</b>
+    <ul>
+      <li><b>Z</b>＝<b>熱點集合</b>，也就是第 2 格留下來的那 25% 體素（<a href="#s2">STEP 2</a>）。</li>
+      <li><b>UPGMA</b>＝一種<b>階層分群</b>法，全名 <i>unweighted pair group method with arithmetic mean</i>，中譯「不加權平均連結法」。它反覆把「彼此平均距離最近」的兩群併起來，長出一棵樹，你再決定在哪個高度把樹剪斷（<a href="#s3">STEP 3</a>；「平均」是在講兩群之間的距離怎麼定，見<a href="#linkage">〈什麼是「連結法」〉</a>）。</li>
+    </ul>
+  </div>
 
   <h3 id="figS5D">論文自己跑過一次，全篇只有這一個實例</h3>
 
@@ -474,12 +482,12 @@
 
   <div class="note">
     <b>那怎麼辦？</b>三條路，各有代價。
-    <p style="margin-top:8px"><b>一、換一種連結法</b>（下一節〈什麼是「連結法」〉會解釋這個詞）。<b>單一連結</b>沒有平手問題，但在這裡完全沒有分辨力。</p>
+    <p style="margin-top:8px"><b>一、換一種連結法</b>（下一節<a href="#linkage">〈什麼是「連結法」〉</a>會解釋這個詞）。<b>單一連結</b>沒有平手問題，但在這裡完全沒有分辨力。</p>
     <p style="margin-top:8px"><b>二、報範圍，不報單一數字。</b>打亂順序跑幾次，把最小到最大一起呈現。下面那張<b>切割高度掃描圖</b>就是這樣畫的。</p>
     <p style="margin-top:8px"><b>三、只採信打亂之後不變的結論。</b>切割高度掃描圖上<b>帶寬為 0</b> 的區段才算數；帶寬張開的地方，那個數字不是資料告訴你的。</p>
   </div>
 
-  <h3>什麼是「連結法」，為什麼換一種就沒有平手問題</h3>
+  <h3 id="linkage">什麼是「連結法」，為什麼換一種就沒有平手問題</h3>
 
   <p>UPGMA 每一步要挑「最近的兩群」併起來。但<b>兩群之間的距離</b>是什麼？群裡有很多個體素，體素跟體素之間有很多條距離——要拿哪一條當作「這兩群的距離」？</p>
 
@@ -959,7 +967,7 @@
   </table></div>
 
   <div class="gap">
-    <h4>神經束是連接 LPU 還是連接 neuropil？論文兩處寫得不一樣</h4>
+    <h4>神經束的節點：正文寫 LPU、補充材料寫 neuropil</h4>
     <p>步驟七要用「有沒有神經束」來驗證 LPU。那神經束本身是怎麼定出來的？<b>論文的正文與補充材料給了不同的答案。</b></p>
     <div class="tblwrap"><table>
       <tr><th style="width:22%">出處</th><th>原文</th><th style="width:20%">節點是</th></tr>
