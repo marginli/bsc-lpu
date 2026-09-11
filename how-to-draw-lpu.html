@@ -335,7 +335,7 @@
 
   <div class="gap">
     <h4>我們那張 AL_R 密度圖做了論文沒做的事</h4>
-    <p>上面那張 AL_R 的密度圖，除了論文那個 3×3×3 的平均，還先做了一次<b>真正的併格</b>：<code>make_part2_figures.py</code> 裡 <code>B = 4</code>，把 4×4×4 個體素併成一個<b>分析體素</b>，體素數變成原本的 1/64。</p>
+    <p>上面那張 AL_R 的密度圖，除了論文那個 3×3×3 的平均，還先做了一次<b>真正的併格</b>：<code>make_part2_figures.py</code> 裡 <code>B = 4</code>，把 4×4×4 個<b>標籤格</b>（1 µm）併成一個<b>分析體素</b>（4 µm），格數變成原本的 1/64。</p>
     <p style="margin-top:8px">理由是 STEP 3 的距離矩陣——不併格的話，熱點體素數乘進 N(N−1)/2 會直接爆掉記憶體（下面 STEP 3 會再談這件事）。<b>這是我們的工程妥協，不是論文的步驟。</b>代價是：小於一個分析體素的密度結構，在我們的圖上根本不會出現。所以我們掃切割高度掃出來的那些數字，也要放在這個尺度下讀。</p>
   </div>
 
@@ -659,7 +659,7 @@
       <li><b>被檢查的那一顆 LN</b>——論文叫它 <i>target</i>（<i>a <b>target</b> neuron is recruited if over 50% of <b>its</b> volume overlaps with the source</i>）。<b>50% 的分母就是它的體積。</b></li>
       <li><b>被拿來比對的那一團</b>——論文叫它 <i>source</i>。<b>本專題把這一團叫「靶」</b>，因為它才是「落在誰裡面」的那個「誰」。（<b>注意：本專題的「靶」＝論文的 <i>source</i>，不是論文的 <i>target</i></b>。論文的 target 是上面那顆被檢查的 LN。）</li>
     </ul>
-    <p style="margin-top:8px"><b>被撐大的只有那一團（source）</b>，被檢查的那顆 LN 不撐大——這是我們的實作選擇，理由與論文原文（<i>all voxel units enlarged</i>，兩邊都撐大）的差別，見下面〈<a href="#dilate">六個要注意的地方</a>〉的第二、三點。</p>
+    <p style="margin-top:8px"><b>被撐大的只有那一團（source）</b>，被檢查的那顆 LN 不撐大——這是我們的實作選擇，理由與論文原文（<i>all voxel units enlarged</i>，兩邊都撐大）的差別，見下面〈<a href="#dilate">六個要注意的地方</a>〉的<b>第一點</b>（「放大」該怎麼讀）與<b>第四點</b>（50% 的分母是哪一個）。</p>
   </div>
 
   <div class="callout">
