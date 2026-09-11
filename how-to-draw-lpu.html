@@ -227,7 +227,7 @@
     <tr><td>≥ 1</td><td>35</td><td>12</td></tr>
     <tr><td>≥ 3</td><td>30</td><td>11</td></tr>
     <tr><td>≥ 5</td><td>24</td><td>9</td></tr>
-    <tr><td>≥ 10</td><td><b>21</b></td><td>8</td></tr>
+    <tr style="background:rgba(34,197,94,.07)"><td><b>≥ 10</b>　<b style="color:#15803d">← PART 4 全腦那一遍用這個</b></td><td><b>21</b></td><td>8</td></tr>
     <tr><td>≥ 20</td><td>17</td><td>7</td></tr>
   </table></div>
 
@@ -246,7 +246,7 @@
   <div class="tblwrap"><table>
     <tr><th>f</th><th>LN 候選</th><th>非零腦區</th><th>蕈狀體四塊合計</th><th>EB</th><th>結節 NO</th><th>AOTU 兩側</th></tr>
     <tr><td>70%</td><td>9,688（33.9%）</td><td>47</td><td>2</td><td>56</td><td>0</td><td>12</td></tr>
-    <tr><td><b>80%</b></td><td><b>6,922（24.2%）</b></td><td><b>35</b></td><td><b>1</b></td><td><b>11</b></td><td><b>0</b></td><td><b>1</b></td></tr>
+    <tr style="background:rgba(34,197,94,.07)"><td><b>80%</b>　<b style="color:#15803d">← 本專題採用</b></td><td><b>6,922（24.2%）</b></td><td><b>35</b></td><td><b>1</b></td><td><b>11</b></td><td><b>0</b></td><td><b>1</b></td></tr>
     <tr><td>90%</td><td>4,545（15.9%）</td><td>25</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
     <tr><td>95%</td><td>3,469（12.1%）</td><td>22</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
     <tr><td>100%</td><td>1,761（6.2%）</td><td>17</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
@@ -743,8 +743,9 @@
       <tr><td>1 格</td><td>99.6%</td><td>0.092</td><td>0.35</td><td>0.00%</td></tr>
       <tr><td>2 格</td><td>100%</td><td>0.238</td><td>0.68</td><td>5.9%</td></tr>
       <tr><td>3 格</td><td>100%</td><td>0.398</td><td>0.90</td><td>35.2%</td></tr>
+      <tr style="background:rgba(34,197,94,.07)"><td><b>4 格</b></td><td>100%</td><td><b>0.531</b></td><td>0.96</td><td><b>53.4%</b>　<b style="color:#15803d">← 管線實際採用</b></td></tr>
     </table></div>
-    <p style="margin-top:8px"><b>不膨脹時最大的重疊率只有 0.10，沒有任何一對過得了 50% 的門檻</b>——雪球一顆都招募不到，STEP 4 當場停住。<b>膨脹不是在微調結果，是在讓這個步驟成立。</b></p>
+    <p style="margin-top:8px"><b>不膨脹時最大的重疊率只有 0.10，沒有任何一對過得了 50% 的門檻</b>——雪球一顆都招募不到，STEP 4 當場停住。<b>膨脹不是在微調結果，是在讓這個步驟成立。</b><p style="margin-top:8px"><b>管線最後用 4 格，也是被這張表逼出來的</b>：撐大 2 格只有 5.9% 的配對過門檻，<a href="agent-run.html">PART 4</a> 實測在右觸角葉上<b>一顆都招不到</b>；撐大到 4 格才有 53.4%——但那之後雪球又<b>三輪吞下全部 723 顆</b>。<b>兩個極端之間沒有中間值，這正是滾雪球讀法的問題。</b></p></p>
     <div class="note" style="margin-top:10px">
       <b>等一下——體素是整齊切的格子，不膨脹的話兩顆神經元怎麼可能佔到同一格？</b>
       <p style="margin-top:8px"><b>因為格子不是被「分配」掉的。</b>如果體素像拼圖，一格屬於一顆神經元，那確實不可能重疊。但實際的流程不是這樣：</p>
@@ -816,7 +817,7 @@
     </div>
     <p style="margin-top:8px">論文沒有給這個 4 的推導——<code>enlarged 4 folds</code> 全文只出現這一次。<b>論文有說整個招募在做什麼</b>（見上面的引文），<b>沒說的是這個 4 從哪裡來、以及它對應到格點上的哪一步</b>。</p>
 
-    <p><b>六、種子的條件挑不挑得出人，要看腦區。</b>論文寫「<i>a smallest LN with its fibers <b>restricted within</b> the smallest candidate LPU</i>」——纖維要<b>完全侷限在</b>那個候選 LPU 之內。在右觸角葉、切割高度 8 分出來的那幾群上，照字面一顆都挑不到：</p>
+    <p><b>六、種子的條件挑不挑得出合格的神經元，要看腦區。</b>論文寫「<i>a smallest LN with its fibers <b>restricted within</b> the smallest candidate LPU</i>」——纖維要<b>完全侷限在</b>那個候選 LPU 之內。在右觸角葉、切割高度 8 分出來的那幾群上，照字面一顆都挑不到：</p>
     <div class="tblwrap"><table>
       <tr><th>右觸角葉 723 顆 LN 候選，各有多少比例的體素落在……</th><th>中位數</th><th>最大值</th><th>達到 100% 的</th></tr>
       <tr><td>最小的那一群（切割高度 8，346 個體素）</td><td>4.5%</td><td>23.6%</td><td><b>0 顆</b></td></tr>
@@ -824,7 +825,7 @@
       <tr><td>整個右觸角葉</td><td>92.1%</td><td>99.5%</td><td><b>0 顆</b></td></tr>
     </table></div>
     <p style="margin-top:8px"><b>照字面找，一顆都找不到</b>——最接近的那顆也只有 23.6% 的體素落在最小那一群裡。把該群膨脹兩格、再<b>填洞</b>（把區域內部剩下的小空洞補起來）放寬，最好的一顆升到 46.9%，達到 100% 的<b>還是 0 顆</b>（<code>scripts/seed_check.py</code>）。<b>要讓這一步跑起來，只能改成「有一部分落在裡面就算」，而「一部分」是多少，論文沒有給。</b></p>
-    <p style="margin-top:8px"><b>但換一個腦區，這個條件就成立了。</b>在 AVLP_R、切割高度取平台上的 17 時，最大的那一群裡有五顆 LN 的體素<b>有 97% 以上</b>落在群內，最高的一顆是 <b>99.1%</b>（該顆共 112 個分析體素，不是小到失真的個案）。<b>所以「挑不到合格的種子」是右觸角葉這個腦區的性質，不是這個條件本身的性質。</b>真正沒有給的是另一件事：<b>當一個腦區挑不出人時該怎麼辦。</b></p>
+    <p style="margin-top:8px"><b>但換一個腦區，這個條件就成立了。</b>在 AVLP_R、切割高度取平台上的 17 時，最大的那一群裡有五顆 LN 的體素<b>有 97% 以上</b>落在群內，最高的一顆是 <b>99.1%</b>（該顆共 112 個分析體素，不是小到失真的個案）。<b>所以「挑不到合格的種子」是右觸角葉這個腦區的性質，不是這個條件本身的性質。</b>真正沒有給的是另一件事：<b>當一個腦區裡一顆合格的都沒有時該怎麼辦。</b></p>
     <p style="margin-top:8px">再加上論文明寫這一顆是<b>目視</b>決定的——這是整條流程唯一寫明要人介入的一步，而<b>換一顆種子，招募出來的結果可能不同</b>。</p>
   </div>
 
@@ -905,7 +906,7 @@
       <tr><td>10</td><td>373.7%</td><td>248.9</td><td>過</td></tr>
       <tr><td>25</td><td>283.0%</td><td>99.2</td><td>過</td></tr>
       <tr><td>50</td><td>187.2%</td><td>24.9</td><td>過</td></tr>
-      <tr><td><b>75</b></td><td><b>93.4%</b></td><td><b>2.67</b></td><td>過</td></tr>
+      <tr style="background:rgba(34,197,94,.07)"><td><b>75</b>　<b style="color:#15803d">← 本專題採用</b></td><td><b>93.4%</b></td><td><b>2.67</b></td><td>過</td></tr>
       <tr><td>90</td><td>37.4%</td><td>1.22</td><td><b style="color:var(--red)">不過</b></td></tr>
     </table></div>
     <p style="margin-top:8px"><b>c 值從 248.9 掉到 1.22——205 倍，而且中途跨過了 c &gt; 2 這條判準。</b>前三個門檻抽出來的「候選 LPU」甚至比腦區本身還大（密度場會溢出到區外，因為被招募的神經元有一部分伸出去了）。<b>第 75 百分位是這幾個裡唯一讓區域小於腦區的</b>，本專題後面一律用它——那是我們挑的，不是論文給的。<span class="figsrc">由 <code>part5/lpu_lib.py</code> 的 <code>c_value()</code> 算出。</span></p>
@@ -993,7 +994,7 @@
     <div class="tblwrap"><table>
       <tr><th style="width:22%">出處</th><th>原文</th><th style="width:20%">節點是</th></tr>
       <tr><td><b>正文</b></td><td><i>we clustered neurons based on whether they follow a similar trajectory path linking specific <b>LPUs</b></i></td><td><b>LPU</b></td></tr>
-      <tr><td><b>補充材料<br>〈Searching Neural Tracts〉</b></td><td><i>For a selected neuron linking two <b>neuropils</b>, an average position of all terminals within each of the two regions was first determined…paths within the two selected <b>neuropils</b> were removed</i></td><td><b>neuropil</b></td></tr>
+      <tr style="background:rgba(34,197,94,.07)"><td><b>補充材料<br>〈Searching Neural Tracts〉</b><br><b style="color:#15803d">← 本專題照這一列實作</b></td><td><i>For a selected neuron linking two <b>neuropils</b>, an average position of all terminals within each of the two regions was first determined…paths within the two selected <b>neuropils</b> were removed</i></td><td><b>neuropil</b></td></tr>
     </table></div>
     <p style="margin-top:8px"><b>差別很要緊。</b>照正文那句，要找神經束得先有 LPU，而驗證 LPU 又要先有神經束——那是個循環。<b>但照補充材料的演算法，神經束是在 neuropil 之間找的，根本用不到 LPU，循環就不存在。</b></p>
     <p style="margin-top:8px">兩處哪一個算數，論文沒有說。<b>實作時建議照補充材料</b>——那是唯一寫出可執行步驟的地方（兩端平均終點位置相距 &lt; 30 個體素、總路徑長度相似度 &gt; 60%），而且它讓步驟七跑得起來。</p>
@@ -1069,7 +1070,7 @@
     <tr><th style="width:6%">編號</th><th style="width:16%">在哪一步</th><th style="width:28%">缺什麼</th><th>影響</th></tr>
     <tr><td><b>②</b></td><td>STEP 3</td><td><b>UPGMA 樹的切割高度</b></td><td>直接決定找到幾個候選 LPU。同一個右觸角葉可以是 1 個，也可以是 15 個</td></tr>
     <tr><td><b>⑥</b></td><td>STEP 5</td><td><b>等值面的門檻</b></td><td>決定候選 LPU 的體積，連帶影響 c 值。<b>同一批神經元只換這個門檻，區域從腦區的 373.7% 縮到 37.4%、c 值從 248.9 掉到 1.22（205 倍），中途跨過 c &gt; 2</b>——見 <a href="#s5">STEP 5</a> 那張掃描表</td></tr>
-    <tr><td><b>④</b></td><td>STEP 4</td><td><b>起始種子怎麼挑</b></td><td>論文的條件「纖維完全侷限在該候選 LPU 內」<b>在右觸角葉上</b>按字面挑不出任何一顆（最接近的只有 23.6% 落在裡面），<b>在 AVLP_R 上卻挑得到</b>（最高的一顆是 99.1%，<code>scripts/seed_check.py</code>）——論文沒有寫「挑不出人的時候該怎麼辦」。放寬成「有一部分在裡面」則沒給比例。而且它明寫是目視決定的——換一顆種子，招募結果可能不同</td></tr>
+    <tr><td><b>④</b></td><td>STEP 4</td><td><b>起始種子怎麼挑</b></td><td>論文的條件「纖維完全侷限在該候選 LPU 內」<b>在右觸角葉上</b>按字面挑不出任何一顆（最接近的只有 23.6% 落在裡面），<b>在 AVLP_R 上卻挑得到</b>（最高的一顆是 99.1%，<code>scripts/seed_check.py</code>）——論文沒有寫「一顆合格的都挑不到時該怎麼辦」。放寬成「有一部分在裡面」則沒給比例。而且它明寫是目視決定的——換一顆種子，招募結果可能不同</td></tr>
   </table></div>
 
   <h3>五個定義上的含糊</h3>

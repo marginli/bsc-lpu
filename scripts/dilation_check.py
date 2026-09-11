@@ -67,7 +67,7 @@ def run(region="AL_R", nsample=60, seed=0):
     print(f"{region}：LN 候選 {len(S)} 顆，抽 {len(ids)} 顆；每顆體素數中位 "
           f"{int(np.median([M[i].sum() for i in ids]))}")
     print(" 膨脹  有交集  重疊率中位  最大重疊  >50% 的配對")
-    for grow in (0, 1, 2, 3):
+    for grow in (0, 1, 2, 3, 4):   # 4 格是管線實際採用的值（Config.grow）
         D = {i: (ndimage.binary_dilation(M[i], st, iterations=grow) if grow else M[i]) for i in ids}
         fr = np.array([(D[a] & M[b]).sum() / M[b].sum() for a in ids for b in ids if a != b])
         print(f" {grow:4d}  {(fr>0).mean()*100:6.1f}%  {np.median(fr):10.3f}  {fr.max():8.2f}  {(fr>0.5).mean()*100:11.2f}%")
